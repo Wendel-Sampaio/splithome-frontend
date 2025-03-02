@@ -1,0 +1,26 @@
+<table border="1">
+
+    <thead>
+        <tr>
+            <th>Id</th>
+            <th>Nome</th>
+            <th>Email</th>
+            <th>Password</th>
+            <th>Telefone</th>
+            <th>Chave PIX</th>
+        </tr>
+    </thead>
+
+    <tbody>
+        @for (user of lista; track $index) {
+        <tr>
+            <td>{{user.id}}</td>
+            <td>{{user.name}}</td>
+            <td>{{user.email}}</td> 
+            <td>{{user.password}}</td>
+            <td>{{user.phoneNumber}}</td>
+            <td>{{user.pixKey}}</td> 
+        </tr>
+        }
+    </tbody>
+</table>
