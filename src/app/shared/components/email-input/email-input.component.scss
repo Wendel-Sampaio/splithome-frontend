@@ -1,0 +1,18 @@
+@use '@angular/material' as mat;
+@use '../../../core/theme-colors.scss' as my-theme;
+
+mat-form-field {
+    margin-top: 10px;
+    min-width: 350px;
+}
+p {
+    @include mat.theme((
+    color: (
+      primary: my-theme.$primary-palette,
+      tertiary: my-theme.$tertiary-palette,
+    ),
+    typography: Roboto,
+    density: 0,
+));
+}
+
