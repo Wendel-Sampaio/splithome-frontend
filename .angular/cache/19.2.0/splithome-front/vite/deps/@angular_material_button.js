@@ -4,11 +4,11 @@ import {
   MatRippleLoader,
   MatRippleModule,
   _StructuralStylesLoader
-} from "./chunk-VQUDHBQ6.js";
+} from "./chunk-AHLUEMKZ.js";
+import "./chunk-PBMZHSVF.js";
 import {
   _CdkPrivateStyleLoader
 } from "./chunk-NJJ6XIGQ.js";
-import "./chunk-PBMZHSVF.js";
 import "./chunk-MM3KTIS5.js";
 import {
   ANIMATION_MODULE_TYPE,

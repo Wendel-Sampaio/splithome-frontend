@@ -1,0 +1,75 @@
+@import url('https://fonts.googleapis.com/css2?family=Arimo:ital,wght@0,400..700;1,400..700&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=Arimo:ital,wght@0,400..700;1,400..700&family=Tilt+Warp&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=Itim&display=swap');
+
+.example-card {
+    width: 500px;
+    min-height: 500px;
+}
+
+#splithome {
+    font-family: "Tilt Warp", serif;
+    font-optical-sizing: auto;
+    font-weight: 400;
+    font-style: normal;
+    font-variation-settings:
+      "XROT" 0,
+      "YROT" 0;
+    color: #48A75A;
+}
+
+#aqui {
+    color: #48A75A;
+    text-decoration: none;
+}
+
+button {
+    font-family: "Itim", serif;
+    font-weight: 300;
+    font-style: normal;
+    font-size: 20px;
+    color: white;
+    background-color: #48A75A;
+    border: none;
+    border-radius: 8px;
+    min-width: 250px;
+    min-height: 35px;
+}
+
+mat-card {
+    box-shadow: 1px 2px 10px rgb(99, 99, 99);
+    display: flex;
+    align-items: center;
+    border-radius: 25px;
+}
+
+mat-card-header{
+    margin-top: 10px;
+    min-width: 500px;
+}
+
+mat-card-title {
+    font-family: "Arimo", serif;
+    font-optical-sizing: auto;
+    font-weight: 700;
+    font-style: normal;
+    font-size: 35px;
+    color: #9F9D9D;
+    word-wrap: normal;
+}
+
+mat-card-subtitle {
+    font-family: "Itim", serif;
+    font-weight: 300;
+    font-style: normal;
+    text-align: center;
+    font-size: 19px;
+    color: #9F9D9D;
+}
+
+mat-card-content {
+    display: grid;
+    justify-content: center;
+    min-width: 400px;
+
+}

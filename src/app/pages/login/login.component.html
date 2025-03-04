@@ -7,11 +7,11 @@
         </mat-card-header>
         <img mat-card-image src="" alt="">
         <mat-card-content>
-            <email-input></email-input>
-            <password-input></password-input>
+            <email-input (inputValue)="getEmail($event)"></email-input>
+            <password-input (inputValue)="getPassword($event)"></password-input>
         </mat-card-content>
         <mat-card-actions>
-            <button mat-button>Entrar</button>
+            <button mat-button mdbRipple (click)="login()">Entrar</button>
         </mat-card-actions>
     </mat-card>
 </div>

@@ -1,1 +1,17 @@
-<p>cadastro works!</p>
+<div>
+    <mat-card class="example-card" appearance="outlined">
+        <mat-card-header>
+            <div mat-card-avatar class="example-header-image"></div>
+            <mat-card-title>Bem vindo ao <b id="splithome">SplitHome</b></mat-card-title>
+            <mat-card-subtitle>Já tem uma conta? faça o login <a id="aqui" href="">aqui.</a></mat-card-subtitle>
+        </mat-card-header>
+        <img mat-card-image src="" alt="">
+        <mat-card-content>
+            <email-input (inputValue)="getEmail($event)"></email-input>
+            <password-input (inputValue)="getPassword($event)"></password-input>
+        </mat-card-content>
+        <mat-card-actions>
+            <button mat-button mdbRipple (click)="login()">Entrar</button>
+        </mat-card-actions>
+    </mat-card>
+</div>

@@ -1,7 +1,7 @@
 <p>
     <mat-form-field appearance="outline">
       <mat-label>Insira seu email</mat-label>
-      <input matInput>
-      <mat-icon matSuffix>email</mat-icon>
+      <input matInput [(ngModel)]="inputEmail" (input)="inviteEmail()">
+      <mat-icon matSuffix>person</mat-icon>
     </mat-form-field>
 </p>
