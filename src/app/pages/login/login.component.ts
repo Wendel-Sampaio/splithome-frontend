@@ -3,6 +3,8 @@ import {MatCardModule} from '@angular/material/card';
 import { PasswordInput } from '../../shared/components/password-input/password-input.component';
 import { EmailInputComponent } from '../../shared/components/email-input/email-input.component';
 import { Router } from '@angular/router';
+import { LoginService } from '../../core/auth/login.service';
+import { Login } from '../../core/auth/login';
 
 @Component({
   selector: 'app-login',
@@ -16,6 +18,7 @@ export class LoginComponent {
   password!: string;
 
   router = inject(Router);
+  loginService = inject(LoginService);
 
   getEmail(event: string) {
     this.email = event;
@@ -26,12 +29,16 @@ export class LoginComponent {
   }
 
   login() {
-    console.log('User Input:', this.email);
-    if(this.email == "admin" && this.password == "123") {
-      this.router.navigate(['cadastro']);
-    } else {
-      alert("Usuário ou senha incorretos!")
-    }
+    const login: Login = new Login(this.email, this.password);
+    this.loginService.logar(login).subscribe({
+      next: token => {
+        this.loginService.addToken(token);
+        this.router.navigate(["/cadastro"]);
+      }, 
+      error: erro => {
+        alert("Usuário ou senha incorreto!")
+      }
+    })
   }
   
 }
