@@ -5,10 +5,11 @@ import { EmailInputComponent } from '../../shared/components/email-input/email-i
 import { Router } from '@angular/router';
 import { LoginService } from '../../core/auth/login.service';
 import { Login } from '../../core/auth/login';
+import { MatButtonModule } from '@angular/material/button';
 
 @Component({
   selector: 'app-login',
-  imports: [MatCardModule, EmailInputComponent,PasswordInput],
+  imports: [MatCardModule, MatButtonModule, EmailInputComponent,PasswordInput],
   templateUrl: './login.component.html',
   styleUrl: './login.component.scss',
 })
@@ -33,7 +34,7 @@ export class LoginComponent {
     this.loginService.logar(login).subscribe({
       next: token => {
         this.loginService.addToken(token);
-        this.router.navigate(["/cadastro"]);
+        this.router.navigate(["/home"]);
       }, 
       error: erro => {
         alert("Usuário ou senha incorreto!")
