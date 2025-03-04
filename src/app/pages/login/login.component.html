@@ -3,12 +3,12 @@
         <mat-card-header>
             <div mat-card-avatar class="example-header-image"></div>
             <mat-card-title>Bem vindo ao <b id="splithome">SplitHome</b></mat-card-title>
-            <mat-card-subtitle>Não tem uma conta? cadastre-se <a id="aqui" href="">aqui.</a></mat-card-subtitle>
+            <mat-card-subtitle>Não tem uma conta? cadastre-se <a id="aqui" href="/cadastro">aqui.</a></mat-card-subtitle>
         </mat-card-header>
         <img mat-card-image src="" alt="">
         <mat-card-content>
-            <email-input (inputValue)="getEmail($event)"></email-input>
-            <password-input (inputValue)="getPassword($event)"></password-input>
+            <email-input (inputValue)="getEmail($event)"><mat-icon>person</mat-icon></email-input>
+            <password-input (inputValue)="getPassword($event)"><ng-content>Insira sua senha</ng-content></password-input>
         </mat-card-content>
         <mat-card-actions>
             <button mat-raised-button id="login-button" (click)="login()">Entrar</button>

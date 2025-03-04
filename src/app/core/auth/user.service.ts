@@ -4,21 +4,26 @@ import { Observable } from 'rxjs';
 import { jwtDecode, JwtPayload } from "jwt-decode";
 import { Login } from './login';
 import { Usuario } from './usuario';
+import { Register } from './register';
 
 @Injectable({
   providedIn: 'root'
 })
-export class LoginService {
+export class UserService {
 
   http = inject(HttpClient);
-  API = "http://localhost:8080/api/user/auth/login";
+  API = "http://localhost:8080/api/user/auth";
 
 
   constructor() { }
 
 
   logar(login: Login): Observable<string> {
-    return this.http.post<string>(this.API, login, {responseType: 'text' as 'json'});
+    return this.http.post<string>(this.API+"/login", login, {responseType: 'text' as 'json'});
+  }
+
+  cadastrar(register: Register): Observable<string> {
+    return this.http.post<string>(this.API+"/register", register, {responseType: 'text' as 'json'})
   }
 
   addToken(token: string) {

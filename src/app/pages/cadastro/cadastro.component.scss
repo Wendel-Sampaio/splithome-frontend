@@ -1,3 +1,5 @@
+@use '@angular/material' as mat;
+@use '../../core/theme-colors.scss' as my-theme;
 @import url('https://fonts.googleapis.com/css2?family=Arimo:ital,wght@0,400..700;1,400..700&display=swap');
 @import url('https://fonts.googleapis.com/css2?family=Arimo:ital,wght@0,400..700;1,400..700&family=Tilt+Warp&display=swap');
 @import url('https://fonts.googleapis.com/css2?family=Itim&display=swap');
@@ -5,6 +7,29 @@
 .example-card {
     width: 500px;
     min-height: 500px;
+}
+
+.input-name, 
+.input-email,
+.password-input, 
+.repeat-password-input {
+    @include mat.theme((
+    color: (
+      primary: my-theme.$primary-palette,
+      tertiary: my-theme.$tertiary-palette,
+    ),
+  ));
+}
+
+.input-name, 
+.input-email,
+.password-input, 
+.repeat-password-input {
+    min-width: 300px;
+}
+
+.input-name {
+    margin-top: 30px;
 }
 
 #splithome {
@@ -23,7 +48,7 @@
     text-decoration: none;
 }
 
-button {
+#register-button {
     font-family: "Itim", serif;
     font-weight: 300;
     font-style: normal;
@@ -71,5 +96,5 @@ mat-card-content {
     display: grid;
     justify-content: center;
     min-width: 400px;
-
 }
+

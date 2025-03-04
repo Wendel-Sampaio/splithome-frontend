@@ -3,13 +3,14 @@ import {MatCardModule} from '@angular/material/card';
 import { PasswordInput } from '../../shared/components/password-input/password-input.component';
 import { EmailInputComponent } from '../../shared/components/email-input/email-input.component';
 import { Router } from '@angular/router';
-import { LoginService } from '../../core/auth/login.service';
+import { UserService } from '../../core/auth/user.service';
 import { Login } from '../../core/auth/login';
 import { MatButtonModule } from '@angular/material/button';
+import { MatIcon } from '@angular/material/icon';
 
 @Component({
   selector: 'app-login',
-  imports: [MatCardModule, MatButtonModule, EmailInputComponent,PasswordInput],
+  imports: [MatCardModule, MatIcon, MatButtonModule, EmailInputComponent,PasswordInput],
   templateUrl: './login.component.html',
   styleUrl: './login.component.scss',
 })
@@ -19,7 +20,7 @@ export class LoginComponent {
   password!: string;
 
   router = inject(Router);
-  loginService = inject(LoginService);
+  userService = inject(UserService);
 
   getEmail(event: string) {
     this.email = event;
@@ -31,9 +32,9 @@ export class LoginComponent {
 
   login() {
     const login: Login = new Login(this.email, this.password);
-    this.loginService.logar(login).subscribe({
+    this.userService.logar(login).subscribe({
       next: token => {
-        this.loginService.addToken(token);
+        this.userService.addToken(token);
         this.router.navigate(["/home"]);
       }, 
       error: erro => {
