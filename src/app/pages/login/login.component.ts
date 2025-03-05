@@ -1,16 +1,17 @@
-import { Component, inject } from '@angular/core';
+import { Component, inject, signal } from '@angular/core';
 import {MatCardModule} from '@angular/material/card';
-import { PasswordInput } from '../../shared/components/password-input/password-input.component';
-import { EmailInputComponent } from '../../shared/components/email-input/email-input.component';
 import { Router } from '@angular/router';
 import { UserService } from '../../core/auth/user.service';
 import { Login } from '../../core/auth/login';
 import { MatButtonModule } from '@angular/material/button';
 import { MatIcon } from '@angular/material/icon';
+import {FormsModule} from '@angular/forms';
+import { MatFormFieldModule } from '@angular/material/form-field';
+import { MatInputModule } from '@angular/material/input';
 
 @Component({
   selector: 'app-login',
-  imports: [MatCardModule, MatIcon, MatButtonModule, EmailInputComponent,PasswordInput],
+  imports: [MatCardModule, MatIcon, MatButtonModule, FormsModule, MatFormFieldModule, MatInputModule],
   templateUrl: './login.component.html',
   styleUrl: './login.component.scss',
 })
@@ -21,13 +22,11 @@ export class LoginComponent {
 
   router = inject(Router);
   userService = inject(UserService);
+  hide1 = signal(true);
 
-  getEmail(event: string) {
-    this.email = event;
-  }
-
-  getPassword(event: string) {
-    this.password = event
+  clickEventPassword(event: MouseEvent) {
+    this.hide1.set(!this.hide1());
+    event.stopPropagation();
   }
 
   login() {

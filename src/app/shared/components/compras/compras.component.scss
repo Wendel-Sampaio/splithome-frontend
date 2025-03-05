@@ -1,0 +1,18 @@
+@use '@angular/material' as mat;
+@use '../../../core/theme-colors.scss' as my-theme;
+
+.mat-mdc-table {
+    background: none;
+}
+
+.column-name {
+    background: #EBEBEB !important;
+    color: #828181;
+    border: none;
+    font-size: 15px;
+    font-weight: 500;
+}
+
+.column-cell {
+    color: #9F9D9D;
+}

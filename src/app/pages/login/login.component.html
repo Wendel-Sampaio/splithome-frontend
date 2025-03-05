@@ -7,8 +7,28 @@
         </mat-card-header>
         <img mat-card-image src="" alt="">
         <mat-card-content>
-            <email-input (inputValue)="getEmail($event)"><mat-icon>person</mat-icon></email-input>
-            <password-input (inputValue)="getPassword($event)"><ng-content>Insira sua senha</ng-content></password-input>
+            <div>
+                <mat-form-field class="input-email" appearance="outline">
+                  <mat-label>Insira seu email</mat-label>
+                  <input matInput [(ngModel)]="email">
+                  <mat-icon matSuffix>person</mat-icon>
+                </mat-form-field>
+            </div>
+            <div>
+                <mat-form-field class="password-input" appearance="outline">
+                  <mat-label>Insira sua senha</mat-label>
+                  <input matInput [(ngModel)]="password" [type]="hide1() ? 'password' : 'text'" />
+                  <button
+                    mat-icon-button
+                    matSuffix
+                    (click)="clickEventPassword($event)"
+                    [attr.aria-label]="'Hide password'"
+                    [attr.aria-pressed]="hide1()"
+                  >
+                    <mat-icon>{{hide1() ? 'visibility_off' : 'visibility'}}</mat-icon>
+                  </button>
+                </mat-form-field>
+            </div>
         </mat-card-content>
         <mat-card-actions>
             <button mat-raised-button id="login-button" (click)="login()">Entrar</button>

@@ -1,10 +1,30 @@
+@use '@angular/material' as mat;
+@use '../../core/theme-colors.scss' as my-theme;
 @import url('https://fonts.googleapis.com/css2?family=Arimo:ital,wght@0,400..700;1,400..700&display=swap');
-@import url('https://fonts.googleapis.com/css2?family=Arimo:ital,wght@0,400..700;1,400..700&family=Tilt+Warp&display=swap');
 @import url('https://fonts.googleapis.com/css2?family=Itim&display=swap');
 
 .example-card {
     width: 500px;
     min-height: 500px;
+}
+
+.input-email,
+.password-input {
+    @include mat.theme((
+    color: (
+      primary: my-theme.$primary-palette,
+      tertiary: my-theme.$tertiary-palette,
+    ),
+  ));
+}
+
+.input-email,
+.password-input {
+    min-width: 300px;
+}
+
+.input-email {
+    margin-top: 20px;
 }
 
 #splithome {

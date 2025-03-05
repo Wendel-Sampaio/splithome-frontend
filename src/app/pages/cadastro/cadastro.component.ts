@@ -2,7 +2,6 @@ import { Component, inject, signal } from '@angular/core';
 import { UserService } from '../../core/auth/user.service';
 import { MatCardModule } from '@angular/material/card';
 import { Router } from '@angular/router';
-import { PasswordInput } from '../../shared/components/password-input/password-input.component';
 import { MatIcon } from '@angular/material/icon';
 import { FormsModule } from '@angular/forms';
 import { MatFormFieldModule } from '@angular/material/form-field';
@@ -12,7 +11,7 @@ import { Register } from '../../core/auth/register';
 
 @Component({
   selector: 'app-cadastro',
-  imports: [MatCardModule, MatButtonModule, PasswordInput, MatIcon, FormsModule, MatFormFieldModule, MatInputModule],
+  imports: [MatCardModule, MatButtonModule, MatIcon, FormsModule, MatFormFieldModule, MatInputModule],
   templateUrl: './cadastro.component.html',
   styleUrl: './cadastro.component.scss'
 })
@@ -46,6 +45,7 @@ export class CadastroComponent {
       this.userService.cadastrar(register).subscribe({
         next: string => {
           alert("Usuário cadastrado com sucesso!")
+          this.router.navigate(["/login"])
         }, error: erro => {
           alert("Algo saiu errado!")
         }
