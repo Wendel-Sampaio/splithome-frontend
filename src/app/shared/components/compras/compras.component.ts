@@ -1,5 +1,7 @@
-import {Component, ViewEncapsulation} from '@angular/core';
+import {Component, inject} from '@angular/core';
 import {MatTableModule} from '@angular/material/table';
+import { CompraService } from '../../services/compra/compra.service';
+import { Compra } from '../../../core/models/compra/compra';
 
 export interface PeriodicElement {
   title: string;
@@ -29,9 +31,6 @@ const ELEMENT_DATA: PeriodicElement[] = [
   },
 ];
 
-/**
- * @title Basic use of `<table mat-table>`
- */
 @Component({
   selector: 'tabela-compras',
   styleUrl: 'compras.component.scss',
@@ -39,6 +38,21 @@ const ELEMENT_DATA: PeriodicElement[] = [
   imports: [MatTableModule],
 })
 export class ComprasComponent {
+  
   displayedColumns: string[] = ['title', 'category', 'dateOfPurchase', 'paymentDate', 'value', 'payers', 'unitValue', 'buyer', 'payment','remainingPayers'];
-  dataSource = ELEMENT_DATA;
+
+  compras!: Compra[];
+
+  compraService = inject(CompraService)
+
+  pegarCompras() {
+    this.compraService.listarCompras().subscribe({
+      next: compras => {
+        this.compras = compras
+      }, error: error => {
+        alert("Algo deu errado")
+      }
+    })
+  
+  }
 }

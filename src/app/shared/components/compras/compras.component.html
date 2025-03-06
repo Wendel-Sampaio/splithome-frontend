@@ -1,5 +1,5 @@
 <div class="table">
-    <table  mat-table [dataSource]="dataSource" class="mat-elevation-z8">
+    <table  mat-table [dataSource]="compras" class="mat-elevation-z8">
         <ng-container matColumnDef="title">
             <th class="column-name" mat-header-cell *matHeaderCellDef> Título </th>
             <td class="column-cell" mat-cell *matCellDef="let element"> {{element.title}} </td>
@@ -19,7 +19,7 @@
             <th class="column-name" mat-header-cell *matHeaderCellDef> Data Pagamento </th>
             <td class="column-cell" mat-cell *matCellDef="let element"> {{element.paymentDate}} </td>
         </ng-container>
-
+        
         <ng-container matColumnDef="value">
             <th class="column-name" mat-header-cell *matHeaderCellDef> Valor </th>
             <td class="column-cell" mat-cell *matCellDef="let element"> {{element.value}} </td>
@@ -36,7 +36,7 @@
         </ng-container>
 
         <ng-container matColumnDef="buyer">
-            <th class="column-name" mat-header-cell *matHeaderCellDef> Comprador </th>
+            <th class="column-name" mat-header-cell *matHeaderCellDef> Comprador <button (click)="pegarCompras()">teste</button></th>
             <td class="column-cell" mat-cell *matCellDef="let element"> {{element.buyer}} </td>
         </ng-container>
 
@@ -44,7 +44,7 @@
             <th class="column-name" mat-header-cell *matHeaderCellDef> Pagamento </th>
             <td class="column-cell" mat-cell *matCellDef="let element"> {{element.payment}} </td>
         </ng-container>
-
+        
         <ng-container matColumnDef="remainingPayers">
             <th class="column-name" mat-header-cell *matHeaderCellDef> Pagadores restantes </th>
             <td class="column-cell" mat-cell *matCellDef="let element"> {{element.remainingPayers}} </td>
