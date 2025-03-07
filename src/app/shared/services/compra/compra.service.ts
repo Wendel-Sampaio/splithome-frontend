@@ -15,7 +15,7 @@ export class CompraService {
   API = "http://localhost:8080/api/transactions/purchases"
   
   listarCompras(): Observable<Compra[]>{
-    return this.http.get<Compra[]>(this.API, {responseType: 'json'});
+    return this.http.get<Compra[]>(this.API);
   }
   
 }

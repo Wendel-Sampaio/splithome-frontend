@@ -5,6 +5,7 @@ export class Compra {
     title!: string;
     category!: string;
     value!: number;
+    unitValue!: number;
     payers!: Array<string>;
     paymentDate!: Data;
     remainingPayers!: Array<string>;

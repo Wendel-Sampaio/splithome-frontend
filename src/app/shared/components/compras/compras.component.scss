@@ -8,11 +8,40 @@
 .column-name {
     background: #EBEBEB !important;
     color: #828181;
-    border: none;
     font-size: 15px;
     font-weight: 500;
+    border-top: 1px solid;
+    border-color: #cccccc;
 }
 
 .column-cell {
+    min-height: 200px;
     color: #9F9D9D;
+    border-color: #cccccc;
+}
+
+.payment-button {
+    min-width: 70px;
+    min-height: 25px;
+    font-size: 15px;
+    font-weight: 700;
+    color: #48A75A;
+    background-color: white;
+    border-radius: 13px;
+    box-shadow: 1px 2px 3px rgb(99, 99, 99);
+    border: none;
+}
+
+.payment-button:hover {
+    cursor: pointer;
+    color: white;
+    background-color: #48A75A;
+    transition: color 0.5s;
+}
+
+.payment-button:active {
+    cursor: pointer;
+    color: white;
+    background-color: #a74848;
+    transition: color 0.5s;
 }

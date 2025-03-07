@@ -3,8 +3,8 @@ import { Injectable, inject } from '@angular/core';
 import { Observable } from 'rxjs';
 import { jwtDecode, JwtPayload } from "jwt-decode";
 import { Login } from './login';
-import { Usuario } from './usuario';
 import { Register } from './register';
+import { User } from '../models/user/user';
 
 @Injectable({
   providedIn: 'root'
@@ -41,9 +41,14 @@ export class UserService {
   jwtDecode() {
     let token = this.getToken();
     if (token) {
+      console.log(token)
       return jwtDecode<JwtPayload>(token);
     }
     return "";
+  }
+
+  getUser() {
+    return this.jwtDecode() as User;
   }
 
 }

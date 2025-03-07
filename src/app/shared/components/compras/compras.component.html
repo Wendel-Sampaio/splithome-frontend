@@ -10,9 +10,9 @@
             <td class="column-cell" mat-cell *matCellDef="let element"> {{element.category}} </td>
         </ng-container>
     
-        <ng-container matColumnDef="dateOfPurchase">
+        <ng-container matColumnDef="purchaseDate">
             <th class="column-name" mat-header-cell *matHeaderCellDef> Data compra </th>
-            <td class="column-cell" mat-cell *matCellDef="let element"> {{element.dateOfPurchase}} </td>
+            <td class="column-cell" mat-cell *matCellDef="let element"> {{element.purchaseDate}} </td>
         </ng-container>
     
         <ng-container matColumnDef="paymentDate">
@@ -22,7 +22,7 @@
         
         <ng-container matColumnDef="value">
             <th class="column-name" mat-header-cell *matHeaderCellDef> Valor </th>
-            <td class="column-cell" mat-cell *matCellDef="let element"> {{element.value}} </td>
+            <td class="column-cell" mat-cell *matCellDef="let element"> R${{element.value}} </td>
         </ng-container>
 
         <ng-container matColumnDef="payers">
@@ -32,17 +32,17 @@
 
         <ng-container matColumnDef="unitValue">
             <th class="column-name" mat-header-cell *matHeaderCellDef> Valor unitário </th>
-            <td class="column-cell" mat-cell *matCellDef="let element"> {{element.unitValue}} </td>
+            <td class="column-cell" mat-cell *matCellDef="let element"> R${{element.unitValue}} </td>
         </ng-container>
 
         <ng-container matColumnDef="buyer">
-            <th class="column-name" mat-header-cell *matHeaderCellDef> Comprador <button (click)="pegarCompras()">teste</button></th>
+            <th class="column-name" mat-header-cell *matHeaderCellDef> Comprador </th>
             <td class="column-cell" mat-cell *matCellDef="let element"> {{element.buyer}} </td>
         </ng-container>
 
         <ng-container matColumnDef="payment">
             <th class="column-name" mat-header-cell *matHeaderCellDef> Pagamento </th>
-            <td class="column-cell" mat-cell *matCellDef="let element"> {{element.payment}} </td>
+            <td class="column-cell" mat-cell *matCellDef="let element"> <button (click)="pagamento()" class="payment-button"> Pagar </button>{{element.payment}} </td>
         </ng-container>
         
         <ng-container matColumnDef="remainingPayers">

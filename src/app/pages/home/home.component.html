@@ -1,9 +1,14 @@
 <div class="body">
     <mat-card class="menu-lateral" appearance="outlined">
         <mat-card-header class="header-menu-lateral">
-            <div mat-card-avatar class="example-header-image"></div>
-            <mat-card-title class="titulo-menu-lateral">SplitHome</mat-card-title>
-            <mat-card-subtitle class="subtitulo-menu">Bem vindo {{"user"}}</mat-card-subtitle>
+            <div class="title">
+                <div class="splithome">
+                    <img class="icon-title" src="icon.png" alt="">
+                    <mat-card-title class="titulo-menu-lateral">SplitHome</mat-card-title>
+                </div>
+                <img class="profile-photo" src="perfil.png" alt="">
+                <mat-card-subtitle class="subtitulo-menu"> Bem vindo <div class="username">{{ user.name }}</div></mat-card-subtitle>
+            </div>
         </mat-card-header>
         <mat-card-content class="conteudo-card">
             <div>
@@ -26,7 +31,7 @@
                     perfil</button>
             </div>
             <div>
-                <button class="botoes-menu-lateral"><mat-icon class="icones-botao" matSuffix>logout</mat-icon>Sair</button>
+                <button (click)="logout()" class="botoes-menu-lateral"><mat-icon class="icones-botao" matSuffix>logout</mat-icon>Sair</button>
             </div>
         </mat-card-content>
     </mat-card>
