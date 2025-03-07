@@ -1,59 +1,55 @@
-<div>
-    <mat-card class="example-card" appearance="outlined">
-        <mat-card-header>
-            <div mat-card-avatar class="example-header-image"></div>
-            <mat-card-title>Bem vindo ao <b id="splithome">SplitHome</b></mat-card-title>
-            <mat-card-subtitle>Já tem uma conta? faça o login <a id="aqui" href="">aqui.</a></mat-card-subtitle>
+<div class="body">
+  <div class="main-card">
+    <div>
+      <mat-card class="body-card-register" appearance="outlined">
+        <mat-card-header class="card-header">
+          <mat-card-title id="welcome">Bem vindo ao <b id="splithome">SplitHome</b></mat-card-title>
+          <mat-card-subtitle id="subtitle">Já tem uma conta? faça o login <a id="aqui"
+              href="">aqui.</a></mat-card-subtitle>
         </mat-card-header>
-        <img mat-card-image src="" alt="">
-        <mat-card-content>
-            <div>
-                <mat-form-field class="input-name" appearance="outline">
-                    <mat-label>Insira seu nome</mat-label>
-                    <mat-icon matSuffix>person</mat-icon>
-                    <input matInput [(ngModel)]="name">
-                </mat-form-field>
-            </div>
-            <div>
-                <mat-form-field class="input-email" appearance="outline">
-                  <mat-label>Insira seu email</mat-label>
-                  <input matInput [(ngModel)]="email">
-                  <mat-icon matSuffix>email</mat-icon>
-                </mat-form-field>
-            </div>
-            <div>
-                <mat-form-field class="password-input" appearance="outline">
-                  <mat-label>Insira sua senha</mat-label>
-                  <input matInput [(ngModel)]="password" [type]="hide1() ? 'password' : 'text'" />
-                  <button
-                    mat-icon-button
-                    matSuffix
-                    (click)="clickEventPassword($event)"
-                    [attr.aria-label]="'Hide password'"
-                    [attr.aria-pressed]="hide1()"
-                  >
-                    <mat-icon>{{hide1() ? 'visibility_off' : 'visibility'}}</mat-icon>
-                  </button>
-                </mat-form-field>
-            </div>
-            <div>
-                <mat-form-field class="repeat-password-input" appearance="outline">
-                  <mat-label>Repita sua senha</mat-label>
-                  <input matInput [(ngModel)]="repeatPassword" [type]="hide2() ? 'password' : 'text'" />
-                  <button
-                    mat-icon-button
-                    matSuffix
-                    (click)="clickEventRepeatPassword($event)"
-                    [attr.aria-label]="'Hide password'"
-                    [attr.aria-pressed]="hide2()"
-                  >
-                    <mat-icon>{{hide2() ? 'visibility_off' : 'visibility'}}</mat-icon>
-                  </button>
-                </mat-form-field>
-            </div>
+        <mat-card-content class="content-card">
+          <div>
+            <mat-form-field class="input-name" appearance="outline">
+              <mat-label>Insira seu nome</mat-label>
+              <mat-icon matSuffix>person</mat-icon>
+              <input matInput [(ngModel)]="name">
+            </mat-form-field>
+          </div>
+          <div>
+            <mat-form-field class="input-email" appearance="outline">
+              <mat-label>Insira seu email</mat-label>
+              <input matInput [(ngModel)]="email">
+              <mat-icon matSuffix>email</mat-icon>
+            </mat-form-field>
+          </div>
+          <div>
+            <mat-form-field class="password-input" appearance="outline">
+              <mat-label>Insira sua senha</mat-label>
+              <input matInput [(ngModel)]="password" [type]="hide1() ? 'password' : 'text'" />
+              <button mat-icon-button matSuffix (click)="clickEventPassword($event)" [attr.aria-label]="'Hide password'"
+                [attr.aria-pressed]="hide1()">
+                <mat-icon>{{hide1() ? 'visibility_off' : 'visibility'}}</mat-icon>
+              </button>
+            </mat-form-field>
+          </div>
+          <div>
+            <mat-form-field class="repeat-password-input" appearance="outline">
+              <mat-label>Repita sua senha</mat-label>
+              <input matInput [(ngModel)]="repeatPassword" [type]="hide2() ? 'password' : 'text'" />
+              <button mat-icon-button matSuffix (click)="clickEventRepeatPassword($event)"
+                [attr.aria-label]="'Hide password'" [attr.aria-pressed]="hide2()">
+                <mat-icon>{{hide2() ? 'visibility_off' : 'visibility'}}</mat-icon>
+              </button>
+            </mat-form-field>
+          </div>
         </mat-card-content>
         <mat-card-actions>
-            <button mat-raised-button id="register-button" (click)="registrar()">Cadastrar</button>
+          <button mat-raised-button id="register-button" (click)="registrar()">Cadastrar</button>
         </mat-card-actions>
-    </mat-card>
+      </mat-card>
+    </div>
+    <div class="slogan">
+      <img src="../../../assets/imagem1.png" alt="">
+    </div>
+  </div>
 </div>

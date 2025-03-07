@@ -1,12 +1,12 @@
-<div>
-    <mat-card class="example-card" appearance="outlined">
-        <mat-card-header>
-            <div mat-card-avatar class="example-header-image"></div>
-            <mat-card-title>Bem vindo ao <b id="splithome">SplitHome</b></mat-card-title>
-            <mat-card-subtitle>Não tem uma conta? cadastre-se <a id="aqui" href="/cadastro">aqui.</a></mat-card-subtitle>
+<div class="body">
+  <div class="main-card">
+    <div>
+      <mat-card class="body-card-login" appearance="outlined">
+        <mat-card-header class="card-header">
+            <mat-card-title id="welcome">Bem vindo ao <b id="splithome">SplitHome</b></mat-card-title>
+            <mat-card-subtitle id="subtitle">Não tem uma conta? cadastre-se <a id="aqui" href="/cadastro">aqui.</a></mat-card-subtitle>
         </mat-card-header>
-        <img mat-card-image src="" alt="">
-        <mat-card-content>
+        <mat-card-content class="content-card">
             <div>
                 <mat-form-field class="input-email" appearance="outline">
                   <mat-label>Insira seu email</mat-label>
@@ -31,7 +31,12 @@
             </div>
         </mat-card-content>
         <mat-card-actions>
-            <button mat-raised-button id="login-button" (click)="login()">Entrar</button>
+            <button mat-raised-button id="register-button" (click)="login()">Entrar</button>
         </mat-card-actions>
-    </mat-card>
+      </mat-card>
+    </div>
+    <div class="slogan">
+      <img src="../../../assets/imagem1.png" alt="">
+    </div>
+  </div>
 </div>

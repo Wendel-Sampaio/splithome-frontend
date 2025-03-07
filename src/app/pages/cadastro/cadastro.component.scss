@@ -1,9 +1,89 @@
 @use '@angular/material' as mat;
 @use '../../core/theme-colors.scss' as my-theme;
 
-.example-card {
-    width: 500px;
-    min-height: 500px;
+.body {
+    background-image: url('/assets/background.png');
+    background-size: cover; /* Faz a imagem cobrir todo o fundo */
+    background-position: center; /* Centraliza a imagem */
+    background-repeat: no-repeat; /* Garante que a imagem não se repita */
+    position: relative;
+    min-height: 100vh;
+    display: flex;
+    justify-content: center;
+    align-items: center; 
+}
+
+.main-card {
+    display: flex;
+    justify-items: center;
+    gap: 400px;
+}
+
+.body-card-register {
+    width: 550px;
+    min-height: 630px;
+    background-color: white;
+    box-shadow: 5px 5px 10px rgb(170, 170, 170);
+    display: flex;
+    align-items: center;
+    border-radius: 25px;
+    border: none;
+    margin-left: -100px;
+}
+
+.card-header {
+    display: flex;
+    justify-content: center;
+    margin-top: 30px;
+    min-width: 500px;
+}
+
+.slogan {
+    margin-top: 60px;
+}
+
+#welcome {
+    font-family: "Inter", serif;
+    font-weight: 700;
+    font-style: normal;
+    font-size: 33px;
+    color: #9F9D9D;
+    word-wrap: normal;
+}
+
+#splithome {
+    font-family: "Tilt Warp", serif;
+    font-weight: 500;
+    font-size: 33px;
+    font-style: normal;
+    font-variation-settings:
+      "XROT" 0,
+      "YROT" 0;
+    color: #48A75A;
+}
+
+#aqui {
+    color: #48A75A;
+    text-decoration: none;
+}
+
+#subtitle {
+    font-family: "Zain", serif;
+    font-weight: normal;
+    font-style: 100;
+    text-align: center;
+    font-size: 23px;
+    color: #9F9D9D;
+    margin-top: 15px;
+}
+
+.input-name,
+.input-email,
+.password-input,
+.repeat-password-input {
+    min-width: 350px;
+    margin-top: 10px;
+    color: #48A75A;
 }
 
 .input-name, 
@@ -22,7 +102,7 @@
 .input-email,
 .password-input, 
 .repeat-password-input {
-    min-width: 300px;
+    min-width: 350px;
 }
 
 .input-name {

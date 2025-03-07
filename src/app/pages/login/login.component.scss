@@ -3,34 +3,60 @@
 @import url('https://fonts.googleapis.com/css2?family=Arimo:ital,wght@0,400..700;1,400..700&display=swap');
 @import url('https://fonts.googleapis.com/css2?family=Itim&display=swap');
 
-.example-card {
-    width: 500px;
-    min-height: 500px;
+.body {
+    background-image: url('/assets/background.png');
+    background-size: cover; /* Faz a imagem cobrir todo o fundo */
+    background-position: center; /* Centraliza a imagem */
+    background-repeat: no-repeat; /* Garante que a imagem não se repita */
+    position: relative;
+    min-height: 100vh;
+    display: flex;
+    justify-content: center;
+    align-items: center; 
 }
 
-.input-email,
-.password-input {
-    @include mat.theme((
-    color: (
-      primary: my-theme.$primary-palette,
-      tertiary: my-theme.$tertiary-palette,
-    ),
-  ));
+.main-card {
+    display: flex;
+    justify-items: center;
+    gap: 400px;
 }
 
-.input-email,
-.password-input {
-    min-width: 300px;
+.body-card-login {
+    width: 550px;
+    min-height: 630px;
+    background-color: white;
+    box-shadow: 5px 5px 10px rgb(170, 170, 170);
+    display: flex;
+    align-items: center;
+    border-radius: 25px;
+    border: none;
+    margin-left: -100px;
 }
 
-.input-email {
-    margin-top: 20px;
+.card-header {
+    display: flex;
+    justify-content: center;
+    margin-top: 30px;
+    min-width: 500px;
+}
+
+.slogan {
+    margin-top: 60px;
+}
+
+#welcome {
+    font-family: "Inter", serif;
+    font-weight: 700;
+    font-style: normal;
+    font-size: 33px;
+    color: #9F9D9D;
+    word-wrap: normal;
 }
 
 #splithome {
     font-family: "Tilt Warp", serif;
-    font-optical-sizing: auto;
-    font-weight: 400;
+    font-weight: 500;
+    font-size: 33px;
     font-style: normal;
     font-variation-settings:
       "XROT" 0,
@@ -43,7 +69,33 @@
     text-decoration: none;
 }
 
-#login-button {
+#subtitle {
+    font-family: "Zain", serif;
+    font-weight: normal;
+    font-style: 100;
+    text-align: center;
+    font-size: 23px;
+    color: #9F9D9D;
+    margin-top: 15px;
+}
+
+.input-email,
+.password-input {
+    min-width: 350px;
+    margin-top: 10px;
+}
+
+.input-email,
+.password-input {
+    @include mat.theme((
+    color: (
+      primary: my-theme.$primary-palette,
+      tertiary: my-theme.$tertiary-palette,
+    ),
+  ));
+}
+
+#register-button {
     font-family: "Itim", serif;
     font-weight: 300;
     font-style: normal;
@@ -52,44 +104,7 @@
     background-color: #48A75A;
     border: none;
     border-radius: 8px;
+    margin-top: 10px;
     min-width: 250px;
     min-height: 35px;
-}
-
-mat-card {
-    box-shadow: 1px 2px 10px rgb(99, 99, 99);
-    display: flex;
-    align-items: center;
-    border-radius: 25px;
-}
-
-mat-card-header{
-    margin-top: 10px;
-    min-width: 500px;
-}
-
-mat-card-title {
-    font-family: "Arimo", serif;
-    font-optical-sizing: auto;
-    font-weight: 700;
-    font-style: normal;
-    font-size: 35px;
-    color: #9F9D9D;
-    word-wrap: normal;
-}
-
-mat-card-subtitle {
-    font-family: "Itim", serif;
-    font-weight: 300;
-    font-style: normal;
-    text-align: center;
-    font-size: 19px;
-    color: #9F9D9D;
-}
-
-mat-card-content {
-    display: grid;
-    justify-content: center;
-    min-width: 400px;
-
 }
