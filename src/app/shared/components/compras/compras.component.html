@@ -1,3 +1,4 @@
+<button mat-button (click)="openDialog()">Cadastrar compra</button>
 <div class="table">
     <table  mat-table [dataSource]="compras" class="mat-elevation-z8">
         <ng-container matColumnDef="title">
@@ -25,9 +26,9 @@
             <td class="column-cell" mat-cell *matCellDef="let element"> R${{element.value}} </td>
         </ng-container>
 
-        <ng-container matColumnDef="payers">
-            <th class="column-name" mat-header-cell *matHeaderCellDef> Pagadores </th>
-            <td class="column-cell" mat-cell *matCellDef="let element"> {{element.payers}} </td>
+        <ng-container matColumnDef="formatedPayers">
+            <th class="column-name" mat-header-cell *matHeaderCellDef> Pagadoresss </th>
+            <td class="column-cell" mat-cell *matCellDef="let element"> {{ element.formatedPayers }} </td>
         </ng-container>
 
         <ng-container matColumnDef="unitValue">
@@ -35,19 +36,21 @@
             <td class="column-cell" mat-cell *matCellDef="let element"> R${{element.unitValue}} </td>
         </ng-container>
 
-        <ng-container matColumnDef="buyer">
+        <ng-container matColumnDef="purchaserId">
             <th class="column-name" mat-header-cell *matHeaderCellDef> Comprador </th>
-            <td class="column-cell" mat-cell *matCellDef="let element"> {{element.buyer}} </td>
+            <td class="column-cell" mat-cell *matCellDef="let element"> {{element.purchaserId}} </td>
         </ng-container>
 
         <ng-container matColumnDef="payment">
             <th class="column-name" mat-header-cell *matHeaderCellDef> Pagamento </th>
-            <td class="column-cell" mat-cell *matCellDef="let element"> <button (click)="pagamento()" class="payment-button"> Pagar </button>{{element.payment}} </td>
+            <td class="column-cell" mat-cell *matCellDef="let element"> 
+                    <button *ngIf="element.showPaymentButton ; else indisponivel" class="payment-button"> Pagar </button>{{element.payment}} </td>
+                    <ng-template #indisponivel><span>Indisponível</span></ng-template>
         </ng-container>
         
-        <ng-container matColumnDef="remainingPayers">
+        <ng-container matColumnDef="formatedRemainingPayers">
             <th class="column-name" mat-header-cell *matHeaderCellDef> Pagadores restantes </th>
-            <td class="column-cell" mat-cell *matCellDef="let element"> {{element.remainingPayers}} </td>
+            <td class="column-cell" mat-cell *matCellDef="let element"> {{ element.formatedRemainingPayers }} </td>
         </ng-container>
         <tr mat-header-row *matHeaderRowDef="displayedColumns"></tr>
         <tr mat-row *matRowDef="let row; columns: displayedColumns;"></tr>

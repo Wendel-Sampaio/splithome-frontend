@@ -1,0 +1,18 @@
+.title {
+    color: #777777;
+}
+
+.cancel-button, .confirm-button {
+    background-color: #48A75A !important;
+    color: #ffffff !important;
+}
+
+.cancel-button:hover , .confirm-button:hover {
+    background-color: white !important;
+    color: #48A75A !important;
+}
+
+.mdc-button {
+    border: solid 2px !important;
+    border-color: #48A75A !important;
+}

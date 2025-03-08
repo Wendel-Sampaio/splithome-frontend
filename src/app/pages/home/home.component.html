@@ -3,10 +3,10 @@
         <mat-card-header class="header-menu-lateral">
             <div class="title">
                 <div class="splithome">
-                    <img class="icon-title" src="icon.png" alt="">
+                    <img class="icon-title" src="../../../assets/icon.png" alt="">
                     <mat-card-title class="titulo-menu-lateral">SplitHome</mat-card-title>
                 </div>
-                <img class="profile-photo" src="perfil.png" alt="">
+                <img class="profile-photo" src="../../../assets/perfil.png" alt="">
                 <mat-card-subtitle class="subtitulo-menu"> Bem vindo <div class="username">{{ user.name }}</div></mat-card-subtitle>
             </div>
         </mat-card-header>
@@ -31,7 +31,7 @@
                     perfil</button>
             </div>
             <div>
-                <button (click)="logout()" class="botoes-menu-lateral"><mat-icon class="icones-botao" matSuffix>logout</mat-icon>Sair</button>
+                <button (click)="openDialog('200ms', '200ms')" class="botoes-menu-lateral"><mat-icon class="icones-botao" matSuffix>logout</mat-icon>Sair</button>
             </div>
         </mat-card-content>
     </mat-card>
@@ -39,4 +39,5 @@
         <mat-card-title class="titulo-menu-compras">Compras</mat-card-title>
         <mat-card-content><tabela-compras></tabela-compras></mat-card-content>
     </mat-card>
+
 </div>

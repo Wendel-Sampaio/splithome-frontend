@@ -1,5 +1,4 @@
 import { Component, inject, signal } from '@angular/core';
-import { UserService } from '../../core/auth/user.service';
 import { MatCardModule } from '@angular/material/card';
 import { Router } from '@angular/router';
 import { MatIcon } from '@angular/material/icon';
@@ -7,7 +6,8 @@ import { FormsModule } from '@angular/forms';
 import { MatFormFieldModule } from '@angular/material/form-field';
 import { MatInputModule } from '@angular/material/input';
 import { MatButtonModule } from '@angular/material/button';
-import { Register } from '../../core/auth/register';
+import { UserService } from '../../core/auth/user/user.service';
+import { Register } from '../../core/auth/user/register';
 
 @Component({
   selector: 'app-cadastro',

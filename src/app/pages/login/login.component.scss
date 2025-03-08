@@ -85,6 +85,10 @@
     margin-top: 10px;
 }
 
+.input-email {
+    margin-top: 30px;
+}
+
 .input-email,
 .password-input {
     @include mat.theme((

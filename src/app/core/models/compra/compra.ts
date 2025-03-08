@@ -7,8 +7,11 @@ export class Compra {
     value!: number;
     unitValue!: number;
     payers!: Array<string>;
-    paymentDate!: Data;
+    formatedPayers!: string;
+    paymentDate!: string;
     remainingPayers!: Array<string>;
+    formatedRemainingPayers!: string;
     purchaserId!: string;
-    purchaseDate!: Data;
+    purchaseDate!: string;
+    showPaymentButton!: boolean;
 }

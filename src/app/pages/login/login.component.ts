@@ -1,13 +1,13 @@
 import { Component, inject, signal } from '@angular/core';
 import {MatCardModule} from '@angular/material/card';
 import { Router } from '@angular/router';
-import { UserService } from '../../core/auth/user.service';
-import { Login } from '../../core/auth/login';
 import { MatButtonModule } from '@angular/material/button';
 import { MatIcon } from '@angular/material/icon';
 import {FormsModule} from '@angular/forms';
 import { MatFormFieldModule } from '@angular/material/form-field';
 import { MatInputModule } from '@angular/material/input';
+import { Login } from '../../core/auth/user/login';
+import { UserService } from '../../core/auth/user/user.service';
 
 @Component({
   selector: 'app-login',
