@@ -14,9 +14,7 @@ export class UserService {
   http = inject(HttpClient);
   API = "http://localhost:8080/api/user";
 
-
   constructor() { }
-
 
   logar(login: Login): Observable<string> {
     return this.http.post<string>(this.API+"/auth/login", login, {responseType: 'text' as 'json'});
@@ -28,6 +26,10 @@ export class UserService {
 
   getUserById(id: string): Observable<User> {
     return this.http.get<User>(`${this.API}/${id}`);
+  }
+  
+  getAllUsers(): Observable<User[]> {
+    return this.http.get<User[]>(this.API+"/listall")
   }
 
   addToken(token: string) {

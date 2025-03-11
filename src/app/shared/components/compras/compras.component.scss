@@ -43,12 +43,48 @@
     cursor: pointer;
     color: white;
     background-color: #48A75A;
-    transition: color 0.5s;
 }
 
 .payment-button:active {
     cursor: pointer;
     color: white;
-    background-color: #a74848;
-    transition: color 0.5s;
+}
+
+.cadastrar-compra {
+    font-size: 18px;
+    font-weight: 700;
+    color: #48A75A;
+    background-color: white;
+    border: none;
+    min-width: 140px;
+    min-height: 35px;
+    border-radius: 12px;
+    cursor: pointer;
+    margin-right: 30px;
+    margin-bottom: 10px;
+    box-shadow: 1px 2px 3px rgb(99, 99, 99);
+}
+
+.cadastrar-compra:hover {
+    color: white;
+    background-color: #48A75A;
+}
+
+.card-body{
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+
+.titulo-menu-compras {
+    font-family: "Arimo", serif;
+    font-optical-sizing: auto;
+    font-weight: 700;
+    font-size: 40px;
+    font-style: normal;
+    font-variation-settings:
+      "XROT" 0,
+      "YROT" 0;
+    color: #828181;
+    margin: 20px 20px 30px 30px;
 }

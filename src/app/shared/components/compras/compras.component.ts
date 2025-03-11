@@ -3,10 +3,12 @@ import { MatTableModule } from '@angular/material/table';
 import { CompraService } from '../../services/compra/compra.service';
 import { Compra } from '../../../core/models/compra/compra';
 import { CommonModule } from '@angular/common';
-import moment from 'moment';
 import { MatDialog, MatDialogModule } from '@angular/material/dialog';
 import { FormCompraComponent } from '../form-compra/form-compra.component';
 import { UserService } from '../../../core/auth/user/user.service';
+import { MatCardTitle } from '@angular/material/card';
+import { TransacaoService } from '../../services/transacao/transacao.service';
+import { DialogPagamentoComponent } from '../dialog-pagamento/dialog-pagamento.component';
 
 export interface CompraModel {
   title: string;
@@ -16,7 +18,7 @@ export interface CompraModel {
   value: number;
   formatedPayers: string;
   unitValue: number;
-  purchaserId: string;
+  purchaserName: string;
   payment: string;
   formatedRemainingPayers: string;
   showPaymentButton: boolean;
@@ -26,25 +28,33 @@ export interface CompraModel {
   selector: 'tabela-compras',
   styleUrl: 'compras.component.scss',
   templateUrl: 'compras.component.html',
-  imports: [MatTableModule, CommonModule, MatDialogModule],
+  imports: [MatTableModule, CommonModule, MatDialogModule, MatCardTitle],
 })
 export class ComprasComponent implements OnInit {
 
   readonly dialog = inject(MatDialog);
   
-    openDialog() {
-      const dialogRef = this.dialog.open(FormCompraComponent);
-  
-      dialogRef.afterClosed().subscribe(result => {
-        console.log(`Dialog result: ${result}`);
-      });
-    }
+  abrirFormCompra() {
+    const formRef = this.dialog.open(FormCompraComponent);
+    formRef.afterClosed().subscribe(result => {
+      console.log(`Dialog result: ${result}`);
+    });
+  }
+
+  efetuarPagamento(element: any) {
+    const dialogRef = this.dialog.open(DialogPagamentoComponent, {
+      data: element
+    });
+    dialogRef.afterClosed().subscribe(result => {
+      console.log(`Dialog result: ${result}`);
+    });
+  }
 
   ngOnInit(): void {
     this.pegarCompras()
   }
 
-  displayedColumns: string[] = ['title', 'category', 'purchaseDate', 'paymentDate', 'value', 'formatedPayers', 'unitValue', 'purchaserId', 'payment', 'formatedRemainingPayers'];
+  displayedColumns: string[] = ['title', 'category', 'purchaseDate', 'paymentDate', 'value', 'formatedPayers', 'unitValue', 'purchaserName', 'payment', 'formatedRemainingPayers'];
 
   compras: Compra[] = [];
 
@@ -58,6 +68,7 @@ export class ComprasComponent implements OnInit {
         console.log(compras)
         this.tratamentoLista(compras)
         this.compras = compras
+        console.log(compras)
       }, error: error => {
         console.log("Erro ao carregar lista de compras!")
       }
@@ -71,7 +82,6 @@ export class ComprasComponent implements OnInit {
       this.calculaValorUnitario(compra)
       this.formatNomes(compra)
       this.formatPagador(compra)
-      this.formatData(compra)
     })
   }
 
@@ -86,23 +96,19 @@ export class ComprasComponent implements OnInit {
   formatPagador(compra: Compra) {
     this.userService.getUserById(compra.purchaserId).subscribe({
       next: user => {
-        compra.purchaserId = user.name
+        compra.purchaserName = user.name
       }
     })
-  }
-
-  formatData(compra: Compra) {
-    compra.purchaseDate = moment(compra.purchaseDate).format('DD/MM/YYYY');
-    compra.paymentDate = moment(compra.paymentDate).format('DD/MM/YYYY');
   }
 
   formatNomes(compra: Compra) {
     if (compra.payers.length === 1) {
       compra.formatedPayers = compra.payers[0];
+      return;
     }
     const lastPayer = compra.payers.pop();
     compra.formatedPayers = `${compra.payers.join(', ')} e ${lastPayer}`;
-    if (compra.remainingPayers.length === 1){
+    if (compra.remainingPayers.length === 1) {
       compra.formatedRemainingPayers = compra.remainingPayers[1]
     }
     const lastRemainingPayer = compra.remainingPayers.pop()

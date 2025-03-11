@@ -1,4 +1,7 @@
-<button mat-button (click)="openDialog()">Cadastrar compra</button>
+<div class="card-body">
+    <mat-card-title class="titulo-menu-compras">Compras</mat-card-title>
+    <button class="cadastrar-compra" mat-button (click)="abrirFormCompra()">Nova compra</button>
+</div>
 <div class="table">
     <table  mat-table [dataSource]="compras" class="mat-elevation-z8">
         <ng-container matColumnDef="title">
@@ -13,12 +16,12 @@
     
         <ng-container matColumnDef="purchaseDate">
             <th class="column-name" mat-header-cell *matHeaderCellDef> Data compra </th>
-            <td class="column-cell" mat-cell *matCellDef="let element"> {{element.purchaseDate}} </td>
+            <td class="column-cell" mat-cell *matCellDef="let element"> {{element.purchaseDate | date: "dd/MM/yyyy"}}</td>
         </ng-container>
     
         <ng-container matColumnDef="paymentDate">
             <th class="column-name" mat-header-cell *matHeaderCellDef> Data Pagamento </th>
-            <td class="column-cell" mat-cell *matCellDef="let element"> {{element.paymentDate}} </td>
+            <td class="column-cell" mat-cell *matCellDef="let element"> {{element.paymentDate | date: "dd/MM/yyyy"}} </td>
         </ng-container>
         
         <ng-container matColumnDef="value">
@@ -27,7 +30,7 @@
         </ng-container>
 
         <ng-container matColumnDef="formatedPayers">
-            <th class="column-name" mat-header-cell *matHeaderCellDef> Pagadoresss </th>
+            <th class="column-name" mat-header-cell *matHeaderCellDef> Pagadores </th>
             <td class="column-cell" mat-cell *matCellDef="let element"> {{ element.formatedPayers }} </td>
         </ng-container>
 
@@ -36,15 +39,15 @@
             <td class="column-cell" mat-cell *matCellDef="let element"> R${{element.unitValue}} </td>
         </ng-container>
 
-        <ng-container matColumnDef="purchaserId">
+        <ng-container matColumnDef="purchaserName">
             <th class="column-name" mat-header-cell *matHeaderCellDef> Comprador </th>
-            <td class="column-cell" mat-cell *matCellDef="let element"> {{element.purchaserId}} </td>
+            <td class="column-cell" mat-cell *matCellDef="let element"> {{element.purchaserName}} </td>
         </ng-container>
 
         <ng-container matColumnDef="payment">
             <th class="column-name" mat-header-cell *matHeaderCellDef> Pagamento </th>
             <td class="column-cell" mat-cell *matCellDef="let element"> 
-                    <button *ngIf="element.showPaymentButton ; else indisponivel" class="payment-button"> Pagar </button>{{element.payment}} </td>
+                    <button *ngIf="element.showPaymentButton ; else indisponivel" class="payment-button" (click)="efetuarPagamento(element)"> Pagar </button>{{element.payment}} </td>
                     <ng-template #indisponivel><span>Indisponível</span></ng-template>
         </ng-container>
         
