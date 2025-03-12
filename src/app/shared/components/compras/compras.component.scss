@@ -1,5 +1,5 @@
 @use '@angular/material' as mat;
-@use '../../../core/theme-colors.scss' as my-theme;
+@use '../../../../assets/theme-colors.scss' as my-theme;
 
 .mat-mdc-table {
     background: none;
