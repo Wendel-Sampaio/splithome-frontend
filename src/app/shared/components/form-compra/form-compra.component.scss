@@ -1,0 +1,65 @@
+@use '@angular/material' as mat;
+@use '../../../core/theme-colors.scss' as my-theme;
+
+
+.title-input, 
+.users-layout, 
+.date-input,
+.categoria-input,
+.valor-input {
+    @include mat.theme((
+    color: (
+      primary: my-theme.$primary-palette,
+      tertiary: my-theme.$tertiary-palette,
+    ),
+  ));
+}
+
+.title {
+    font-weight: 500;
+    margin-left: 30px;
+    margin-top: 30px;
+    margin-bottom: 0px;
+    color: #777777;
+}
+
+.title-input {
+    margin-top: 0px;
+}
+
+.users-layout {
+    display: flex;
+    flex-wrap: wrap;
+}
+
+.users, .mat-mdc-standard-chip {
+    flex-basis: 33%;
+    border-color: #48A75A !important;
+    cursor: pointer;
+}
+
+.confirm-button {
+    background-color: #48A75A !important;
+    color: #ffffff !important;
+    border: solid 2px;
+    border-color: #48A75A;
+    box-shadow: 2px 2px 5px rgb(131, 131, 131);
+}
+
+.cancel-button {
+    background-color: #b61b1b !important;
+    color: #ffffff !important;
+    box-shadow: 2px 2px 5px rgb(131, 131, 131);
+    border: solid 2px;
+    border-color: #b61b1b;
+}
+
+.cancel-button:hover {
+    background-color: white !important;
+    color: #b61b1b !important;
+}
+
+.confirm-button:hover {
+    background-color: white !important;
+    color: #48A75A !important;
+}

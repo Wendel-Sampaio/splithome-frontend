@@ -16,9 +16,5 @@ export class TransacaoService {
   listarCategorias(): Observable<string[]> {
     return this.http.get<string[]>(this.API+"/categories");
   }
-
-  cadastrarCompra(data: any): Observable<any> {
-    return this.http.post<any>(`${this.API}/new-purchase`, data);
-  }
-
+  
 }

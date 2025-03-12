@@ -12,10 +12,19 @@ export class CompraService {
 
   http = inject(HttpClient)
 
-  API = "http://localhost:8080/api/transactions/purchases"
+  API = "http://localhost:8080/api/transactions"
   
   listarCompras(): Observable<Compra[]>{
-    return this.http.get<Compra[]>(this.API);
+    return this.http.get<Compra[]>(this.API+"/purchases");
   }
   
+  cadastrarCompra(data: any): Observable<any> {
+    return this.http.post<any>(`${this.API}/new-purchase`, data);
+  }
+
+  atualizarCompra(data: any): Observable<any> {
+    console.log("Antes da requisição:", data)
+    return this.http.put<any>(this.API+"/update-purchase", data)
+  }
+
 }

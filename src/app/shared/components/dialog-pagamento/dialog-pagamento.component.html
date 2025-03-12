@@ -1,16 +1,16 @@
-<h2 mat-dialog-title>Pagamento</h2>
-<mat-dialog-content>
-
-  <p>Você irá pagar para:</p>
-
-  <span> {{ user.name }} </span>
-
-  <p>Chave pix:</p>
-
-  <span> {{ user.pixKey }} </span>
-
-</mat-dialog-content>
-<mat-dialog-actions>
-  <button mat-button mat-dialog-close>Cancelar </button>
-  <button mat-button [mat-dialog-close]="true" cdkFocusInitial>Pagar</button>
-</mat-dialog-actions>
+<div class="card-body">
+  <h2 class="title">Pagamento</h2>
+  <mat-dialog-content class="card-content">
+    <h3>Você irá pagar para:</h3>
+    <p> ⮕ {{ user.name }} </p>
+    <h3>O valor de:</h3>
+    <p> ⮕ R{{ data.unitValue | currency }} </p>
+    <h3>Chave pix do comprador:</h3>
+    <p> ⮕{{ user.pixKey }} </p>
+  </mat-dialog-content>
+  <mat-dialog-actions>
+    <button class="cancel-button" mat-button mat-dialog-close>Cancelar </button>
+    <button class="confirm-button" mat-button (click)="efetuarPagamento()" [mat-dialog-close]="true"
+      cdkFocusInitial>Pagar</button>
+  </mat-dialog-actions>
+</div>

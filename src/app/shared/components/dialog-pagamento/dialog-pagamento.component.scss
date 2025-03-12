@@ -1,0 +1,52 @@
+.card-body {
+    min-width: 200px;
+}
+
+.card-content {
+    min-height: 260px;
+}
+
+.title {
+    font-size: 30px;
+    font-weight: 500;
+    margin-left: 30px;
+    margin-top: 30px;
+    margin-bottom: 0px;
+    color: #535353;
+}
+
+h3 {
+    font-weight: 400;
+}
+
+p {
+    font-size: 20px;
+    font-style: italic;
+    color: #48A75A;
+}
+
+.confirm-button {
+    background-color: #48A75A !important;
+    color: #ffffff !important;
+    border: solid 2px;
+    border-color: #48A75A;
+    box-shadow: 2px 2px 5px rgb(131, 131, 131);
+}
+
+.cancel-button {
+    background-color: #b61b1b !important;
+    color: #ffffff !important;
+    box-shadow: 2px 2px 5px rgb(131, 131, 131);
+    border: solid 2px;
+    border-color: #b61b1b;
+}
+
+.cancel-button:hover {
+    background-color: white !important;
+    color: #b61b1b !important;
+}
+
+.confirm-button:hover {
+    background-color: white !important;
+    color: #48A75A !important;
+}

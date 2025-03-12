@@ -35,7 +35,7 @@
     color: #48A75A;
     background-color: white;
     border-radius: 13px;
-    box-shadow: 1px 2px 3px rgb(99, 99, 99);
+    box-shadow: 0px 0px 4px rgb(99, 99, 99);
     border: none;
 }
 
@@ -62,7 +62,7 @@
     cursor: pointer;
     margin-right: 30px;
     margin-bottom: 10px;
-    box-shadow: 1px 2px 3px rgb(99, 99, 99);
+    box-shadow: 0px 0px 3px rgb(99, 99, 99);
 }
 
 .cadastrar-compra:hover {
@@ -82,9 +82,21 @@
     font-weight: 700;
     font-size: 40px;
     font-style: normal;
-    font-variation-settings:
-      "XROT" 0,
-      "YROT" 0;
     color: #828181;
     margin: 20px 20px 30px 30px;
+}
+
+.payed-style {
+    color: white;
+    background-color: #5aaa67;
+}
+
+.payed-button {
+    color: white;
+    background-color: #48A75A;
+}
+
+.payed-button:hover {
+    color: #48A75A;
+    background-color: white;
 }

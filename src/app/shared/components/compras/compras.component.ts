@@ -7,21 +7,23 @@ import { MatDialog, MatDialogModule } from '@angular/material/dialog';
 import { FormCompraComponent } from '../form-compra/form-compra.component';
 import { UserService } from '../../../core/auth/user/user.service';
 import { MatCardTitle } from '@angular/material/card';
-import { TransacaoService } from '../../services/transacao/transacao.service';
 import { DialogPagamentoComponent } from '../dialog-pagamento/dialog-pagamento.component';
 
 export interface CompraModel {
+  id: string;
   title: string;
   category: string;
   purchaseDate: Date;
   paymentDate: Date;
   value: number;
+  remainingPayers: string[];
   formatedPayers: string;
   unitValue: number;
   purchaserName: string;
   payment: string;
   formatedRemainingPayers: string;
   showPaymentButton: boolean;
+  isPaid: boolean;
 }
 
 @Component({
@@ -33,19 +35,39 @@ export interface CompraModel {
 export class ComprasComponent implements OnInit {
 
   readonly dialog = inject(MatDialog);
-  
+
   abrirFormCompra() {
     const formRef = this.dialog.open(FormCompraComponent);
     formRef.afterClosed().subscribe(result => {
       console.log(`Dialog result: ${result}`);
+      this.pegarCompras()
     });
   }
 
   efetuarPagamento(element: any) {
+    if (!this.verificaUserRemainingPayers(element)) {
+      const userName = this.userService.getUser().name;
+      element.remainingPayers.push(userName)
+      element.isPaid = false;
+      this.compraService.atualizarCompra({
+        id: element.id,
+        remainingPayers: element.remainingPayers
+      }).subscribe({
+        next: (response) => {
+          this.pegarCompras()
+          console.log('Compra atualizada com sucesso', response);
+        },
+        error: (error) => {
+          console.error('Erro ao atualizar a compra', error);
+        }
+      });
+      return;
+    }
     const dialogRef = this.dialog.open(DialogPagamentoComponent, {
       data: element
     });
     dialogRef.afterClosed().subscribe(result => {
+      this.pegarCompras()
       console.log(`Dialog result: ${result}`);
     });
   }
@@ -54,21 +76,27 @@ export class ComprasComponent implements OnInit {
     this.pegarCompras()
   }
 
-  displayedColumns: string[] = ['title', 'category', 'purchaseDate', 'paymentDate', 'value', 'formatedPayers', 'unitValue', 'purchaserName', 'payment', 'formatedRemainingPayers'];
-
+  displayedColumns: string[] = [
+    'title', 
+    'category', 
+    'purchaseDate', 
+    'paymentDate', 
+    'value', 
+    'formatedPayers', 
+    'unitValue', 
+    'purchaserName', 
+    'payment', 
+    'formatedRemainingPayers'
+  ];
   compras: Compra[] = [];
-
-  status: boolean = false;
   compraService = inject(CompraService)
   userService = inject(UserService)
 
   pegarCompras() {
     this.compraService.listarCompras().subscribe({
       next: compras => {
-        console.log(compras)
         this.tratamentoLista(compras)
         this.compras = compras
-        console.log(compras)
       }, error: error => {
         console.log("Erro ao carregar lista de compras!")
       }
@@ -77,16 +105,45 @@ export class ComprasComponent implements OnInit {
 
   tratamentoLista(compras: Compra[]) {
     compras.forEach(compra => {
+      this.formatPagador(compra)
       this.pagamentoDisponivel(compra)
       this.formatCategoria(compra)
       this.calculaValorUnitario(compra)
-      this.formatNomes(compra)
-      this.formatPagador(compra)
+      this.formatNomesPagadores(compra)
+      this.formatNomesPagadoresRestantes(compra)
+      this.verificaUserRemainingPayers(compra)
+      this.mudarStatusDaCompra(compra)
     })
   }
 
+  mudarStatusDaCompra(compra: Compra) {
+    if (this.verificaUserRemainingPayers(compra)) {
+      compra.isPaid = false;
+    } else {
+      compra.isPaid = true;
+    }
+  }
+
+  verificaUserRemainingPayers(compra: Compra): boolean {
+    const userName = this.userService.getUser().name;
+    return compra.remainingPayers.includes(userName);
+  }
+
+  verificarPagamento(element: Compra): boolean {
+    return element.isPaid || element.purchaserId === this.userService.getUser().id;
+  }
+
   pagamentoDisponivel(compra: Compra) {
-    compra.showPaymentButton = compra.payers.includes(this.userService.getUser().name);
+    const userName = this.userService.getUser().name;
+    this.userService.getUserById(compra.purchaserId).subscribe({
+      next: user => {
+        if (user.name === userName){
+          compra.showPaymentButton = false
+        } else {
+          compra.showPaymentButton = compra.payers.includes(this.userService.getUser().name);
+        }
+      }
+    })
   }
 
   calculaValorUnitario(compra: Compra) {
@@ -101,18 +158,26 @@ export class ComprasComponent implements OnInit {
     })
   }
 
-  formatNomes(compra: Compra) {
+  formatNomesPagadores(compra: Compra) {
     if (compra.payers.length === 1) {
       compra.formatedPayers = compra.payers[0];
       return;
     }
+    const listaPagadoresOriginal = [...compra.payers];
     const lastPayer = compra.payers.pop();
     compra.formatedPayers = `${compra.payers.join(', ')} e ${lastPayer}`;
+    compra.payers = listaPagadoresOriginal
+  }
+
+  formatNomesPagadoresRestantes(compra: Compra) {
     if (compra.remainingPayers.length === 1) {
-      compra.formatedRemainingPayers = compra.remainingPayers[1]
+      compra.formatedRemainingPayers = compra.remainingPayers[0]
+      return;
     }
-    const lastRemainingPayer = compra.remainingPayers.pop()
-    compra.formatedRemainingPayers = `${compra.payers.join(', ')} e ${lastPayer}`;
+    const listaPagadoresRestantesOriginal = [...compra.remainingPayers];
+    const lastRemainingPayer = compra.remainingPayers.pop();
+    compra.formatedRemainingPayers = `${compra.remainingPayers.join(', ')} e ${lastRemainingPayer}`;
+    compra.remainingPayers = listaPagadoresRestantesOriginal
   }
 
   formatCategoria(compra: Compra) {

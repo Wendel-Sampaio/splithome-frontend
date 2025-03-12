@@ -1,54 +1,62 @@
-<h2 mat-dialog-title>Cadastro de compra</h2>
-<mat-dialog-content class="mat-typography">
+<h2 class="title">Cadastro de compra</h2>
+<mat-dialog-content class="form-body">
+  <div>
+    <form [formGroup]="formCompra" (ngSubmit)="cadastrarCompra()">
 
-  <form [formGroup]="formCompra" (ngSubmit)="cadastrarCompra()">
-    <div>
-      <mat-form-field class="input-name" appearance="outline">
-        <mat-label>Insira o título</mat-label>
-        <input matInput formControlName="titulo">
-      </mat-form-field>
-    </div>
+      <div class="title-input">
+        <mat-form-field class="input-name" appearance="outline">
+          <mat-label>Insira o título</mat-label>
+          <input matInput formControlName="titulo">
+        </mat-form-field>
+      </div>
+      
+      <div class="categoria-input">
+        <mat-form-field appearance="outline">
+          <mat-label>Categoria</mat-label>
+          <mat-select formControlName="categoria">        
+            <!-- O [value]="categoria" é usado para atribuir o valor do select à variável categoria. -->
+            <mat-option *ngFor="let categoria of categorias" [value]="categoria"> 
+              {{ categoria }}
+            </mat-option>
+          </mat-select>
+        </mat-form-field>
+      </div>
+
+      <div class="valor-input">
+        <mat-form-field floatLabel="always" appearance="outline">
+          <mat-label>Valor</mat-label>
+          <input matInput formControlName="valor" placeholder="0" /> 
+          <span matTextPrefix>R$&nbsp;</span>
+        </mat-form-field>
+      </div>
+
+      <div class="date-input">
+        <mat-form-field appearance="outline">
+          <mat-label>Data pagamento</mat-label>
+          <input matInput formControlName="dataPagamento" [matDatepicker]="dp3" >
+          <mat-datepicker-toggle matIconSuffix [for]="dp3"></mat-datepicker-toggle>
+          <mat-datepicker #dp3 disabled="false"></mat-datepicker>
+        </mat-form-field>
+      </div>
   
-    <mat-form-field appearance="outline">
-      <mat-label>Categoria</mat-label>
-      <mat-select formControlName="categoria">        
-        <!-- O [value]="categoria" é usado para atribuir o valor do select à variável categoria. -->
-        <mat-option *ngFor="let categoria of categorias" [value]="categoria"> 
-          {{ categoria }}
-        </mat-option>
-      </mat-select>
-    </mat-form-field>
-    
-    <mat-form-field floatLabel="always" appearance="outline">
-      <mat-label>Valor</mat-label>
-      <input matInput formControlName="valor" class="example-right-align" placeholder="0" /> 
-      <span matTextPrefix>R$&nbsp;</span>
-    </mat-form-field>
-
-    <mat-form-field appearance="outline">
-      <mat-label>Data pagamento</mat-label>
-      <input matInput formControlName="dataPagamento" [matDatepicker]="dp3" >
-      <mat-datepicker-toggle matIconSuffix [for]="dp3"></mat-datepicker-toggle>
-      <mat-datepicker #dp3 disabled="false"></mat-datepicker>
-    </mat-form-field>
-
-    <div>
-      <label> Selecione os pagadores </label>
-      <mat-chip-listbox [multiple]="true" aria-label="Seleção de pagadores">
-        <mat-chip-option 
-          *ngFor="let usuario of usuarios"
-          [selected]="usuarioSelecionado(usuario)" 
-          (click)="mudarSelecaoUsuario(usuario)">
-          <img matChipAvatar src="../../../../assets/perfil.png" alt="Foto do Usuário"/>
-          {{ usuario.name }}
-        </mat-chip-option>
-      </mat-chip-listbox>
-    </div>
-
-  </form>
-
+      <div>
+        <label> Selecione os pagadores </label>
+        <mat-chip-listbox class="users-layout" [multiple]="true" aria-label="Seleção de pagadores">
+          <mat-chip-option 
+            class="users"
+            *ngFor="let usuario of usuarios"
+            [selected]="usuarioSelecionado(usuario)" 
+            (click)="mudarSelecaoUsuario(usuario)">
+            <img matChipAvatar src="../../../../assets/perfil.png" alt="Foto do Usuário"/>
+            {{ usuario.name }}
+          </mat-chip-option>
+        </mat-chip-listbox>
+      </div>
+  
+    </form>
+  </div>
 </mat-dialog-content>
 <mat-dialog-actions>
-  <button mat-button mat-dialog-close>Cancelar</button>
-  <button mat-button [mat-dialog-close]="true" cdkFocusInitial (click)="cadastrarCompra()">Cadastrar</button>
+  <button mat-button class="cancel-button" mat-dialog-close>Cancelar</button>
+  <button mat-button class="confirm-button" [mat-dialog-close]="true" cdkFocusInitial (click)="cadastrarCompra()">Cadastrar</button>
 </mat-dialog-actions>

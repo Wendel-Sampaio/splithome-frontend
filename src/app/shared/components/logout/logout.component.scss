@@ -2,17 +2,28 @@
     color: #777777;
 }
 
-.cancel-button, .confirm-button {
+.cancel-button {
     background-color: #48A75A !important;
     color: #ffffff !important;
+    border: solid 2px;
+    border-color: #48A75A;
+    box-shadow: 2px 2px 5px rgb(131, 131, 131);
 }
 
-.cancel-button:hover , .confirm-button:hover {
+.confirm-button {
+    background-color: #b61b1b !important;
+    color: #ffffff !important;
+    box-shadow: 2px 2px 5px rgb(131, 131, 131);
+    border: solid 2px;
+    border-color: #b61b1b;
+}
+
+.confirm-button:hover {
+    background-color: white !important;
+    color: #b61b1b !important;
+}
+
+.cancel-button:hover {
     background-color: white !important;
     color: #48A75A !important;
-}
-
-.mdc-button {
-    border: solid 2px !important;
-    border-color: #48A75A !important;
 }

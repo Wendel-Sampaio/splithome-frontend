@@ -1,4 +1,4 @@
-import { ChangeDetectionStrategy, Component, inject } from '@angular/core';
+import { ChangeDetectionStrategy, ChangeDetectorRef, Component, inject } from '@angular/core';
 import { FormControl, FormGroup, FormsModule, ReactiveFormsModule } from '@angular/forms';
 import { MatButtonModule } from '@angular/material/button';
 import { MatCardModule } from '@angular/material/card';
@@ -15,9 +15,11 @@ import { CategoriaEnum } from '../../../core/models/categoria/categoriaEnum';
 import { User } from '../../../core/models/user/user';
 import { UserService } from '../../../core/auth/user/user.service';
 import moment, { Moment } from 'moment/moment';
+import { CompraService } from '../../services/compra/compra.service';
 
 @Component({
   selector: 'dialog-content-example-dialog',
+  styleUrl: 'form-compra.component.scss',
   templateUrl: 'form-compra.component.html',
   imports: [
     MatDialogModule, 
@@ -40,7 +42,9 @@ import moment, { Moment } from 'moment/moment';
 export class FormCompraComponent {
   
   userService = inject(UserService)
+  compraService = inject(CompraService)
   transacaoService = inject(TransacaoService)
+  cdRef = inject(ChangeDetectorRef)
 
   categorias!: string[];
   categoriasOriginal!: string[];
@@ -51,8 +55,8 @@ export class FormCompraComponent {
   
 
   ngOnInit(): void {
-    this.listarCategorias();
     this.listarUsuarios();
+    this.listarCategorias();
     this.formCompra = new FormGroup({
       titulo: new FormControl(""),
       categoria: new FormControl(""),
@@ -97,13 +101,13 @@ export class FormCompraComponent {
         console.log("Erro ao carregar categorias");
       }
     });
-}
-
+  }
 
   listarUsuarios() {
     this.userService.getAllUsers().subscribe({
       next: usuarios => {
         this.usuarios = usuarios;
+        this.cdRef.detectChanges();
       }
     })
   } 
@@ -123,7 +127,7 @@ export class FormCompraComponent {
       purchaserId: this.comprador,
       purchaseDate: moment(this.formCompra.value.dataPagamento).format('YYYY-MM-DD'),
     }
-    this.transacaoService.cadastrarCompra(formData).subscribe({
+    this.compraService.cadastrarCompra(formData).subscribe({
       next: response => {
         console.log('Compra cadastrada com sucesso', response);
       },
