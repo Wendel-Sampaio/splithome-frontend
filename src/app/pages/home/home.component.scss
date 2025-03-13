@@ -1,134 +1,180 @@
+#navbar {
+    position: fixed;
+    top: 0;
+    right: 0;
+    background-color: #48A75A;
+    width: 100%; 
+    display: flex;
+    justify-content: space-between; 
+    padding: 10px 30px; 
+    box-sizing: border-box;
+    box-shadow: 1px 2px 10px rgb(155, 155, 155);
+
+    .toolbar {
+        background: #48A75A !important;
+    }
+    
+    #titulo-nav {
+        font-size: 35px;
+        font-weight: 500;
+        margin-left: 400px;
+        color: white;
+        text-shadow: 1px 1px 3px #2c2929
+    }
+}
+
 .body {
     width: 100%;
     height: 100%;
     display: grid;
     justify-content: center;
     background-color: #F2F2F2;
-}
+    
+    .menu-lateral {
+        background-color: white;
+        box-shadow: 1px 2px 10px rgb(70, 70, 70);
+        display: flex;
+        align-items: center;
+        border-radius: 0px;
+        min-width: 390px;
+        height: 100%;
+        position: fixed;
 
-.icon-title { 
-    filter: drop-shadow(3px 3px 5px rgb(161, 161, 161))
-}
+        .header-menu-lateral {
+            display: grid;
+            justify-items: center;
+        }
+    
+        .title {
+            margin-top: 40px;
+            display: grid;
+            justify-items: center;
+        }
+        
+        .splithome {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            gap: 10px;
+        }
+    
+        .icon-title { 
+            filter: drop-shadow(3px 3px 5px rgb(161, 161, 161))
+        }
+        
+        .titulo-menu-lateral {
+            font-family: "Tilt Warp", serif;
+            font-optical-sizing: auto;
+            font-weight: 400;
+            font-size: 45px;
+            font-style: normal;
+            color: #48A75A;
+            text-shadow: 2px 3px 4px #c4c4c4;
+        }
+        
+        .profile-photo {
+            margin-top: 40px;
+        }
+        
+        .subtitulo-menu {
+            font-family: "Arimo", serif;
+            font-weight: 700;
+            color: #9F9D9D;
+            margin-top: 13px;
+            margin-bottom: 40px;
+            display: grid;
+            justify-items: center;
+        }
+    
+        .username {
+            color: #48A75A;
+            font-weight: 700;
+        }
 
-.profile-photo {
-    margin-top: 40px;
-}
+        .botoes-menu-lateral {
+            font-size: 22px;
+            font-family: Arial, Helvetica, sans-serif;
+            font-weight: 600;
+            color: #9F9D9D;
+            min-width: 250px;
+            min-height: 60px;
+            position: relative;
+            display: inline-flex;
+            justify-items: center;
+            align-items: center;
+            padding: 10px 15px;
+            border: none;
+            gap: 10px;
+            border-radius: 20px;
+            background-color: transparent;
+        }
 
-.title {
-    margin-top: 40px;
-    display: grid;
-    justify-items: center;
-}
+        .botoes-menu-lateral:hover {
+            background-color: #48A75A; 
+            color: white;  
+            cursor: pointer;
+            transition: 0.2s;
+        }
+        
+        .botoes-menu-lateral:hover .mat-icon {
+            color: white; 
+        }
+        
+        .icones-botao {
+            color: #9F9D9D;
+            margin-right: 20px;
+            min-width: 30px;
+            min-height: 30px;
+        }
+        
+        .material-icons{
+            font-size: 32px;
+        }
 
-.splithome {
-    display: flex;
-    justify-content: center;
-    align-items: center;
-    gap: 10px;
-}
+        .conteudo-card {
+            display: grid;
+            justify-content: center;
+            margin-top: -10px;
+            gap: 10px;
+        }
 
-.menu-lateral {
-    background-color: white;
-    box-shadow: 1px 2px 10px rgb(155, 155, 155);
-    display: flex;
-    align-items: center;
-    border-radius: 0px;
-    min-width: 390px;
-    height: 100%;
-    position: fixed;
-}
+        .botoes-menu-lateral.selected {
+            background-color: #48A75A;
+            color: white;
+        }
+        
+        .botoes-menu-lateral.selected .mat-icon {
+            color: white;
+        }
+        
+        .botoes-menu-lateral:hover {
+            background-color: #48A75A;
+            color: white;
+            cursor: pointer;
+            transition: 0.2s;
+        }
+        
+        .botoes-menu-lateral:hover .mat-icon {
+            color: white;
+        }
+    }
 
-.header-menu-lateral {
-    display: grid;
-    justify-items: center;
-}
+    .tabela-compras {
+        background-color: white;
+        width: 1350px;
+        max-height: min-content;
+        margin-left: 370px;
+        margin-top: 100px;
+        box-shadow: 0px 2px 5px rgb(99, 99, 99);
+        border-radius: 20px;
+        border: none;
 
-.titulo-menu-lateral {
-    font-family: "Tilt Warp", serif;
-    font-optical-sizing: auto;
-    font-weight: 400;
-    font-size: 45px;
-    font-style: normal;
-    font-variation-settings:
-      "XROT" 0,
-      "YROT" 0;
-    color: #48A75A;
-    text-shadow: 2px 3px 4px #c4c4c4;
-}
-
-.username {
-    color: #48A75A;
-    font-weight: 700;
-}
-
-.subtitulo-menu {
-    font-family: "Arimo", serif;
-    font-weight: 700;
-    color: #9F9D9D;
-    margin-top: 13px;
-    margin-bottom: 40px;
-    display: grid;
-    justify-items: center;
-}
-
-.botoes-menu-lateral {
-    font-size: 22px;
-    font-family: Arial, Helvetica, sans-serif;
-    font-weight: 600;
-    color: #9F9D9D;
-    min-width: 250px;
-    min-height: 60px;
-    position: relative;
-    display: inline-flex;
-    justify-items: center;
-    align-items: center;
-    padding: 10px 15px;
-    border: none;
-    gap: 10px;
-    border-radius: 20px;
-    background-color: transparent;
-}
-
-.botoes-menu-lateral:hover {
-    background-color: #48A75A; 
-    color: white;  
-    cursor: pointer;
-    transition: 0.2s;
-}
-
-.botoes-menu-lateral:hover .mat-icon {
-    color: white; 
-}
-
-.icones-botao {
-    color: #9F9D9D;
-    margin-right: 20px;
-    min-width: 30px;
-    min-height: 30px;
-}
-
-.material-icons{
-    font-size: 32px;
-}
-
-.conteudo-card {
-    display: grid;
-    justify-content: center;
-    margin-top: -10px;
-    gap: 10px;
-}
-
-.tabela-compras {
-    background-color: white;
-    width: 1350px;
-    height: 610px;
-    margin-left: 370px;
-    margin-top: 50px;
-    box-shadow: 0px 2px 5px rgb(99, 99, 99);
-    border-radius: 20px;
-    border: none;
-}
-
-.mat-mdc-card-content {
-    padding: 0;
+        .mat-mdc-card-content {
+            padding: 0;
+        }
+    }
+    
+    .meu-perfil {
+        margin-left: -450px;
+    }
 }

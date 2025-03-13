@@ -130,7 +130,12 @@ export class ComprasComponent implements OnInit {
   }
 
   verificarPagamento(element: Compra): boolean {
-    return element.isPaid || element.purchaserId === this.userService.getUser().id;
+    if (element.purchaserId === this.userService.getUser().id) {
+      if (element.remainingPayers.length !== 0) {
+        return element.isPaid = false;
+      }
+    }
+    return element.isPaid;
   }
 
   pagamentoDisponivel(compra: Compra) {
@@ -172,6 +177,9 @@ export class ComprasComponent implements OnInit {
   formatNomesPagadoresRestantes(compra: Compra) {
     if (compra.remainingPayers.length === 1) {
       compra.formatedRemainingPayers = compra.remainingPayers[0]
+      return;
+    } else if (compra.remainingPayers.length === 0) {
+      compra.formatedRemainingPayers = 'Todos efetuaram o pagamento.'
       return;
     }
     const listaPagadoresRestantesOriginal = [...compra.remainingPayers];

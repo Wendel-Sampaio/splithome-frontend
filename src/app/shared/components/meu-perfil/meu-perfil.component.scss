@@ -1,0 +1,116 @@
+#meu-perfil-card {
+    min-width: 500px;
+    margin-top: 115px;
+    margin-left: -50px;
+    background-color: white;
+    box-shadow: 1px 2px 3px rgb(160, 160, 160);
+    border-radius: 19px;
+    border: none;
+}
+
+#title {
+    font-weight: 500;
+    font-size: 30px;
+    margin: 10px 0px 30px 20px;
+    color: #777777;
+}
+
+#conteudo-card {
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-start;
+    max-width: 100%;
+}
+
+#inputs-container {
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+    margin-right: 20px;
+    width: 60%; 
+}
+
+#input-linha-dois {
+    display: flex;
+    justify-content: space-between;
+    gap: 10px;
+}
+
+#foto-container {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    margin-left: -150px;
+    width: 35%;
+}
+
+#foto-perfil {
+    max-width: 100%; 
+    max-height: 100px;
+}
+
+.input-name,
+.input-email,
+.input-phonenumber-div,
+.input-chavepix-div {
+    margin-bottom: 10px; 
+}
+
+#input-phonenumber, #input-chavepix {
+    max-width: 220px;
+}
+
+#caixa-botao {
+    display: flex;
+    justify-content: flex-end;
+    margin-top: -20px;
+}
+
+#botao-editar {
+    font-size: 18px;
+    font-weight: 500;
+    color: white;
+    background-color: #48A75A;
+    border: none;
+    min-width: 140px;
+    min-height: 35px;
+    border-radius: 12px;
+    box-shadow: 0px 0px 3px rgb(99, 99, 99);
+    margin: 10px;
+    cursor: pointer;
+}
+
+#botao-editar:hover {
+    color: #48A75A;
+    background-color: white;
+    border: solid 1px #48A75A;
+}
+
+#botao-cancelar {
+    background-color: #f44336;
+    color: white;
+    font-size: 16px;
+    font-weight: bold;
+    border-radius: 12px;
+    margin-left: 10px;
+    margin-right: 10px;
+    border: solid 1px #f44336;
+}
+
+#botao-cancelar:hover {
+    background-color: white; 
+    color: #f44336;
+    font-size: 16px;
+    font-weight: bold;
+    border-radius: 12px;
+    margin-left: 10px;
+    margin-right: 10px;
+}
+
+#botao-editar {
+    background-color: #48A75A;
+    color: white;
+    font-size: 16px;
+    font-weight: bold;
+    border-radius: 12px;
+}
