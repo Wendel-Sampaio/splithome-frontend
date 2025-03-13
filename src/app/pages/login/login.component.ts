@@ -8,6 +8,7 @@ import { MatFormFieldModule } from '@angular/material/form-field';
 import { MatInputModule } from '@angular/material/input';
 import { Login } from '../../core/auth/user/login';
 import { UserService } from '../../core/auth/user/user.service';
+import { MatSnackBar } from '@angular/material/snack-bar';
 
 @Component({
   selector: 'app-login',
@@ -20,6 +21,7 @@ export class LoginComponent {
   email!: string;
   password!: string;
 
+  private _snackBar = inject(MatSnackBar);
   router = inject(Router);
   userService = inject(UserService);
   hide1 = signal(true);
@@ -37,9 +39,13 @@ export class LoginComponent {
         this.router.navigate(["/home"]);
       }, 
       error: erro => {
-        alert("Usuário ou senha incorreto!")
+        this.openSnackBar("Usuário ou senha incorreto!")
       }
     })
   }
   
+  openSnackBar(message: string) {
+    this._snackBar.open(message, '', { duration: 5000 });
+  }
+
 }

@@ -58,7 +58,7 @@
                     (click)="efetuarPagamento(element)"
                     *ngIf="element.showPaymentButton ; else indisponivel" 
                     class="payment-button" 
-                    > {{ element.isPaid ? 'Pago ✔' : 'Pagar' }} </button>{{element.payment}} </td>
+                    > {{ element.isPaid ? 'Pago ✔' : 'Pagar' }} </button>{{ element.payment }} </td>
                     <ng-template #indisponivel><span>Indisponível</span></ng-template>
         </ng-container>
         

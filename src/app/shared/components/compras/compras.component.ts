@@ -55,10 +55,8 @@ export class ComprasComponent implements OnInit {
       }).subscribe({
         next: (response) => {
           this.pegarCompras()
-          console.log('Compra atualizada com sucesso', response);
         },
         error: (error) => {
-          console.error('Erro ao atualizar a compra', error);
         }
       });
       return;

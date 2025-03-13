@@ -16,6 +16,7 @@ import { User } from '../../../core/models/user/user';
 import { UserService } from '../../../core/auth/user/user.service';
 import moment, { Moment } from 'moment/moment';
 import { CompraService } from '../../services/compra/compra.service';
+import { MatSnackBar } from '@angular/material/snack-bar';
 
 @Component({
   selector: 'dialog-content-example-dialog',
@@ -44,6 +45,7 @@ export class FormCompraComponent {
   userService = inject(UserService)
   compraService = inject(CompraService)
   transacaoService = inject(TransacaoService)
+  private _snackBar = inject(MatSnackBar);
   cdRef = inject(ChangeDetectorRef)
 
   categorias!: string[];
@@ -91,9 +93,6 @@ export class FormCompraComponent {
           CategoriaEnum[categoria as keyof typeof CategoriaEnum] || categoria
         );
         this.categoriasOriginal = categorias;
-      },
-      error: error => {
-        console.log("Erro ao carregar categorias");
       }
     });
   }
@@ -129,14 +128,16 @@ export class FormCompraComponent {
     }
     this.compraService.cadastrarCompra(formData).subscribe({
       next: response => {
-        console.log('Compra cadastrada com sucesso', response);
+        this.openSnackBar("Compra cadastrada com sucesso!")
       },
       error: error => {
-        console.error('Erro ao cadastrar compra', error);
+        this.openSnackBar("Erro ao cadastrar compra!")
       }
     });
   }
 
-  
+  openSnackBar(message: string) {
+    this._snackBar.open(message, '', { duration: 5000 });
+  }
 }
 

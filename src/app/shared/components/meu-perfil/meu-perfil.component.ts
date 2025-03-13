@@ -8,6 +8,7 @@ import { MatInputModule } from '@angular/material/input';
 import { User } from '../../../core/models/user/user';
 import { UserService } from '../../../core/auth/user/user.service';
 import { FormsModule } from '@angular/forms';
+import { MatSnackBar } from '@angular/material/snack-bar';
 
 @Component({
   selector: 'meu-perfil',
@@ -20,6 +21,7 @@ export class MeuPerfilComponent implements OnInit {
 
   isEditable: boolean = false; 
   private cdr = inject(ChangeDetectorRef);
+  private _snackBar = inject(MatSnackBar);
   
   userData: User = { 
     id: '',
@@ -57,11 +59,15 @@ export class MeuPerfilComponent implements OnInit {
       const userId = this.userService.getUser().id;
       this.userService.atualizarUsuario(userId, this.userData).subscribe({
         next: message => {
-          console.log(message)
+          this.openSnackBar("Usuário atualizado com sucesso!")
           this.loadUserData();
         }
       });
     }
+  }
+
+  openSnackBar(message: string) {
+    this._snackBar.open(message, '', { duration: 5000 });
   }
 
 }

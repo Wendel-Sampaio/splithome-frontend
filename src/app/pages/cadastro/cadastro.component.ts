@@ -8,6 +8,7 @@ import { MatInputModule } from '@angular/material/input';
 import { MatButtonModule } from '@angular/material/button';
 import { UserService } from '../../core/auth/user/user.service';
 import { Register } from '../../core/auth/user/register';
+import {MatSnackBar} from '@angular/material/snack-bar';
 
 @Component({
   selector: 'app-cadastro',
@@ -23,6 +24,7 @@ export class CadastroComponent {
   repeatPassword!: string;
 
   router = inject(Router);
+  private _snackBar = inject(MatSnackBar);
   userService = inject(UserService);
   hide1 = signal(true);
   hide2 = signal(true);
@@ -39,12 +41,12 @@ export class CadastroComponent {
 
   registrar() {
     if (this.password != this.repeatPassword) {
-      alert("As senhas não coincidem!")
+      this.openSnackBar("As senhas não coincidem!")
     } else {
       const register: Register = new Register(this.name, this.email, this.password);
       this.userService.cadastrar(register).subscribe({
         next: string => {
-          alert("Usuário cadastrado com sucesso!")
+          this.openSnackBar("Usuário cadastrado com sucesso!");
           this.router.navigate(["/login"])
         }, error: erro => {
           alert("Algo saiu errado!")
@@ -53,4 +55,7 @@ export class CadastroComponent {
     }
   }
 
+  openSnackBar(message: string) {
+    this._snackBar.open(message, '', { duration: 5000 });
+  }
 }
