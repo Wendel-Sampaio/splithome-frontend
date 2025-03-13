@@ -1,3 +1,18 @@
+@use '@angular/material' as mat;
+@use '../../../../assets/theme-colors.scss' as my-theme;
+
+.input-name, 
+.input-email, 
+.input-phonenumber-div,
+.input-chavepix-div {
+    @include mat.theme((
+    color: (
+      primary: my-theme.$primary-palette,
+      tertiary: my-theme.$tertiary-palette,
+    ),
+  ));
+}
+
 #meu-perfil-card {
     min-width: 500px;
     margin-top: 115px;
@@ -11,7 +26,7 @@
 #title {
     font-weight: 500;
     font-size: 30px;
-    margin: 10px 0px 30px 20px;
+    margin: 10px 0px 30px 110px;
     color: #777777;
 }
 

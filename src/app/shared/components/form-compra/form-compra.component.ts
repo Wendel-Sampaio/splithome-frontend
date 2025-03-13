@@ -50,6 +50,7 @@ export class FormCompraComponent {
   categoriasOriginal!: string[];
   usuarios!: User[];
   pagadores: string[] = [];
+  pagadoresRestantes: string[] = [];
   comprador: string = this.userService.getUser().id
   formCompra!: FormGroup;
   
@@ -78,12 +79,6 @@ export class FormCompraComponent {
     return this.pagadores.includes(usuario.name);
   }
 
-  removeUsuario(usuario: User): void {
-    const index = this.pagadores.indexOf(usuario.name);
-    if (index >= 0) {
-      this.pagadores.splice(index, 1);
-    }
-  }
 
   getPagadoresSelecionados(): string[] {
     return this.pagadores;
@@ -117,15 +112,20 @@ export class FormCompraComponent {
     const categoriaOriginal = this.categoriasOriginal.find(
       categoria => CategoriaEnum[categoria as keyof typeof CategoriaEnum] === categoriaSelecionada
     );  
+    const nomeUsuarioLogado = this.userService.getUser().name
+    this.pagadoresRestantes = [...this.pagadores];
+    if (this.pagadoresRestantes.indexOf(nomeUsuarioLogado) !== -1) {
+      this.pagadoresRestantes.splice(this.pagadoresRestantes.indexOf(nomeUsuarioLogado), 1);
+    }
     const formData = {
       title: this.formCompra.value.titulo,
       category: categoriaOriginal,
       value: this.formCompra.value.valor,
       payers: this.pagadores,
       paymentDate: moment(this.formCompra.value.dataPagamento).format('YYYY-MM-DD'),
-      remainingPayers: this.pagadores,
+      remainingPayers: this.pagadoresRestantes,
       purchaserId: this.comprador,
-      purchaseDate: moment(this.formCompra.value.dataPagamento).format('YYYY-MM-DD'),
+      purchaseDate: new Date(),
     }
     this.compraService.cadastrarCompra(formData).subscribe({
       next: response => {

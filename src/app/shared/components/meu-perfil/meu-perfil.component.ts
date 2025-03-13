@@ -52,5 +52,16 @@ export class MeuPerfilComponent implements OnInit {
     });
   }
 
+  atualizarUsuario() {
+    if (this.isEditable === true) {
+      const userId = this.userService.getUser().id;
+      this.userService.atualizarUsuario(userId, this.userData).subscribe({
+        next: message => {
+          console.log(message)
+          this.loadUserData();
+        }
+      });
+    }
+  }
 
 }

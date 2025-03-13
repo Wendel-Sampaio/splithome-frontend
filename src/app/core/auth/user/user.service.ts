@@ -24,6 +24,10 @@ export class UserService {
     return this.http.post<string>(this.API+"/auth/register", register, {responseType: 'text' as 'json'})
   }
 
+  atualizarUsuario(id: string, user: User): Observable<User> {
+    return this.http.put<User>(`${this.API}/${id}/edit-user`, user)
+  }
+
   getUserById(id: string): Observable<User> {
     return this.http.get<User>(`${this.API}/${id}`);
   }

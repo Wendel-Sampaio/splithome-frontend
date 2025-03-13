@@ -77,15 +77,15 @@ export class ComprasComponent implements OnInit {
   }
 
   displayedColumns: string[] = [
-    'title', 
-    'category', 
-    'purchaseDate', 
-    'paymentDate', 
-    'value', 
-    'formatedPayers', 
-    'unitValue', 
-    'purchaserName', 
-    'payment', 
+    'title',
+    'category',
+    'purchaseDate',
+    'paymentDate',
+    'value',
+    'formatedPayers',
+    'unitValue',
+    'purchaserName',
+    'payment',
     'formatedRemainingPayers'
   ];
   compras: Compra[] = [];
@@ -142,7 +142,7 @@ export class ComprasComponent implements OnInit {
     const userName = this.userService.getUser().name;
     this.userService.getUserById(compra.purchaserId).subscribe({
       next: user => {
-        if (user.name === userName){
+        if (user.name === userName) {
           compra.showPaymentButton = false
         } else {
           compra.showPaymentButton = compra.payers.includes(this.userService.getUser().name);
@@ -199,8 +199,23 @@ export class ComprasComponent implements OnInit {
       case "UTILITIES":
         compra.category = "Utilitários"
         break
+      case "RENT":
+        compra.category = "Aluguel"
+        break
+      case "INTERNET":
+        compra.category = "Internet"
+        break
+      case "ENERGY":
+        compra.category = "Energia"
+        break
+      case "WATER":
+        compra.category = "Água"
+        break
+      case "GAS":
+        compra.category = "Gás"
+        break
       case "OTHERS":
-        compra.category = "Limpeza"
+        compra.category = "Outros"
         break
     }
   }

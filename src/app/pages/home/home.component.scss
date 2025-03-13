@@ -19,7 +19,6 @@
         font-weight: 500;
         margin-left: 400px;
         color: white;
-        text-shadow: 1px 1px 3px #2c2929
     }
 }
 
@@ -162,11 +161,12 @@
     .tabela-compras {
         background-color: white;
         width: 1350px;
+        min-height: 200px;
         max-height: min-content;
         margin-left: 370px;
-        margin-top: 100px;
+        margin-top: 120px;
         box-shadow: 0px 2px 5px rgb(99, 99, 99);
-        border-radius: 20px;
+        border-radius: 20px 20px 0px 0px;
         border: none;
 
         .mat-mdc-card-content {
