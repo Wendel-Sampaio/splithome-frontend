@@ -1,0 +1,54 @@
+<mat-card id="meu-perfil-card" appearance="outlined">
+    <mat-card-header>
+        <mat-card-title id="title">Suas informações</mat-card-title>
+    </mat-card-header>
+    <mat-card-content>
+        <div id="conteudo-card">
+            <div id="inputs-container">
+                <div class="input-name">
+                    <mat-form-field appearance="outline">
+                        <mat-label>Seu nome</mat-label>
+                        <mat-icon matSuffix>person</mat-icon>
+                        <input [(ngModel)]="userData.name" [disabled]="!isEditable" matInput>
+                    </mat-form-field>
+                </div>
+                <div class="input-email">
+                    <mat-form-field appearance="outline">
+                        <mat-label>Insira seu email</mat-label>
+                        <input [(ngModel)]="userData.email" [disabled]="!isEditable" matInput>
+                        <mat-icon matSuffix>email</mat-icon>
+                    </mat-form-field>
+                </div>
+                <div id="input-linha-dois">
+                    <div class="input-phonenumber-div">
+                        <mat-form-field id="input-phonenumber" appearance="outline">
+                            <mat-label>Seu telefone</mat-label>
+                            <mat-icon matSuffix>phone</mat-icon>
+                            <input [(ngModel)]="userData.phoneNumber" [disabled]="!isEditable" matInput>
+                        </mat-form-field>
+                    </div>
+                    <div class="input-chavepix-div">
+                        <mat-form-field id="input-chavepix" appearance="outline">
+                            <mat-label>Sua chave Pix</mat-label>
+                            <mat-icon matSuffix>pix</mat-icon>
+                            <input [(ngModel)]="userData.pixKey" [disabled]="!isEditable" matInput>
+                        </mat-form-field>
+                    </div>
+                </div>
+            </div>
+            <div id="foto-container">
+                <img id="foto-perfil" src="../../../../assets/perfil.png" alt="">
+            </div>
+        </div>
+    </mat-card-content>
+    <div id="caixa-botao">
+        <mat-card-actions>
+            <button id="botao-editar" mat-button (click)="atualizarUsuario()" (click)="toggleEditMode()">
+                {{ isEditable ? 'Salvar' : 'Editar informações' }} <mat-icon matSuffix>edit</mat-icon>
+            </button>
+            <button *ngIf="isEditable" id="botao-cancelar" mat-button (click)="cancelEdit()">
+                Cancelar <mat-icon matSuffix>cancel</mat-icon>
+            </button>
+        </mat-card-actions>
+    </div>
+</mat-card>

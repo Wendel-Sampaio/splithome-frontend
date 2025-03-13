@@ -124,6 +124,10 @@ export class ComprasComponent implements OnInit {
     }
   }
 
+  isLastCompra(compra: Compra): boolean {
+    return this.compras[this.compras.length - 1] === compra;
+  }  
+
   verificaUserRemainingPayers(compra: Compra): boolean {
     const userName = this.userService.getUser().name;
     return compra.remainingPayers.includes(userName);

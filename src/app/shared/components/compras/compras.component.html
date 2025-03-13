@@ -6,7 +6,12 @@
     <table  mat-table [dataSource]="compras">
         <ng-container matColumnDef="title">
             <th class="column-name" mat-header-cell *matHeaderCellDef> Título </th>
-            <td [ngClass]="{'payed-style': verificarPagamento(element)}" mat-cell *matCellDef="let element"> {{element.title}} </td>
+            <td [ngClass]="{
+                'payed-style': verificarPagamento(element),
+                'payed-style-last-left': isLastCompra(element)
+            }" mat-cell *matCellDef="let element"> 
+                {{element.title}} 
+            </td>
         </ng-container>
     
         <ng-container matColumnDef="category">
@@ -59,7 +64,12 @@
         
         <ng-container matColumnDef="formatedRemainingPayers">
             <th class="column-name" mat-header-cell *matHeaderCellDef> Pagadores restantes </th>
-            <td [ngClass]="{'payed-style': verificarPagamento(element)}" mat-cell *matCellDef="let element"> {{ element.formatedRemainingPayers }} </td>
+            <td [ngClass]="{
+                'payed-style': verificarPagamento(element),
+                'payed-style-last-right': isLastCompra(element)
+            }" mat-cell *matCellDef="let element"> 
+                {{element.formatedRemainingPayers}} 
+            </td>
         </ng-container>
         <tr mat-header-row *matHeaderRowDef="displayedColumns"></tr>
         <tr mat-row *matRowDef="let row; columns: displayedColumns;"></tr>
