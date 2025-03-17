@@ -1,7 +1,7 @@
 ---
 name: Bug Report
 about: Use this template to report a bug or unexpected behavior in the project.
-title: "[BUG] Bug Report: <short description of the bug>"
+title: ''
 labels: ''
 assignees: ''
 

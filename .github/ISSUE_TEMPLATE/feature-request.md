@@ -1,7 +1,7 @@
 ---
 name: Feature Request
 about: Use this template to request a new feature or improvement to the project.
-title: "[FEATURE] Feature Request: <short description of the feature>"
+title: ''
 labels: ''
 assignees: ''
 

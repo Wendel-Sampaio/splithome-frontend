@@ -1,7 +1,7 @@
 ---
 name: Custom Template
 about: Use this template for more general issues, tasks, or custom reports.
-title: "[CUSTOM] Custom Issue: <short description of the issue>"
+title: ''
 labels: ''
 assignees: ''
 
