@@ -83,8 +83,8 @@ Open the project in your browser at `http://localhost:4200`
       </a>
     </td>
      <td>
-      <a href="#">
-        <img src="https://avatars.githubusercontent.com/u/111626474?v=4" width="100px;" alt="José Lúcio Profile Picture"/><br>
+      <a href="https://github.com/JLucioLP">
+        <img src="https://avatars.githubusercontent.com/u/140078702?v=4" width="100px;" alt="José Lúcio Profile Picture"/><br>
         <sub>
           <b>José Lúcio</b>
         </sub><br>
