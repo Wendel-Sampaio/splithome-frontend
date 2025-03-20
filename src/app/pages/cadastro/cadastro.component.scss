@@ -60,12 +60,14 @@
   text-decoration: none;
 }
 
-#subtitle, mat-card-subtitle {
+#subtitle {
   font-family: "Zain", serif;
-  font-size: 21px;
-  color: #9F9D9D;
+  font-weight: normal;
+  font-style: 100;
   text-align: center;
-  margin-top: 5%;
+  font-size: 23px;
+  color: #9F9D9D;
+  margin-top: 15px;
 }
 
 #error-message {
@@ -111,6 +113,15 @@ mat-card {
 mat-card-content {
   margin-left: 13%;
   margin-bottom: 2%;
+}
+
+mat-form-field{
+  @include mat.theme((
+    color: (
+      primary: my-theme.$primary-palette,
+      tertiary: my-theme.$tertiary-palette,
+    ),
+  ));
 }
 
 /* Responsividade */

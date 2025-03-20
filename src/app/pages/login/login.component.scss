@@ -23,7 +23,8 @@
 
 .body-card-login {
     width: 550px;
-    min-height: 630px;
+    min-height: max-content;
+    padding-bottom: 10%;
     background-color: white;
     box-shadow: 5px 5px 10px rgb(170, 170, 170);
     display: flex;
@@ -41,7 +42,7 @@
 }
 
 .slogan {
-    margin-top: 60px;
+    margin-top: 20px;
 }
 
 #welcome {
@@ -91,6 +92,7 @@
 
 .input-email,
 .password-input {
+    margin-bottom: 2%;
     @include mat.theme((
     color: (
       primary: my-theme.$primary-palette,
@@ -108,7 +110,9 @@
     background-color: #48A75A;
     border: none;
     border-radius: 8px;
-    margin-top: 10px;
-    min-width: 250px;
-    min-height: 35px;
+    margin-top: 2%;
+    min-width: 350px;
+    min-height: 50px;
+
+
 }
