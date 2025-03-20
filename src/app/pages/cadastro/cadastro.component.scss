@@ -2,176 +2,182 @@
 @use '../../../assets/theme-colors.scss' as my-theme;
 
 .body {
-    background-image: url('/assets/background.png');
-    background-size: cover; /* Faz a imagem cobrir todo o fundo */
-    background-position: center; /* Centraliza a imagem */
-    background-repeat: no-repeat; /* Garante que a imagem não se repita */
-    position: relative;
-    min-height: 100vh;
-    display: flex;
-    justify-content: center;
-    align-items: center; 
+  background: url('/assets/background.png') center / cover no-repeat;
+  min-height: 100vh;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  position: relative;
 }
 
 .main-card {
-    display: flex;
-    justify-items: center;
-    gap: 400px;
+  display: flex;
+  justify-items: center;
+  gap: 400px;
+  flex-wrap: wrap; /* Adicionado para permitir quebra de linha em telas menores */
 }
 
 .body-card-register {
-    width: 550px;
-    min-height: 630px;
-    background-color: white;
-    box-shadow: 5px 5px 10px rgb(131, 131, 131);
-    display: flex;
-    align-items: center;
-    border-radius: 25px;
-    border: none;
-    margin-left: -100px;
+  width: 550px;
+  min-height: 630px;
+  background: white;
+  box-shadow: 5px 5px 10px rgb(131, 131, 131);
+  display: flex;
+  align-items: center;
+  border-radius: 25px;
+  margin-left: -100px;
+  padding: 20px; /* Garantir padding consistente */
 }
 
-.card-header {
-    display: flex;
-    justify-content: center;
-    margin-top: 30px;
-    min-width: 500px;
+.card-header, mat-card-header {
+  display: flex;
+  justify-content: center;
+  margin-top: 30px;
+  min-width: 500px;
 }
 
 .slogan {
-    margin-top: 60px;
+  margin-top: 60px;
 }
 
-#welcome {
-    font-family: "Inter", serif;
-    font-weight: 700;
-    font-style: normal;
-    font-size: 33px;
-    color: #9F9D9D;
-    word-wrap: normal;
+#welcome, mat-card-title {
+  font-family: "Inter", serif;
+  font-weight: 700;
+  font-size: 33px;
+  color: #9F9D9D;
+  margin-bottom: 5%;
 }
 
 #splithome {
-    font-family: "Tilt Warp", serif;
-    font-weight: 500;
-    font-size: 33px;
-    font-style: normal;
-    font-variation-settings:
-      "XROT" 0,
-      "YROT" 0;
-    color: #48A75A;
+  font-family: "Tilt Warp", serif;
+  font-weight: 400;
+  font-size: 33px;
+  color: #48A75A;
 }
 
 #aqui {
-    color: #48A75A;
-    text-decoration: none;
+  color: #48A75A;
+  text-decoration: none;
 }
 
-#subtitle {
-    font-family: "Zain", serif;
-    font-weight: normal;
-    font-style: 100;
-    text-align: center;
-    font-size: 23px;
-    color: #9F9D9D;
-    margin-top: 15px;
+#subtitle, mat-card-subtitle {
+  font-family: "Zain", serif;
+  font-size: 21px;
+  color: #9F9D9D;
+  text-align: center;
+  margin-top: 5%;
 }
 
-.input-name,
-.input-email,
-.password-input,
-.repeat-password-input {
-    min-width: 350px;
-    margin-top: 10px;
-    color: #48A75A;
+#error-message {
+  margin-top: 2%;
+  color: white;
+  background: red;
+  padding: 2%;
+  border-radius: 8px;
 }
 
-.input-name, 
-.input-email,
-.password-input, 
-.repeat-password-input {
-    @include mat.theme((
-    color: (
-      primary: my-theme.$primary-palette,
-      tertiary: my-theme.$tertiary-palette,
-    ),
-  ));
-}
-
-.input-name, 
-.input-email,
-.password-input, 
-.repeat-password-input {
-    min-width: 350px;
+.input-name, .input-email, .password-input, .repeat-password-input, #register-button {
+  min-width: 350px;
+  margin-top: 12px;
 }
 
 .input-name {
-    margin-top: 20px;
-}
-
-#splithome {
-    font-family: "Tilt Warp", serif;
-    font-optical-sizing: auto;
-    font-weight: 400;
-    font-style: normal;
-    font-variation-settings:
-      "XROT" 0,
-      "YROT" 0;
-    color: #48A75A;
-}
-
-#aqui {
-    color: #48A75A;
-    text-decoration: none;
+  margin-top: 20px;
 }
 
 #register-button {
-    font-family: "Itim", serif;
-    font-weight: 300;
-    font-style: normal;
-    font-size: 20px;
-    color: white;
-    background-color: #48A75A;
-    border: none;
-    border-radius: 8px;
-    min-width: 250px;
-    min-height: 35px;
+  font-family: "Itim", serif;
+  font-weight: 500;
+  font-size: 25px;
+  color: white;
+  background-color: #48A75A;
+  border: none;
+  border-radius: 8px;
+  min-height: 50px;
+  cursor: pointer;
+
+  &:disabled {
+    background-color: #9F9D9D;
+  }
 }
 
 mat-card {
-    box-shadow: 1px 2px 10px rgb(99, 99, 99);
-    display: flex;
-    align-items: center;
-    border-radius: 25px;
-}
-
-mat-card-header{
-    margin-top: 10px;
-    min-width: 500px;
-}
-
-mat-card-title {
-    font-family: "Arimo", serif;
-    font-optical-sizing: auto;
-    font-weight: 700;
-    font-style: normal;
-    font-size: 35px;
-    color: #9F9D9D;
-    word-wrap: normal;
-}
-
-mat-card-subtitle {
-    font-family: "Itim", serif;
-    font-weight: 300;
-    font-style: normal;
-    text-align: center;
-    font-size: 19px;
-    color: #9F9D9D;
+  box-shadow: 1px 2px 10px rgb(99, 99, 99);
+  display: flex;
+  align-items: center;
+  border-radius: 25px;
 }
 
 mat-card-content {
-    display: grid;
-    justify-content: center;
-    min-width: 400px;
+  margin-left: 13%;
+  margin-bottom: 2%;
 }
 
+/* Responsividade */
+@media (max-width: 1024px) {
+  .main-card {
+    gap: 30px; /* Ajuste de espaçamento para telas menores */
+  }
+
+  .body-card-register {
+    width: 90%;
+    margin-left: 0;
+  }
+
+  #welcome, mat-card-title {
+    font-size: 28px;
+  }
+
+  #splithome {
+    font-size: 28px;
+  }
+
+  #subtitle, mat-card-subtitle {
+    font-size: 18px; /* Reduzido para melhor leitura em telas menores */
+  }
+
+  mat-form-field {
+    max-width: 100%;
+  }
+
+  #register-button {
+    font-size: 22px;
+    min-height: 50px;
+  }
+}
+
+/* Responsividade extra para telas pequenas */
+@media (max-width: 768px) {
+  .main-card {
+    flex-direction: column;
+    gap: 20px;
+    align-items: center; /* Alinhamento centralizado em telas menores */
+  }
+
+  .body-card-register {
+    width: 100%;
+    min-height: auto;
+    padding: 15px;
+  }
+
+  #welcome, mat-card-title {
+    font-size: 24px; /* Ajuste de tamanho para melhor legibilidade */
+  }
+
+  #splithome {
+    font-size: 24px;
+  }
+
+  #subtitle, mat-card-subtitle {
+    font-size: 16px; /* Maior legibilidade em telas pequenas */
+  }
+
+  .input-name, .input-email, .password-input, .repeat-password-input, #register-button {
+    min-width: 100%; /* Garantir que os campos ocupem 100% da largura disponível */
+  }
+
+  mat-card-content {
+    margin-left: 0;
+    margin-bottom: 0;
+  }
+}

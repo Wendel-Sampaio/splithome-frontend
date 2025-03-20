@@ -1,55 +1,90 @@
 <div class="body">
   <div class="main-card">
-    <div>
-      <mat-card class="body-card-register" appearance="outlined">
-        <mat-card-header class="card-header">
-          <mat-card-title id="welcome">Bem vindo ao <b id="splithome">SplitHome</b></mat-card-title>
-          <mat-card-subtitle id="subtitle">Já tem uma conta? faça o login <a id="aqui"
-              href="">aqui.</a></mat-card-subtitle>
-        </mat-card-header>
-        <mat-card-content class="content-card">
-          <div>
-            <mat-form-field class="input-name" appearance="outline">
-              <mat-label>Insira seu nome</mat-label>
-              <mat-icon matSuffix>person</mat-icon>
-              <input matInput [(ngModel)]="name">
-            </mat-form-field>
-          </div>
-          <div>
-            <mat-form-field class="input-email" appearance="outline">
-              <mat-label>Insira seu email</mat-label>
-              <input matInput [(ngModel)]="email">
-              <mat-icon matSuffix>email</mat-icon>
-            </mat-form-field>
-          </div>
-          <div>
-            <mat-form-field class="password-input" appearance="outline">
-              <mat-label>Insira sua senha</mat-label>
-              <input matInput [(ngModel)]="password" [type]="hide1() ? 'password' : 'text'" />
-              <button mat-icon-button matSuffix (click)="clickEventPassword($event)" [attr.aria-label]="'Hide password'"
-                [attr.aria-pressed]="hide1()">
-                <mat-icon>{{hide1() ? 'visibility_off' : 'visibility'}}</mat-icon>
-              </button>
-            </mat-form-field>
-          </div>
-          <div>
-            <mat-form-field class="repeat-password-input" appearance="outline">
-              <mat-label>Repita sua senha</mat-label>
-              <input matInput [(ngModel)]="repeatPassword" [type]="hide2() ? 'password' : 'text'" />
-              <button mat-icon-button matSuffix (click)="clickEventRepeatPassword($event)"
-                [attr.aria-label]="'Hide password'" [attr.aria-pressed]="hide2()">
-                <mat-icon>{{hide2() ? 'visibility_off' : 'visibility'}}</mat-icon>
-              </button>
-            </mat-form-field>
-          </div>
-        </mat-card-content>
-        <mat-card-actions>
-          <button mat-raised-button id="register-button" (click)="registrar()">Cadastrar</button>
-        </mat-card-actions>
-      </mat-card>
-    </div>
+    <mat-card class="body-card-register" appearance="outlined">
+      <mat-card-header class="card-header">
+        <mat-card-title id="welcome">
+          Bem-vindo ao <b id="splithome">SplitHome</b>
+        </mat-card-title>
+      </mat-card-header>
+      
+      <mat-card-content class="content-card">
+        <form [formGroup]="cadastroForm">
+          
+          <!-- Nome -->
+          <mat-form-field class="input-name" appearance="outline">
+            <mat-label>Insira seu nome</mat-label>
+            <mat-icon matSuffix>person</mat-icon>
+            <input matInput formControlName="name" required>
+            <mat-error *ngIf="cadastroForm.get('name')?.hasError('required')">
+              O nome é obrigatório.
+            </mat-error>
+            <mat-error *ngIf="cadastroForm.get('name')?.hasError('maxLenght')">
+              O nome não deve ter mais do que 20 caracteres.
+            </mat-error>
+          </mat-form-field>
+  
+          <!-- E-mail -->
+          <mat-form-field class="input-email" appearance="outline">
+            <mat-label>Insira seu email</mat-label>
+            <mat-icon matSuffix>email</mat-icon>
+            <input matInput formControlName="email" required>
+            <mat-error *ngIf="cadastroForm.get('email')?.hasError('required')">
+              O e-mail é obrigatório.
+            </mat-error>
+            <mat-error *ngIf="cadastroForm.get('email')?.hasError('email')">
+              Por favor insira um e-mail válido.
+            </mat-error>
+          </mat-form-field>
+  
+          <!-- Senha -->
+          <mat-form-field class="password-input" appearance="outline">
+            <mat-label>Insira sua senha</mat-label>
+            <input matInput formControlName="password" [type]="hide1() ? 'password' : 'text'" required />
+            <button mat-icon-button matSuffix (click)="clickEventPassword($event)" [attr.aria-label]="'Hide password'" [attr.aria-pressed]="hide1()">
+              <mat-icon>{{ hide1() ? 'visibility_off' : 'visibility' }}</mat-icon>
+            </button>
+            <mat-error *ngIf="cadastroForm.get('password')?.hasError('required')">
+              A senha é obrigatória.
+            </mat-error>
+            <mat-error *ngIf="cadastroForm.get('password')?.hasError('minLength')">
+              Deve conter no mínimo 8 caracteres.
+            </mat-error>
+            <mat-error *ngIf="cadastroForm.get('password')?.hasError('pattern')">
+              Deve conter pelo menos um caractere especial.
+            </mat-error>
+          </mat-form-field>
+  
+          <!-- Repita a Senha -->
+          <mat-form-field class="repeat-password-input" appearance="outline">
+            <mat-label>Repita sua senha</mat-label>
+            <input matInput formControlName="repeatPassword" [type]="hide2() ? 'password' : 'text'" required />
+            <button mat-icon-button matSuffix (click)="clickEventRepeatPassword($event)" [attr.aria-label]="'Hide password'" [attr.aria-pressed]="hide2()">
+              <mat-icon>{{ hide2() ? 'visibility_off' : 'visibility' }}</mat-icon>
+            </button>
+            <mat-error *ngIf="cadastroForm.get('repeatPassword')?.hasError('required')">
+              Por favor repita a sua senha.
+            </mat-error>
+            <mat-error *ngIf="cadastroForm.get('repeatPassword')?.hasError('passwordMismatch')">
+              As senhas devem ser iguais.
+            </mat-error>
+          </mat-form-field>
+          
+        </form>
+      </mat-card-content>
+  
+      <mat-card-actions>
+        <button mat-raised-button id="register-button" (click)="registrar()" [disabled]="cadastroForm.invalid">
+          Cadastrar
+        </button>
+      </mat-card-actions>
+      
+      <mat-card-subtitle id="subtitle">
+        Já tem uma conta? Faça o login <a id="aqui" href="#">aqui.</a>
+      </mat-card-subtitle>
+    </mat-card>
+    
     <div class="slogan">
-      <img src="../../../assets/imagem1.png" alt="">
+      <img src="../../../assets/imagem1.png" alt="Slogan Image">
     </div>
   </div>
 </div>
