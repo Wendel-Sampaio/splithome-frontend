@@ -1,39 +1,46 @@
 <div class="body">
   <div class="main-card">
     <div>
-      <mat-card class="body-card-login" appearance="outlined">
-        <mat-card-header class="card-header">
+      <form [formGroup]="loginForm">
+        <mat-card class="body-card-login" appearance="outlined">
+          <mat-card-header class="card-header">
             <mat-card-title id="welcome">Bem vindo ao <b id="splithome">SplitHome</b></mat-card-title>
-            <mat-card-subtitle id="subtitle">Não tem uma conta? cadastre-se <a id="aqui" href="/cadastro">aqui.</a></mat-card-subtitle>
-        </mat-card-header>
-        <mat-card-content class="content-card">
+          </mat-card-header>
+          <mat-card-content class="content-card">
             <div>
-                <mat-form-field class="input-email" appearance="outline">
-                  <mat-label>Insira seu email</mat-label>
-                  <input matInput [(ngModel)]="email">
-                  <mat-icon matSuffix>person</mat-icon>
-                </mat-form-field>
+              <mat-form-field class="input-email" appearance="outline">
+                <mat-label>Insira seu email</mat-label>
+                <input matInput formControlName="email" required>
+                <mat-error *ngIf="loginForm.get('email')?.hasError('required')">
+                  Por favor insira o email.
+                </mat-error>  
+                <mat-error *ngIf="loginForm.get('email')?.hasError('email')">
+                  Por favor insira um email válido.
+                </mat-error>               
+                <mat-icon matSuffix>person</mat-icon>
+              </mat-form-field>
             </div>
             <div>
-                <mat-form-field class="password-input" appearance="outline">
-                  <mat-label>Insira sua senha</mat-label>
-                  <input matInput [(ngModel)]="password" [type]="hide1() ? 'password' : 'text'" />
-                  <button
-                    mat-icon-button
-                    matSuffix
-                    (click)="clickEventPassword($event)"
-                    [attr.aria-label]="'Hide password'"
-                    [attr.aria-pressed]="hide1()"
-                  >
-                    <mat-icon>{{hide1() ? 'visibility_off' : 'visibility'}}</mat-icon>
-                  </button>
-                </mat-form-field>
+              <mat-form-field class="password-input" appearance="outline">
+                <mat-label>Insira sua senha</mat-label>
+                <input matInput formControlName="password" [type]="hide1() ? 'password' : 'text'" />
+                <mat-error *ngIf="loginForm.get('password')?.hasError('required')">
+                  Por favor insira a senha.
+                </mat-error> 
+                <button mat-icon-button matSuffix (click)="clickEventPassword($event)"
+                  [attr.aria-label]="'Hide password'" [attr.aria-pressed]="hide1()">
+                  <mat-icon>{{hide1() ? 'visibility_off' : 'visibility'}}</mat-icon>
+                </button>
+              </mat-form-field>
             </div>
-        </mat-card-content>
-        <mat-card-actions>
+          </mat-card-content>
+          <mat-card-actions>
             <button mat-raised-button id="register-button" (click)="login()">Entrar</button>
-        </mat-card-actions>
-      </mat-card>
+          </mat-card-actions>
+          <mat-card-subtitle id="subtitle">Não tem uma conta? cadastre-se <a id="aqui"
+            href="/cadastro">aqui.</a></mat-card-subtitle>
+        </mat-card>
+      </form>
     </div>
     <div class="slogan">
       <img src="../../../assets/imagem1.png" alt="">
