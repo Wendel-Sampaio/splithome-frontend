@@ -27,4 +27,8 @@ export class CompraService {
     return this.http.put<any>(this.API+"/update-purchase", data)
   }
 
+  deleteCompra(contaId: string): Observable<string> {
+    return this.http.delete<string>(`${this.API}/delete/${contaId}`, {responseType: 'text' as 'json'}); 
+  }
+  
 }

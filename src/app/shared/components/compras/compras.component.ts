@@ -1,4 +1,4 @@
-import { Component, inject, OnInit } from '@angular/core';
+import { ChangeDetectorRef, Component, inject, OnInit } from '@angular/core';
 import { MatTableModule } from '@angular/material/table';
 import { CompraService } from '../../services/compra/compra.service';
 import { Compra } from '../../../core/models/compra/compra';
@@ -8,6 +8,8 @@ import { FormCompraComponent } from '../form-compra/form-compra.component';
 import { UserService } from '../../../core/auth/user/user.service';
 import { MatCardTitle } from '@angular/material/card';
 import { DialogPagamentoComponent } from '../dialog-pagamento/dialog-pagamento.component';
+import { MatIconModule } from '@angular/material/icon';
+import { MatButtonModule } from '@angular/material/button';
 
 export interface CompraModel {
   id: string;
@@ -30,9 +32,18 @@ export interface CompraModel {
   selector: 'tabela-compras',
   styleUrl: 'compras.component.scss',
   templateUrl: 'compras.component.html',
-  imports: [MatTableModule, CommonModule, MatDialogModule, MatCardTitle],
+  imports: [
+    MatTableModule, 
+    CommonModule,
+    MatDialogModule, 
+    MatCardTitle,
+    MatIconModule,
+    MatButtonModule
+  ],
 })
 export class ComprasComponent implements OnInit {
+
+  constructor(private cdr: ChangeDetectorRef) {}
 
   readonly dialog = inject(MatDialog);
 
@@ -84,8 +95,10 @@ export class ComprasComponent implements OnInit {
     'unitValue',
     'purchaserName',
     'payment',
-    'formatedRemainingPayers'
+    'formatedRemainingPayers',
+    'actions'
   ];
+
   compras: Compra[] = [];
   compraService = inject(CompraService)
   userService = inject(UserService)
@@ -221,4 +234,19 @@ export class ComprasComponent implements OnInit {
         break
     }
   }
+
+  deleteCompra(contaId: string): void {
+    this.compraService.deleteCompra(contaId).subscribe({
+      next: (response: string) => {
+        console.log('Compra deletada com sucesso:', response);  
+        this.pegarCompras();  
+      },
+      error: (err) => {
+        console.error('Erro ao deletar compra', err);
+      }
+    });
+  }
+  
 }
+
+

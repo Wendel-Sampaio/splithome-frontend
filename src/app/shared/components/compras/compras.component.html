@@ -1,76 +1,90 @@
 <div class="card-body">
     <mat-card-title class="titulo-menu-compras">Compras</mat-card-title>
-    <button class="cadastrar-compra" mat-button (click)="abrirFormCompra()">Nova compra</button>
+    <button mat-button class="cadastrar-compra" mat-button (click)="abrirFormCompra()"><mat-icon>add_circle</mat-icon>Nova compra</button>
 </div>
 <div class="table">
-    <table  mat-table [dataSource]="compras">
+    <table mat-table [dataSource]="compras">
         <ng-container matColumnDef="title">
             <th class="column-name" mat-header-cell *matHeaderCellDef> Título </th>
             <td [ngClass]="{
                 'payed-style': verificarPagamento(element),
                 'payed-style-last-left': isLastCompra(element)
-            }" mat-cell *matCellDef="let element"> 
-                {{element.title}} 
+            }" mat-cell *matCellDef="let element">
+                {{element.title}}
             </td>
         </ng-container>
-    
+
         <ng-container matColumnDef="category">
             <th class="column-name" lass="column-name" mat-header-cell *matHeaderCellDef> Categoria </th>
-            <td [ngClass]="{'payed-style': verificarPagamento(element)}" mat-cell *matCellDef="let element"> {{element.category}} </td>
+            <td [ngClass]="{'payed-style': verificarPagamento(element)}" mat-cell *matCellDef="let element">
+                {{element.category}} </td>
         </ng-container>
-    
+
         <ng-container matColumnDef="purchaseDate">
             <th class="column-name" mat-header-cell *matHeaderCellDef> Data compra </th>
-            <td [ngClass]="{'payed-style': verificarPagamento(element)}" mat-cell *matCellDef="let element"> {{element.purchaseDate | date: "dd/MM/yyyy"}}</td>
+            <td [ngClass]="{'payed-style': verificarPagamento(element)}" mat-cell *matCellDef="let element">
+                {{element.purchaseDate | date: "dd/MM/yyyy"}}</td>
         </ng-container>
-    
+
         <ng-container matColumnDef="paymentDate">
             <th class="column-name" mat-header-cell *matHeaderCellDef> Data Pagamento </th>
-            <td [ngClass]="{'payed-style': verificarPagamento(element)}" mat-cell *matCellDef="let element"> {{element.paymentDate | date: "dd/MM/yyyy"}} </td>
+            <td [ngClass]="{'payed-style': verificarPagamento(element)}" mat-cell *matCellDef="let element">
+                {{element.paymentDate | date: "dd/MM/yyyy"}} </td>
         </ng-container>
-        
+
         <ng-container matColumnDef="value">
             <th class="column-name" mat-header-cell *matHeaderCellDef> Valor </th>
-            <td [ngClass]="{'payed-style': verificarPagamento(element)}" mat-cell *matCellDef="let element"> R${{ element.value }} </td>
+            <td [ngClass]="{'payed-style': verificarPagamento(element)}" mat-cell *matCellDef="let element"> R${{
+                element.value }} </td>
         </ng-container>
 
         <ng-container matColumnDef="formatedPayers">
             <th class="column-name" mat-header-cell *matHeaderCellDef> Pagadores </th>
-            <td [ngClass]="{'payed-style': verificarPagamento(element)}" mat-cell *matCellDef="let element"> {{ element.formatedPayers }} </td>
+            <td [ngClass]="{'payed-style': verificarPagamento(element)}" mat-cell *matCellDef="let element"> {{
+                element.formatedPayers }} </td>
         </ng-container>
 
         <ng-container matColumnDef="unitValue">
             <th class="column-name" mat-header-cell *matHeaderCellDef> Valor unitário </th>
-            <td [ngClass]="{'payed-style': verificarPagamento(element)}" mat-cell *matCellDef="let element"> R${{ element.unitValue | currency }} </td>
+            <td [ngClass]="{'payed-style': verificarPagamento(element)}" mat-cell *matCellDef="let element"> R${{
+                element.unitValue | currency }} </td>
         </ng-container>
 
         <ng-container matColumnDef="purchaserName">
             <th class="column-name" mat-header-cell *matHeaderCellDef> Comprador </th>
-            <td [ngClass]="{'payed-style': verificarPagamento(element)}" mat-cell *matCellDef="let element"> {{element.purchaserName}} </td>
+            <td [ngClass]="{'payed-style': verificarPagamento(element)}" mat-cell *matCellDef="let element">
+                {{element.purchaserName}} </td>
         </ng-container>
 
         <ng-container matColumnDef="payment">
             <th class="column-name" mat-header-cell *matHeaderCellDef> Pagamento </th>
-            <td [ngClass]="{'payed-style': verificarPagamento(element)}" mat-cell *matCellDef="let element"> 
-                    <button 
-                    [ngClass]="{'payed-button': element.isPaid}" 
-                    (click)="mudarStatusDaCompra(element)"
-                    (click)="efetuarPagamento(element)"
-                    *ngIf="element.showPaymentButton ; else indisponivel" 
-                    class="payment-button" 
-                    > {{ element.isPaid ? 'Pago ✔' : 'Pagar' }} </button>{{ element.payment }} </td>
-                    <ng-template #indisponivel><span>Indisponível</span></ng-template>
+            <td [ngClass]="{'payed-style': verificarPagamento(element)}" mat-cell *matCellDef="let element">
+                <button [ngClass]="{'payed-button': element.isPaid}" (click)="mudarStatusDaCompra(element)"
+                    (click)="efetuarPagamento(element)" *ngIf="element.showPaymentButton ; else indisponivel"
+                    class="payment-button"> {{ element.isPaid ? 'Pago ✔' : 'Pagar' }} </button>{{ element.payment }}
+            </td>
+            <ng-template #indisponivel><span>Indisponível</span></ng-template>
         </ng-container>
-        
+
         <ng-container matColumnDef="formatedRemainingPayers">
             <th class="column-name" mat-header-cell *matHeaderCellDef> Pagadores restantes </th>
             <td [ngClass]="{
                 'payed-style': verificarPagamento(element),
                 'payed-style-last-right': isLastCompra(element)
-            }" mat-cell *matCellDef="let element"> 
-                {{element.formatedRemainingPayers}} 
+            }" mat-cell *matCellDef="let element">
+                {{element.formatedRemainingPayers}}
             </td>
         </ng-container>
+
+        <ng-container matColumnDef="actions">
+            <th class="column-name" mat-header-cell *matHeaderCellDef></th>
+            <td [ngClass]="{'payed-style': verificarPagamento(element)}" mat-cell *matCellDef="let element">
+                <button class="remove-buttom" (click)="deleteCompra(element.id)">
+                    <mat-icon>delete</mat-icon>
+                </button>
+            </td>
+        </ng-container>
+
         <tr mat-header-row *matHeaderRowDef="displayedColumns"></tr>
         <tr mat-row *matRowDef="let row; columns: displayedColumns;"></tr>
     </table>

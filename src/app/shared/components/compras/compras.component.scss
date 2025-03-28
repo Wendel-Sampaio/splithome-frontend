@@ -1,111 +1,117 @@
-@use '@angular/material' as mat;
-@use '../../../../assets/theme-colors.scss' as my-theme;
+// Definindo variáveis de cores
+$primary-color: #4caf50;        // Cor principal (verde)
+$primary-hover: #45a049;        // Cor de hover para o botão de adicionar compra
+$secondary-color: #2196f3;      // Cor azul para o botão de pagamento
+$secondary-hover: #1976d2;      // Cor de hover para o botão de pagamento
+$paid-background: #e8f5e9;      // Cor de fundo para itens pagos (verde claro)
+$paid-border-color: #66bb6a;    // Cor de borda para itens pagos
+$remove-button-color: #f44336;  // Cor do botão de remover (vermelho)
+$remove-button-hover: #d32f2f;  // Cor de hover para o botão de remover
+$header-background: #f4f4f4;    // Cor de fundo das cabeçalhos da tabela
+$header-text-color: #333;       // Cor do texto dos cabeçalhos
+$error-text-color: #f44336;     // Cor de erro (texto vermelho)
+$white-color: #ffffff;          // Cor branca
 
-.mat-mdc-table {
-    background: none;
-}
-
-.column-name {
-    background: #EBEBEB !important;
-    color: #828181;
-    font-size: 15px;
-    font-weight: 500;
-    border-top: 1px solid;
-    border-color: #cccccc;
-}
-
-.column-cell {
-    min-height: 200px;
-    color: #9F9D9D;
-    border-color: #cccccc;
-}
-
-.column-cell.payment {
-    min-height: 200px;
-    color: #777777;
-    border-color: #cccccc;
-    background-color: #93ffa6;
-}
-
-.payment-button {
-    min-width: 70px;
-    min-height: 25px;
-    font-size: 15px;
-    font-weight: 700;
-    color: #48A75A;
-    background-color: white;
-    border-radius: 13px;
-    box-shadow: 0px 0px 4px rgb(99, 99, 99);
-    border: none;
-}
-
-.payment-button:hover {
-    cursor: pointer;
-    color: white;
-    background-color: #48A75A;
-}
-
-.payment-button:active {
-    cursor: pointer;
-    color: white;
-}
-
-.cadastrar-compra {
-    font-size: 18px;
-    font-weight: 700;
-    color: #48A75A;
-    background-color: white;
-    border: none;
-    min-width: 140px;
-    min-height: 35px;
-    border-radius: 12px;
-    cursor: pointer;
-    margin-right: 30px;
-    margin-top: 10px;
-    margin-bottom: 10px;
-    box-shadow: 0px 0px 3px rgb(99, 99, 99);
-}
-
-.cadastrar-compra:hover {
-    color: white;
-    background-color: #48A75A;
-}
-
-.card-body{
+// Estilos para a seção do corpo do card
+.card-body {
     display: flex;
-    justify-content: space-between;
-    align-items: center;
+    
+  
+  // Estilo do título dentro do card
+  .titulo-menu-compras {
+    margin: 2.4%;
+    font-size: 34px;             
+    font-weight: bold;         
+    margin-bottom: 20px;        
+    color: $header-text-color;  
+  }
+
+  // Estilo do botão para cadastrar nova compra
+  .cadastrar-compra {
+    margin-top: 10px;   
+    margin-left: auto;
+    margin-right: 3%;
+    margin-top: 2%;
+    background-color: $primary-color;   
+    color: $white-color;     
+    font-weight: bold;       
+    font-size: 18px;
+    &:hover {
+      background-color: $primary-hover;  
+    }
+  }
 }
 
-.titulo-menu-compras {
-    font-family: "Arimo", serif;
-    font-optical-sizing: auto;
-    font-weight: 700;
-    font-size: 40px;
-    font-style: normal;
-    color: #828181;
-    margin: 20px 20px 20px 30px;
-}
+// Estilos para a tabela de compras
+.table {
+  margin-top: 20px;  
 
-.payed-style {
-    color: white;
-    background-color: #5aaa67;
-}
+  // Estilo da tabela
+  table {
+    width: 100%;               
+    border-collapse: collapse;
+    border: 1px solid #ddd;    
 
-.payed-style-last-right {
-    border-radius: 0px 0px 20px 0px;
-}
+    // Estilo das colunas (cabeçalhos)
+    .column-name {
+      text-align: left;                 
+      font-weight: bold;                
+      background-color: $header-background;
+      padding: 10px;                    
+    }
 
-.payed-style-last-left {
-    border-radius: 0px 0px 0px 20px;
-}
+    // Estilo das células da tabela
+    td {
+      padding: 10px;                    
+      text-align: left;                
+      border-bottom: 1px solid #ddd;    
+    }
 
-.payed-button {
-    color: white;
-    background-color: #48A75A;
-}
+    // Estilo para itens pagos
+    .payed-style {
+      background-color: $paid-background;  
+    }
 
-.payed-button:hover {
-    color: #48A75A;
-    background-color: white;
+
+    // Estilo para o botão de pagamento
+    .payment-button {
+      background-color: $secondary-color;  // Cor de fundo para o botão
+      color: $white-color;                 // Cor do texto (branco)
+      padding: 5px 10px;                   // Padding interno do botão
+      border: none;                        // Sem borda
+      cursor: pointer;                    // Cursor de clique
+      border-radius: 4px;                  // Bordas arredondadas
+      font-weight: bold;                   // Negrito no texto do botão
+      &:hover {
+        background-color: $secondary-hover;  // Cor de fundo ao passar o mouse
+      }
+
+      // Estilo para o botão quando o pagamento já foi efetuado
+      &.payed-button {
+        background-color: $paid-border-color;  // Cor de fundo para o botão quando pago
+        cursor: not-allowed;                   // Cursor desabilitado
+        &:hover {
+          background-color: $primary-color;    // Não permite mudança de cor no hover
+        }
+      }
+    }
+
+    // Estilo para o texto de erro "Indisponível"
+    span {
+      color: $error-text-color;  // Cor vermelha para o erro
+    }
+
+    // Estilo para o botão de remover
+    button {
+      padding: 5px 10px;                      // Padding interno do botão
+      background-color: $remove-button-color;  // Cor de fundo para o botão
+      color: $white-color;                     // Cor do texto (branco)
+      border: none;                            // Sem borda
+      cursor: pointer;                        // Cursor de clique
+      border-radius: 4px;                      // Bordas arredondadas
+      &:hover {
+        background-color: $remove-button-hover; // Cor de fundo ao passar o mouse
+      }
+    }
+  }
 }
