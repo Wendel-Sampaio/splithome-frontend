@@ -46,7 +46,7 @@
             <mat-error *ngIf="cadastroForm.get('password')?.hasError('required')">
               A senha é obrigatória.
             </mat-error>
-            <mat-error *ngIf="cadastroForm.get('password')?.hasError('minLength')">
+            <mat-error *ngIf="cadastroForm.get('password')?.hasError('minlength')">
               Deve conter no mínimo 8 caracteres.
             </mat-error>
             <mat-error *ngIf="cadastroForm.get('password')?.hasError('pattern')">
@@ -77,11 +77,19 @@
             <mat-error *ngIf="cadastroForm.get('familyCode')?.hasError('required')">
               O código da Familia é obrigatório.
             </mat-error>
+            <mat-error *ngIf="cadastroForm.get('familyCode')?.hasError('minlength')">
+              O código deve conter 8 caracteres
+            </mat-error>
           </mat-form-field>
           
         </form>
       </mat-card-content>
-  
+
+      <div class="message-error" *ngIf="mensagemErro">
+        {{ mensagemErro }}
+      </div>
+      
+
       <mat-card-actions>
         <button mat-raised-button id="register-button" (click)="registrar()" [disabled]="cadastroForm.invalid">
           Cadastrar

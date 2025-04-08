@@ -80,7 +80,7 @@
 
 .input-name, .input-email, .password-input, .input-familyCode,  .repeat-password-input, #register-button {
   min-width: 350px;
-  margin-top: 12px;
+  margin-top: 14px;
 }
 
 .input-name {
@@ -156,6 +156,20 @@ mat-form-field{
     min-height: 50px;
   }
 }
+
+.message-error {
+  margin-top: 8px;
+  color: #f44336; 
+  font-weight: 500;
+  font-size: 17px;
+  padding: 8px 12px;
+  border: 1px solid #f44336;
+  border-radius: 4px;
+  background-color: #fdecea;
+  width: 325px;
+  text-align: center;
+}
+
 
 /* Responsividade extra para telas pequenas */
 @media (max-width: 768px) {
