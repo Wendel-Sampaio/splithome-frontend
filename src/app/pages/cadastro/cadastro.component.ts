@@ -42,7 +42,9 @@ export class CadastroComponent {
         name: ['', [Validators.required, Validators.maxLength(20)]],
         email: ['', [Validators.required, Validators.email]],
         password: ['', [Validators.required, Validators.minLength(8), Validators.pattern(/[!@#$%^&*(),.?":{}|<>]/)]],
-        repeatPassword: ['', [Validators.required], [this.passwordMatchValidator.bind(this)]]      }
+        repeatPassword: ['', [Validators.required], [this.passwordMatchValidator.bind(this)]],
+        familyCode: ['', [Validators.required]]
+      }
     );
   }
 
@@ -74,8 +76,8 @@ export class CadastroComponent {
       return;
     }
 
-    const { name, email, password } = this.cadastroForm.value;
-    const register: Register = new Register(name, email, password);
+    const { name, email, password, familyCode } = this.cadastroForm.value;
+    const register: Register = new Register(name, email, password, familyCode);
     
     this.userService.cadastrar(register).subscribe({
       next: () => {
