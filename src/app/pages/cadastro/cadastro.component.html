@@ -68,6 +68,16 @@
               As senhas devem ser iguais.
             </mat-error>
           </mat-form-field>
+
+          <!-- Codígo da Familia -->
+          <mat-form-field class="input-familyCode" appearance="outline">
+            <mat-label>Insira o código da sua Familia</mat-label>
+            <mat-icon matSuffix>group</mat-icon>
+            <input matInput formControlName="familyCode" required>
+            <mat-error *ngIf="cadastroForm.get('familyCode')?.hasError('required')">
+              O código da Familia é obrigatório.
+            </mat-error>
+          </mat-form-field>
           
         </form>
       </mat-card-content>
