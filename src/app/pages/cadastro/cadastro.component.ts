@@ -35,6 +35,7 @@ export class CadastroComponent {
   userService = inject(UserService);
   hide1 = signal(true);
   hide2 = signal(true);
+  mensagemErro: string | null = null;
 
   constructor(private fb: FormBuilder) {
     this.cadastroForm = this.fb.group(
@@ -43,7 +44,7 @@ export class CadastroComponent {
         email: ['', [Validators.required, Validators.email]],
         password: ['', [Validators.required, Validators.minLength(8), Validators.pattern(/[!@#$%^&*(),.?":{}|<>]/)]],
         repeatPassword: ['', [Validators.required], [this.passwordMatchValidator.bind(this)]],
-        familyCode: ['', [Validators.required]]
+        familyCode: ['', [Validators.required, Validators.minLength(8)]],
       }
     );
   }
@@ -84,11 +85,11 @@ export class CadastroComponent {
         this.router.navigate(["/login"]);
       },
       error: (error) => {
-        if (error.status === 409) {
+        if (error.status === 409 || error.status === 404) {
           const errorMessage = JSON.parse(error.error)?.message;
-          alert(errorMessage); 
+          this,this.mensagemErro = errorMessage;
         } else {
-          alert("Tivemos um erro interno, lamentamos.");
+          this,this.mensagemErro = "Tivemos um erro interno, lamentamos.";
           console.error('Erro interno', error);
         }
       }
