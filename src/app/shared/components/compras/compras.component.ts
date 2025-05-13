@@ -33,9 +33,9 @@ export interface CompraModel {
   styleUrl: 'compras.component.scss',
   templateUrl: 'compras.component.html',
   imports: [
-    MatTableModule, 
+    MatTableModule,
     CommonModule,
-    MatDialogModule, 
+    MatDialogModule,
     MatCardTitle,
     MatIconModule,
     MatButtonModule
@@ -43,12 +43,14 @@ export interface CompraModel {
 })
 export class ComprasComponent implements OnInit {
 
-  constructor(private cdr: ChangeDetectorRef) {}
+  constructor(private cdr: ChangeDetectorRef) { }
 
   readonly dialog = inject(MatDialog);
 
   abrirFormCompra() {
-    const formRef = this.dialog.open(FormCompraComponent);
+    const formRef = this.dialog.open(FormCompraComponent, {
+      width: '550px',
+    });
     formRef.afterClosed().subscribe(result => {
       console.log(`Dialog result: ${result}`);
       this.pegarCompras()
@@ -137,7 +139,7 @@ export class ComprasComponent implements OnInit {
 
   isLastCompra(compra: Compra): boolean {
     return this.compras[this.compras.length - 1] === compra;
-  }  
+  }
 
   verificaUserRemainingPayers(compra: Compra): boolean {
     const userName = this.userService.getUser().name;
@@ -238,15 +240,15 @@ export class ComprasComponent implements OnInit {
   deleteCompra(contaId: string): void {
     this.compraService.deleteCompra(contaId).subscribe({
       next: (response: string) => {
-        console.log('Compra deletada com sucesso:', response);  
-        this.pegarCompras();  
+        console.log('Compra deletada com sucesso:', response);
+        this.pegarCompras();
       },
       error: (err) => {
         console.error('Erro ao deletar compra', err);
       }
     });
   }
-  
+
 }
 
 

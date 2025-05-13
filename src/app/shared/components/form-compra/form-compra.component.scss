@@ -1,65 +1,91 @@
-@use '@angular/material' as mat;
-@use '../../../../assets/theme-colors.scss' as my-theme;
-
-
-.title-input, 
-.users-layout, 
-.date-input,
-.categoria-input,
-.valor-input {
-    @include mat.theme((
-    color: (
-      primary: my-theme.$primary-palette,
-      tertiary: my-theme.$tertiary-palette,
-    ),
-  ));
-}
 
 .title {
-    font-weight: 500;
-    margin-left: 30px;
-    margin-top: 30px;
-    margin-bottom: 0px;
-    color: #777777;
+  text-align: center;
+  font-size: 1.8rem;
+  margin-bottom: 1.5rem;
+  font-weight: 600;
+  color: #777777;
 }
 
-.title-input {
-    margin-top: 0px;
+.form-body {
+  display: flex;
+  flex-direction: column;
+  gap: 1.2rem;
+}
+
+form {
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+}
+
+mat-form-field {
+  width: 100%;
+}
+
+.title-input,
+.categoria-input,
+.valor-input,
+.date-input {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
 }
 
 .users-layout {
-    display: flex;
-    flex-wrap: wrap;
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.5rem;
+  margin-top: 1rem;
+  justify-content: center;
 }
 
-.users, .mat-mdc-standard-chip {
-    flex-basis: 33%;
-    border-color: #48A75A !important;
-    cursor: pointer;
+.users {
+  background-color: #e0f7fa;
+  color: #00796b;
+  font-weight: 500;
+  transition: background-color 0.3s ease;
+  cursor: pointer;
+
+  &:hover {
+    background-color: #b2ebf2;
+  }
+
+  &.mat-chip-selected {
+    background-color: #4db6ac;
+    color: #ffffff;
+  }
 }
 
-.confirm-button {
-    background-color: #48A75A !important;
-    color: #ffffff !important;
-    border: solid 2px;
-    border-color: #48A75A;
-    box-shadow: 2px 2px 5px rgb(131, 131, 131);
+mat-dialog-actions {
+  display: flex;
+  justify-content: space-between;
+  margin-top: 1.5rem;
 }
 
 .cancel-button {
-    background-color: #b61b1b !important;
-    color: #ffffff !important;
-    box-shadow: 2px 2px 5px rgb(131, 131, 131);
-    border: solid 2px;
-    border-color: #b61b1b;
+  background-color: #e0e0e0;
+  color: #333;
+  border-radius: 4px;
+  padding: 0.5rem 1.5rem;
+  font-weight: 500;
+  transition: background-color 0.3s ease;
+
+  &:hover {
+    background-color: #d5d5d5;
+  }
 }
 
-.cancel-button:hover {
-    background-color: white !important;
-    color: #b61b1b !important;
+.confirm-button {
+  background-color: #4caf50;
+  color: #fff;
+  border-radius: 4px;
+  padding: 0.5rem 1.5rem;
+  font-weight: 500;
+  transition: background-color 0.3s ease;
+
+  &:hover {
+    background-color: #45a049;
+  }
 }
 
-.confirm-button:hover {
-    background-color: white !important;
-    color: #48A75A !important;
-}
