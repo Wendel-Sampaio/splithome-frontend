@@ -29,6 +29,7 @@ export class MeuPerfilComponent implements OnInit {
     email: '',
     phoneNumber: '',
     pixKey: '',
+    familyCode: ''
   };
 
   userService = inject(UserService)
@@ -45,6 +46,17 @@ export class MeuPerfilComponent implements OnInit {
     this.isEditable = false;
     this.loadUserData(); 
   }
+
+ copyToClipboard() {
+  if (navigator.clipboard) {
+    navigator.clipboard.writeText(this.userData.familyCode)
+      .then(() => this.openSnackBar('Código da família copiado com sucesso!'))
+      .catch(err => console.error('Erro ao copiar código:', err));
+  } else {
+    console.warn('API Clipboard não suportada.');
+  }
+}
+
 
   loadUserData() {
     const userId = this.userService.getUser().id;
