@@ -27,6 +27,7 @@ export class MeuPerfilComponent implements OnInit {
     email: '',
     phoneNumber: '',
     pixKey: '',
+    familyCode: ''
   };
 
   userService = inject(UserService)

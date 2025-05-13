@@ -5,12 +5,14 @@ $secondary-color: #4caf50;      // Cor azul para o botão de pagamento
 $secondary-hover: #21f321;      // Cor de hover para o botão de pagamento
 $paid-background: #e8f5e9;      // Cor de fundo para itens pagos (verde claro)
 $paid-border-color: #66bb6a;    // Cor de borda para itens pagos
-$remove-button-color: #f44336;  // Cor do botão de remover (vermelho)
-$remove-button-hover: #d32f2f;  // Cor de hover para o botão de remover
+$remove-button-color: #f443369f;  // Cor do botão de remover (vermelho)
+$remove-button-hover: #f44336;  // Cor de hover para o botão de remover
 $header-background: #f4f4f4;    // Cor de fundo das cabeçalhos da tabela
 $header-text-color: #333;       // Cor do texto dos cabeçalhos
 $error-text-color: #f44336;     // Cor de erro (texto vermelho)
 $white-color: #ffffff;          // Cor branca
+
+
 
 // Estilos para a seção do corpo do card
 .card-body {
@@ -51,6 +53,7 @@ $white-color: #ffffff;          // Cor branca
     width: 100%;               
     border-collapse: collapse;
     border: 1px solid #ddd;    
+  
 
     // Estilo das colunas (cabeçalhos)
     .column-name {
@@ -77,7 +80,7 @@ $white-color: #ffffff;          // Cor branca
     .payment-button {
       background-color: $secondary-color;  // Cor de fundo para o botão
       color: $white-color;                 // Cor do texto (branco)
-      padding: 5px 10px;                   // Padding interno do botão
+      padding: 8px 17px;                   // Padding interno do botão
       border: none;                        // Sem borda
       cursor: pointer;                    // Cursor de clique
       border-radius: 4px;                  // Bordas arredondadas
