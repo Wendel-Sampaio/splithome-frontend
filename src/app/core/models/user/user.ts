@@ -4,4 +4,5 @@ export class User {
     email!: string;
     phoneNumber!: string;
     pixKey!: string;
+    familyCode!: string;
 }

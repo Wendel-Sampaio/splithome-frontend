@@ -35,6 +35,7 @@
                         </mat-form-field>
                     </div>
                 </div>
+                
             </div>
             <div id="foto-container">
                 <img id="foto-perfil" src="../../../../assets/perfil.png" alt="">
@@ -42,6 +43,7 @@
         </div>
     </mat-card-content>
     <div id="caixa-botao">
+        <p class="family-code" (click)="copyToClipboard()">Código da família: {{userData.familyCode}} </p>
         <mat-card-actions>
             <button id="botao-editar" mat-button (click)="atualizarUsuario()" (click)="toggleEditMode()">
                 {{ isEditable ? 'Salvar' : 'Editar informações' }} <mat-icon matSuffix>edit</mat-icon>
