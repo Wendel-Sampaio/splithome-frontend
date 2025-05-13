@@ -1,180 +1,158 @@
+// Cores Principais
+$primary-color: #48A75A;
+$primary-color-light: #48A75A;
+$secondary-color: #9F9D9D;
+$background-color: #ffffff;
+$white: #F2F2F2;
+$text-dark: #666;
+$shadow-color: rgba(0, 0, 0, 0.1);
+
+
+
 #navbar {
     position: fixed;
     top: 0;
-    right: 0;
-    background-color: #48A75A;
-    width: 100%; 
-    display: flex;
-    justify-content: space-between; 
-    padding: 10px 30px; 
-    box-sizing: border-box;
-    box-shadow: 1px 2px 10px rgb(155, 155, 155);
+    left: 0;
+    width: 100%;
+    background-color: $primary-color;
+    box-shadow: 1px 2px 10px $shadow-color;
+    z-index: 1000;
 
     .toolbar {
-        background: #48A75A !important;
+        background: $primary-color !important;
+        display: flex;
+        justify-content: center;
+        padding: 10px 30px;
     }
-    
+
     #titulo-nav {
-        font-size: 35px;
+        font-size: 2rem;
         font-weight: 500;
-        margin-left: 400px;
-        color: white;
+        color: $white;
     }
 }
 
 .body {
-    width: 100%;
-    height: 100%;
     display: grid;
-    justify-content: center;
-    background-color: #F2F2F2;
-    
+    grid-template-columns: 300px 1fr;
+    gap: 20px;
+    margin-top: 80px;
+    padding: 20px;
+    background-color: $background-color;
+
+    @media (max-width: 768px) {
+        grid-template-columns: 1fr;
+    }
+
     .menu-lateral {
-        background-color: white;
-        box-shadow: 1px 2px 10px rgb(70, 70, 70);
-        display: flex;
-        align-items: center;
-        border-radius: 0px;
-        min-width: 390px;
-        height: 100%;
-        position: fixed;
+        background-color: $background-color;
+        box-shadow: 1px 2px 10px $shadow-color;
+        border-radius: 8px;
+        padding: 20px;
+        position: sticky;
+        top: 80px;
+        height: fit-content;
 
         .header-menu-lateral {
-            display: grid;
-            justify-items: center;
+            text-align: center;
         }
-    
+
         .title {
-            margin-top: 40px;
-            display: grid;
-            justify-items: center;
+            margin: 20px 0;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
         }
-        
+
         .splithome {
             display: flex;
-            justify-content: center;
             align-items: center;
             gap: 10px;
         }
-    
-        .icon-title { 
-            filter: drop-shadow(3px 3px 5px rgb(161, 161, 161))
+
+        .icon-title {
+            filter: drop-shadow(3px 3px 5px rgba(161, 161, 161, 0.5));
+            width: 40px;
         }
-        
+
         .titulo-menu-lateral {
             font-family: "Tilt Warp", serif;
-            font-optical-sizing: auto;
-            font-weight: 400;
-            font-size: 45px;
-            font-style: normal;
-            color: #48A75A;
+            font-size: 2rem;
+            color: $primary-color;
             text-shadow: 2px 3px 4px #c4c4c4;
         }
-        
+
         .profile-photo {
-            margin-top: 40px;
+            margin-top: 20px;
+            width: 80px;
+            height: 80px;
+            border-radius: 50%;
         }
-        
+
         .subtitulo-menu {
-            font-family: "Arimo", serif;
+            font-family: "Arimo", sans-serif;
             font-weight: 700;
-            color: #9F9D9D;
-            margin-top: 13px;
-            margin-bottom: 40px;
-            display: grid;
-            justify-items: center;
+            color: $secondary-color;
+            margin: 20px 0;
         }
-    
+
         .username {
-            color: #48A75A;
+            color: $primary-color;
             font-weight: 700;
-        }
-
-        .botoes-menu-lateral {
-            font-size: 22px;
-            font-family: Arial, Helvetica, sans-serif;
-            font-weight: 600;
-            color: #9F9D9D;
-            min-width: 250px;
-            min-height: 60px;
-            position: relative;
-            display: inline-flex;
-            justify-items: center;
-            align-items: center;
-            padding: 10px 15px;
-            border: none;
-            gap: 10px;
-            border-radius: 20px;
-            background-color: transparent;
-        }
-
-        .botoes-menu-lateral:hover {
-            background-color: #48A75A; 
-            color: white;  
-            cursor: pointer;
-            transition: 0.2s;
-        }
-        
-        .botoes-menu-lateral:hover .mat-icon {
-            color: white; 
-        }
-        
-        .icones-botao {
-            color: #9F9D9D;
-            margin-right: 20px;
-            min-width: 30px;
-            min-height: 30px;
-        }
-        
-        .material-icons{
-            font-size: 32px;
         }
 
         .conteudo-card {
-            display: grid;
-            justify-content: center;
-            margin-top: -10px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
             gap: 10px;
         }
 
-        .botoes-menu-lateral.selected {
-            background-color: #48A75A;
-            color: white;
-        }
-        
-        .botoes-menu-lateral.selected .mat-icon {
-            color: white;
-        }
-        
-        .botoes-menu-lateral:hover {
-            background-color: #48A75A;
-            color: white;
+        .botoes-menu-lateral {
+            font-size: 1.2rem;
+            font-weight: 600;
+            color: $secondary-color;
+            min-width: 200px;
+            padding: 10px 15px;
+            border: none;
+            border-radius: 20px;
+            background-color: transparent;
+            display: flex;
+            align-items: center;
+            gap: 10px;
             cursor: pointer;
-            transition: 0.2s;
+            transition: background-color 0.2s ease;
+
+            &:hover, &.selected {
+                background-color: $primary-color;
+                color: $white;
+
+                .icones-botao {
+                    color: $white;
+                }
+            }
         }
-        
-        .botoes-menu-lateral:hover .mat-icon {
-            color: white;
+
+        .icones-botao {
+            color: $secondary-color;
+            font-size: 1.5rem;
         }
     }
 
     .tabela-compras {
-        background-color: white;
-        width: 1350px;
-        min-height: 176px;
-        max-height: min-content;
-        margin-left: 370px;
-        margin-top: 120px;
-        box-shadow: 0px 2px 5px rgb(99, 99, 99);
-        border-radius: 20px;
-        border: none;
+        background: $background-color;
+        box-shadow: 0 2px 5px $shadow-color;
+        border-radius: 12px;
+        padding: 20px;
+        width: 100%;
+        height: fit-content;
 
         .mat-mdc-card-content {
             padding: 0;
         }
     }
-    
+
     .meu-perfil {
-        margin-left: -450px;
+        margin: 0 auto;
     }
 }

@@ -5,6 +5,7 @@
         </div>
     </mat-toolbar>
 </div>
+
 <div class="body">
     <mat-card class="menu-lateral" appearance="outlined">
         <mat-card-header class="header-menu-lateral">
@@ -14,54 +15,23 @@
                     <mat-card-title class="titulo-menu-lateral">SplitHome</mat-card-title>
                 </div>
                 <img class="profile-photo" src="../../../assets/perfil.png" alt="">
-                <mat-card-subtitle class="subtitulo-menu"> Bem vindo <div class="username">{{ user.name }}</div>
+                <mat-card-subtitle class="subtitulo-menu"> 
+                    Bem-vindo 
+                    <div class="username">{{ user.name }}</div>
                 </mat-card-subtitle>
             </div>
         </mat-card-header>
         <mat-card-content class="conteudo-card">
-            <div>
-                <button (click)="abrirInicio()" 
+            <ng-container *ngFor="let item of menuItems">
+                <button (click)="item.action()" 
                         class="botoes-menu-lateral" 
-                        [ngClass]="{'selected': currentView === 'inicio'}">
-                    <mat-icon class="icones-botao">view_list</mat-icon>Inicío
+                        [ngClass]="{'selected': currentView === item.view}">
+                    <mat-icon class="icones-botao" matSuffix>{{ item.icon }}</mat-icon>{{ item.label }}
                 </button>
-            </div>
-            <div>
-                <button (click)="abrirCompras()" 
-                        class="botoes-menu-lateral" 
-                        [ngClass]="{'selected': currentView === 'compras'}">
-                    <mat-icon class="icones-botao" matSuffix>shopping_cart</mat-icon>Compras
-                </button>
-            </div>
-            <div>
-                <button (click)="abrirDespesas()" 
-                        class="botoes-menu-lateral" 
-                        [ngClass]="{'selected': currentView === 'despesas'}">
-                    <mat-icon class="icones-botao" matSuffix>payments</mat-icon>Despesas
-                </button>
-            </div>
-            <div>
-                <button (click)="abrirRecados()" 
-                        class="botoes-menu-lateral" 
-                        [ngClass]="{'selected': currentView === 'recados'}">
-                    <mat-icon class="icones-botao" matSuffix>forum</mat-icon>Recados
-                </button>
-            </div>
-            <div>
-                <button (click)="abrirMeuPerfil()" 
-                        class="botoes-menu-lateral" 
-                        [ngClass]="{'selected': currentView === 'meuPerfil'}">
-                    <mat-icon class="icones-botao" matSuffix>perm_identity</mat-icon>Meu perfil
-                </button>
-            </div>
-            <div>
-                <button (click)="openDialog('200ms', '200ms')" 
-                        class="botoes-menu-lateral">
-                    <mat-icon class="icones-botao" matSuffix>logout</mat-icon>Sair
-                </button>
-            </div>
+            </ng-container>
         </mat-card-content>
     </mat-card>
+
     <mat-card class="tabela-compras" appearance="outlined" *ngIf="currentView === 'inicio'">
         <mat-card-content><tabela-compras></tabela-compras></mat-card-content>
     </mat-card>
