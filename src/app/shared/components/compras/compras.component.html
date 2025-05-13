@@ -46,7 +46,7 @@
 
         <ng-container matColumnDef="unitValue">
             <th class="column-name" mat-header-cell *matHeaderCellDef> Valor unitário </th>
-            <td [ngClass]="{'payed-style': verificarPagamento(element)}" mat-cell *matCellDef="let element"> R${{
+            <td [ngClass]="{'payed-style': verificarPagamento(element)}" mat-cell *matCellDef="let element"> R{{
                 element.unitValue | currency }} </td>
         </ng-container>
 
