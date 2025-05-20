@@ -2,7 +2,7 @@ import { HttpClient } from '@angular/common/http';
 import { inject, Injectable } from '@angular/core';
 import { Compra } from '../../../core/models/compra/compra';
 import { Observable } from 'rxjs';
-import { environment } from '../../../../environments/environment';
+import { API_URL } from '../../../../../api-url';
 
 @Injectable({
   providedIn: 'root'
@@ -13,8 +13,8 @@ export class CompraService {
 
   http = inject(HttpClient)
 
-  API = `${environment.apiUrl}/transactions`;
-
+  API = `${API_URL}/transactions`;
+  
   listarCompras(): Observable<Compra[]> {
     return this.http.get<Compra[]>(`${this.API}/purchases`);
   }
