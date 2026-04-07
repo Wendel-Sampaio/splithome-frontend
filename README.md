@@ -91,6 +91,15 @@ Open the project in your browser at `http://localhost:4200`
         <sub><i>Collaborator</i></sub>
       </a>
     </td>
+    <td>
+      <a href="https://github.com/sampplier">
+        <img src="https://avatars.githubusercontent.com/u/112439533?v=4"/><br>
+        <sub>
+          <b>Samuel Mendes</b>
+        </sub><br>
+        <sub><i>Collaborator</i></sub>
+      </a>
+    </td>
 </table>
 
 <h2 id="contribute">📫 Contribute</h2>
