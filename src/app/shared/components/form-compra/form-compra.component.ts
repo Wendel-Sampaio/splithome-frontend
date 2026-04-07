@@ -1,4 +1,5 @@
-import { ChangeDetectionStrategy, ChangeDetectorRef, Component, inject } from '@angular/core';
+import { ChangeDetectionStrategy, ChangeDetectorRef, Component, DestroyRef, inject } from '@angular/core';
+import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { FormControl, FormGroup, FormsModule, ReactiveFormsModule } from '@angular/forms';
 import { MatButtonModule } from '@angular/material/button';
 import { MatCardModule } from '@angular/material/card';
@@ -47,6 +48,7 @@ export class FormCompraComponent {
   transacaoService = inject(TransacaoService)
   private _snackBar = inject(MatSnackBar);
   cdRef = inject(ChangeDetectorRef)
+  private destroyRef = inject(DestroyRef);
 
   categorias!: string[];
   categoriasOriginal!: string[];
@@ -87,7 +89,7 @@ export class FormCompraComponent {
   }
 
   listarCategorias() {
-    this.transacaoService.listarCategorias().subscribe({
+    this.transacaoService.listarCategorias().pipe(takeUntilDestroyed(this.destroyRef)).subscribe({
       next: categorias => {
         this.categorias = categorias.map(categoria => 
           CategoriaEnum[categoria as keyof typeof CategoriaEnum] || categoria
@@ -98,7 +100,7 @@ export class FormCompraComponent {
   }
 
   listarUsuarios() {
-    this.userService.getAllUsers().subscribe({
+    this.userService.getAllUsers().pipe(takeUntilDestroyed(this.destroyRef)).subscribe({
       next: usuarios => {
         this.usuarios = usuarios;
         this.cdRef.detectChanges();
@@ -126,7 +128,7 @@ export class FormCompraComponent {
       purchaserId: this.comprador,
       purchaseDate: new Date(),
     }
-    this.compraService.cadastrarCompra(formData).subscribe({
+    this.compraService.cadastrarCompra(formData).pipe(takeUntilDestroyed(this.destroyRef)).subscribe({
       next: response => {
         this.openSnackBar("Compra cadastrada com sucesso!")
       },

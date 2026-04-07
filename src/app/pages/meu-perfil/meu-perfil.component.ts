@@ -1,5 +1,6 @@
 import { CommonModule } from '@angular/common';
-import { ChangeDetectionStrategy, ChangeDetectorRef, Component, inject, OnInit } from '@angular/core';
+import { ChangeDetectionStrategy, ChangeDetectorRef, Component, DestroyRef, inject, OnInit } from '@angular/core';
+import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { MatButtonModule } from '@angular/material/button';
 import { MatCardModule } from '@angular/material/card';
 import { MatFormFieldModule } from '@angular/material/form-field';
@@ -18,9 +19,10 @@ import { UserService } from '../../core/auth/user/user.service';
 })
 export class MeuPerfilComponent implements OnInit {
 
-  isEditable: boolean = false; 
+  isEditable: boolean = false;
   private cdr = inject(ChangeDetectorRef);
-  
+  private destroyRef = inject(DestroyRef);
+
   userData: User = { 
     id: '',
     name: '',
@@ -47,16 +49,16 @@ export class MeuPerfilComponent implements OnInit {
 
   loadUserData() {
     const userId = this.userService.getUser().id;
-    this.userService.getUserById(userId).subscribe(user => {
+    this.userService.getUserById(userId).pipe(takeUntilDestroyed(this.destroyRef)).subscribe(user => {
       this.userData = user;
-      this.cdr.markForCheck(); 
+      this.cdr.markForCheck();
     });
   }
 
   atualizarUsuario() {
     if (this.isEditable === true) {
       const userId = this.userService.getUser().id;
-      this.userService.atualizarUsuario(userId, this.userData).subscribe({
+      this.userService.atualizarUsuario(userId, this.userData).pipe(takeUntilDestroyed(this.destroyRef)).subscribe({
         next: message => {
           console.log(message)
           this.loadUserData();

@@ -1,4 +1,5 @@
-import { Component, inject, Inject, OnInit } from '@angular/core';
+import { Component, DestroyRef, inject, Inject, OnInit } from '@angular/core';
+import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { MatButtonModule } from '@angular/material/button';
 import { MAT_DIALOG_DATA, MatDialogModule, MatDialogRef } from '@angular/material/dialog';
 import { UserService } from '../../../core/auth/user/user.service';
@@ -26,6 +27,7 @@ export class DialogPagamentoComponent implements OnInit {
 
   userService = inject(UserService)
   compraService = inject(CompraService)
+  private destroyRef = inject(DestroyRef);
   user!: User;
 
   ngOnInit(): void {
@@ -33,7 +35,7 @@ export class DialogPagamentoComponent implements OnInit {
   }
 
   pegarComprador() {
-    this.userService.getUserById(this.data.purchaserId).subscribe({
+    this.userService.getUserById(this.data.purchaserId).pipe(takeUntilDestroyed(this.destroyRef)).subscribe({
       next: user => {
         this.user = user;
       }
@@ -50,7 +52,7 @@ export class DialogPagamentoComponent implements OnInit {
       id: this.data.id,
       remainingPayers: this.data.remainingPayers
     }
-    this.compraService.atualizarCompra(modeloPagamento).subscribe({
+    this.compraService.atualizarCompra(modeloPagamento).pipe(takeUntilDestroyed(this.destroyRef)).subscribe({
       next: response => {
         console.log('Compra atualizada com sucesso', response);
       },

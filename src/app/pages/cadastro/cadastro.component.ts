@@ -1,4 +1,5 @@
-import { Component, inject, signal } from '@angular/core';
+import { Component, DestroyRef, inject, signal } from '@angular/core';
+import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { MatCardModule } from '@angular/material/card';
 import { Router } from '@angular/router';
 import { MatIconModule } from '@angular/material/icon';
@@ -33,6 +34,7 @@ export class CadastroComponent {
   cadastroForm: FormGroup;
   router = inject(Router);
   userService = inject(UserService);
+  private destroyRef = inject(DestroyRef);
   hide1 = signal(true);
   hide2 = signal(true);
   mensagemErro: string | null = null;
@@ -80,7 +82,7 @@ export class CadastroComponent {
     const { name, email, password, familyCode } = this.cadastroForm.value;
     const register: Register = new Register(name, email, password, familyCode);
     
-    this.userService.cadastrar(register).subscribe({
+    this.userService.cadastrar(register).pipe(takeUntilDestroyed(this.destroyRef)).subscribe({
       next: () => {
         this.router.navigate(["/login"]);
       },
