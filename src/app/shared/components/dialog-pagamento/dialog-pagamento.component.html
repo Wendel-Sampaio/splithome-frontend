@@ -4,7 +4,7 @@
     <h3>Você irá pagar para:</h3>
     <p> ⮕ {{ user.name }} </p>
     <h3>O valor de:</h3>
-    <p> ⮕ R{{ data.unitValue | currency }} </p>
+    <p> ⮕ {{ data.unitValue | currency:'BRL':'symbol':'1.2-2' }} </p>
     <h3>Chave pix do comprador:</h3>
     <p> ⮕ {{ user.pixKey }} </p>
   </mat-dialog-content>
