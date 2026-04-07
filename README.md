@@ -92,7 +92,7 @@ Open the project in your browser at `http://localhost:4200`
       </a>
     </td>
     <td>
-      <a href="https://github.com/sampplier">
+      <a href="https://github.com/sampplier" width="100px;" alt="Samuel Mendes Profile Picture">
         <img src="https://avatars.githubusercontent.com/u/112439533?v=4"/><br>
         <sub>
           <b>Samuel Mendes</b>
