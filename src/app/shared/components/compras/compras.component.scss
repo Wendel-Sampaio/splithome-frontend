@@ -46,11 +46,13 @@ $white-color: #ffffff;          // Cor branca
 
 // Estilos para a tabela de compras
 .table {
-  margin-top: 20px;  
+  margin-top: 20px;
+  overflow-x: auto;
+  display: block;
 
   // Estilo da tabela
   table {
-    width: 100%;               
+    width: 100%;
     border-collapse: collapse;
     border: 1px solid #ddd;    
   
