@@ -1,0 +1,75 @@
+// Definindo variáveis de cores
+$primary-color: #4caf50;        // Cor principal (verde)
+$primary-hover: #45a049;        // Cor de hover para o botão de adicionar compra
+$secondary-color: #4caf50;      // Cor azul para o botão de pagamento
+$secondary-hover: #21f321;      // Cor de hover para o botão de pagamento
+$paid-background: #e8f5e9;      // Cor de fundo para itens pagos (verde claro)
+$paid-border-color: #66bb6a;    // Cor de borda para itens pagos
+$remove-button-color: #f443369f;  // Cor do botão de remover (vermelho)
+$remove-button-hover: #f44336;  // Cor de hover para o botão de remover
+$header-background: #f4f4f4;    // Cor de fundo das cabeçalhos da tabela
+$header-text-color: #777777;       // Cor do texto dos cabeçalhos
+$error-text-color: #f44336;     // Cor de erro (texto vermelho)
+$white-color: #ffffff;          // Cor branca
+
+// Estilos para a seção do corpo do card
+.card-body {
+  display: flex;
+
+  // Estilo do título dentro do card
+  .titulo-menu-compras {
+    margin: 2.4%;
+    font-size: 34px;
+    font-weight: bold;
+    margin-bottom: 20px;
+    color: $header-text-color;
+  }
+
+  // Estilo do botão para cadastrar nova compra
+  .cadastrar-compra {
+    margin-top: 10px;
+    margin-left: auto;
+    margin-right: 3%;
+    margin-top: 2%;
+    background-color: $primary-color;
+    color: $white-color;
+    font-weight: bold;
+    font-size: 18px;
+
+    &:hover {
+      background-color: $primary-hover;
+    }
+  }
+}
+
+// Estilos para a tabela de compras
+.table {
+  margin-top: 20px;
+
+  // Estilo da tabela
+  table {
+    width: 100%;
+    border-collapse: collapse;
+    border: 1px solid #ddd;
+
+    // Estilo das colunas (cabeçalhos)
+    .column-name {
+      text-align: left;
+      font-weight: bold;
+      background-color: $header-background;
+      padding: 10px;
+    }
+
+    // Estilo das células da tabela
+    td {
+      padding: 10px;
+      text-align: left;
+      border-bottom: 1px solid #ddd;
+    }
+  }
+}
+
+.empty-state {
+  margin: 1rem 0;
+  color: $header-text-color;
+}
