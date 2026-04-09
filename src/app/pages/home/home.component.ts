@@ -11,10 +11,11 @@ import { UserService } from '../../core/auth/user/user.service';
 import { MeuPerfilComponent } from '../../shared/components/meu-perfil/meu-perfil.component';
 import { CommonModule } from '@angular/common';
 import {MatToolbarModule} from '@angular/material/toolbar';
+import { DespesasComponent } from '../../shared/components/despesas/despesas.component';
 
 @Component({
   selector: 'app-home',
-  imports: [MatCardModule, MatIcon, MatButtonModule, ComprasComponent, MeuPerfilComponent, CommonModule, MatToolbarModule],
+  imports: [MatCardModule, MatIcon, MatButtonModule, ComprasComponent, MeuPerfilComponent, CommonModule, MatToolbarModule, DespesasComponent],
   templateUrl: './home.component.html',
   styleUrl: './home.component.scss'
 })
