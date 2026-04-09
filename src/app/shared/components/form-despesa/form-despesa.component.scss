@@ -1,0 +1,21 @@
+@use '@angular/material' as mat;
+
+.form-body {
+  width: 100%;
+  min-width: 24rem;
+}
+
+.title {
+  margin-bottom: 0.5rem;
+}
+
+mat-form-field {
+  width: 100%;
+  margin-bottom: 0.5rem;
+}
+
+mat-dialog-actions {
+  display: flex;
+  justify-content: flex-end;
+  gap: 0.5rem;
+}

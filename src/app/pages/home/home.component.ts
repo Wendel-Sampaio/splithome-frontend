@@ -4,24 +4,23 @@ import { MatCardModule } from '@angular/material/card';
 import { MatIcon } from '@angular/material/icon';
 import { ComprasComponent } from '../../shared/components/compras/compras.component';
 import { User } from '../../core/models/user/user';
-import { Router } from '@angular/router';
 import { LogoutComponent } from '../../shared/components/logout/logout.component';
 import { MatDialog } from '@angular/material/dialog';
 import { UserService } from '../../core/auth/user/user.service';
 import { MeuPerfilComponent } from '../../shared/components/meu-perfil/meu-perfil.component';
 import { CommonModule } from '@angular/common';
 import {MatToolbarModule} from '@angular/material/toolbar';
+import { DespesasComponent } from '../../shared/components/despesas/despesas.component';
 
 @Component({
   selector: 'app-home',
-  imports: [MatCardModule, MatIcon, MatButtonModule, ComprasComponent, MeuPerfilComponent, CommonModule, MatToolbarModule],
+  imports: [MatCardModule, MatIcon, MatButtonModule, ComprasComponent, MeuPerfilComponent, CommonModule, MatToolbarModule, DespesasComponent],
   templateUrl: './home.component.html',
   styleUrl: './home.component.scss'
 })
 export class HomeComponent {
 
   loginService = inject(UserService)
-  router = inject(Router)
   user!: User;
 
   currentView: string = 'inicio';

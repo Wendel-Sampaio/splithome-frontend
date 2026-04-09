@@ -1,0 +1,61 @@
+// Definindo variáveis de cores
+$primary-color: #4caf50;
+$primary-hover: #45a049;
+$header-background: #f4f4f4;
+$header-text-color: #777777;
+$white-color: #ffffff;
+
+.card-body {
+  display: flex;
+
+  .titulo-menu-compras {
+    margin: 2.4%;
+    font-size: 34px;
+    font-weight: bold;
+    margin-bottom: 20px;
+    color: $header-text-color;
+  }
+
+  .cadastrar-compra {
+    margin-top: 10px;
+    margin-left: auto;
+    margin-right: 3%;
+    margin-top: 2%;
+    background-color: $primary-color;
+    color: $white-color;
+    font-weight: bold;
+    font-size: 18px;
+
+    &:hover {
+      background-color: $primary-hover;
+    }
+  }
+}
+
+.table {
+  margin-top: 20px;
+
+  table {
+    width: 100%;
+    border-collapse: collapse;
+    border: 1px solid #ddd;
+
+    .column-name {
+      text-align: left;
+      font-weight: bold;
+      background-color: $header-background;
+      padding: 10px;
+    }
+
+    td {
+      padding: 10px;
+      text-align: left;
+      border-bottom: 1px solid #ddd;
+    }
+  }
+}
+
+.empty-state {
+  margin: 1rem 0;
+  color: #777777;
+}
