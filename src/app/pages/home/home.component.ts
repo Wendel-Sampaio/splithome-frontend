@@ -47,8 +47,7 @@ export class HomeComponent {
 
   // Função para abrir "Despesas"
   abrirDespesas() {
-    this.currentView = 'despesas';
-    this.currentViewTitle = 'Despesas';
+    this.router.navigate(['/despesas']);
   }
 
   // Função para abrir "Recados"
