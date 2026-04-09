@@ -1,0 +1,33 @@
+.despesas-card {
+  margin: 1rem;
+  padding: 1rem;
+}
+
+.card-body {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 1rem;
+}
+
+.cadastrar-despesa {
+  color: #0b4f7c;
+  font-weight: 600;
+}
+
+.table {
+  overflow-x: auto;
+}
+
+table {
+  width: 100%;
+}
+
+.column-name {
+  font-weight: 700;
+}
+
+.empty-state {
+  padding: 1rem;
+  color: #6b7280;
+}
