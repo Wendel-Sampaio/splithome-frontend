@@ -1,0 +1,86 @@
+.card-body {
+  display: flex;
+
+  .titulo-menu-despesas {
+    margin: 2.4%;
+    font-size: 34px;
+    font-weight: bold;
+    margin-bottom: 20px;
+    color: #777;
+  }
+
+  .cadastrar-despesa {
+    margin-left: auto;
+    margin-right: 3%;
+    margin-top: 2%;
+    background-color: #4caf50;
+    color: #fff;
+    font-weight: bold;
+    font-size: 18px;
+
+    &:hover {
+      background-color: #45a049;
+    }
+  }
+}
+
+.table {
+  margin-top: 20px;
+
+  table {
+    width: 100%;
+    border-collapse: collapse;
+    border: 1px solid #ddd;
+
+    .column-name {
+      font-weight: bold;
+      background-color: #f4f4f4;
+      padding: 10px;
+    }
+
+    td {
+      padding: 10px;
+      border-bottom: 1px solid #ddd;
+    }
+
+    .payed-style {
+      background-color: #e8f5e9;
+    }
+
+    .payment-button {
+      background-color: #4caf50;
+      color: #fff;
+      padding: 8px 17px;
+      border: none;
+      cursor: pointer;
+      border-radius: 4px;
+      font-weight: bold;
+
+      &:hover {
+        background-color: #21f321;
+      }
+
+      &.payed-button {
+        background-color: #66bb6a;
+        cursor: not-allowed;
+      }
+    }
+
+    span {
+      color: #f44336;
+    }
+
+    button {
+      padding: 5px 10px;
+      background-color: #f443369f;
+      color: #fff;
+      border: none;
+      cursor: pointer;
+      border-radius: 4px;
+
+      &:hover {
+        background-color: #f44336;
+      }
+    }
+  }
+}
