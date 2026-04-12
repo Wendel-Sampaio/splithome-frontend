@@ -1,3 +1,5 @@
+/// <reference types="jasmine" />
+
 import { User } from './user';
 
 describe('User', () => {
