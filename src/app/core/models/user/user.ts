@@ -5,4 +5,5 @@ export class User {
     phoneNumber!: string;
     pixKey!: string;
     familyCode!: string;
+    plan!: 'FREE' | 'PREMIUM';
 }

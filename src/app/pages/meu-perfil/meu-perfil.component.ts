@@ -23,13 +23,14 @@ export class MeuPerfilComponent implements OnInit {
   private cdr = inject(ChangeDetectorRef);
   private destroyRef = inject(DestroyRef);
 
-  userData: User = { 
+  userData: User = {
     id: '',
     name: '',
     email: '',
     phoneNumber: '',
     pixKey: '',
-    familyCode: ''
+    familyCode: '',
+    plan: 'FREE'
   };
 
   userService = inject(UserService)
@@ -44,7 +45,7 @@ export class MeuPerfilComponent implements OnInit {
 
   cancelEdit() {
     this.isEditable = false;
-    this.loadUserData(); 
+    this.loadUserData();
   }
 
   loadUserData() {
