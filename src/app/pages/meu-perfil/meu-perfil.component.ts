@@ -18,16 +18,17 @@ import { UserService } from '../../core/auth/user/user.service';
 })
 export class MeuPerfilComponent implements OnInit {
 
-  isEditable: boolean = false; 
+  isEditable: boolean = false;
   private cdr = inject(ChangeDetectorRef);
-  
-  userData: User = { 
+
+  userData: User = {
     id: '',
     name: '',
     email: '',
     phoneNumber: '',
     pixKey: '',
-    familyCode: ''
+    familyCode: '',
+    plan: 'FREE'
   };
 
   userService = inject(UserService)
@@ -42,14 +43,14 @@ export class MeuPerfilComponent implements OnInit {
 
   cancelEdit() {
     this.isEditable = false;
-    this.loadUserData(); 
+    this.loadUserData();
   }
 
   loadUserData() {
     const userId = this.userService.getUser().id;
     this.userService.getUserById(userId).subscribe(user => {
       this.userData = user;
-      this.cdr.markForCheck(); 
+      this.cdr.markForCheck();
     });
   }
 

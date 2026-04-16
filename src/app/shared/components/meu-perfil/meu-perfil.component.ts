@@ -19,17 +19,18 @@ import { MatSnackBar } from '@angular/material/snack-bar';
 })
 export class MeuPerfilComponent implements OnInit {
 
-  isEditable: boolean = false; 
+  isEditable: boolean = false;
   private cdr = inject(ChangeDetectorRef);
   private _snackBar = inject(MatSnackBar);
-  
-  userData: User = { 
+
+  userData: User = {
     id: '',
     name: '',
     email: '',
     phoneNumber: '',
     pixKey: '',
-    familyCode: ''
+    familyCode: '',
+    plan: 'FREE'
   };
 
   userService = inject(UserService)
@@ -44,25 +45,25 @@ export class MeuPerfilComponent implements OnInit {
 
   cancelEdit() {
     this.isEditable = false;
-    this.loadUserData(); 
+    this.loadUserData();
   }
 
- copyToClipboard() {
-  if (navigator.clipboard) {
-    navigator.clipboard.writeText(this.userData.familyCode)
-      .then(() => this.openSnackBar('Código da família copiado com sucesso!'))
-      .catch(err => console.error('Erro ao copiar código:', err));
-  } else {
-    console.warn('API Clipboard não suportada.');
+  copyToClipboard() {
+    if (navigator.clipboard) {
+      navigator.clipboard.writeText(this.userData.familyCode)
+        .then(() => this.openSnackBar('Código da família copiado com sucesso!'))
+        .catch(err => console.error('Erro ao copiar código:', err));
+    } else {
+      console.warn('API Clipboard não suportada.');
+    }
   }
-}
 
 
   loadUserData() {
     const userId = this.userService.getUser().id;
     this.userService.getUserById(userId).subscribe(user => {
       this.userData = user;
-      this.cdr.markForCheck(); 
+      this.cdr.markForCheck();
     });
   }
 
