@@ -1,9 +1,9 @@
-import { ChangeDetectionStrategy, ChangeDetectorRef, Component, DestroyRef, inject } from '@angular/core';
+import { ChangeDetectionStrategy, ChangeDetectorRef, Component, DestroyRef, Inject, inject, Optional } from '@angular/core';
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { FormControl, FormGroup, FormsModule, ReactiveFormsModule } from '@angular/forms';
 import { MatButtonModule } from '@angular/material/button';
 import { MatCardModule } from '@angular/material/card';
-import { MatDialogModule } from '@angular/material/dialog';
+import { MAT_DIALOG_DATA, MatDialogModule } from '@angular/material/dialog';
 import { MatFormFieldModule } from '@angular/material/form-field';
 import { MatInputModule } from '@angular/material/input';
 import { MatSelectModule } from '@angular/material/select';
@@ -15,14 +15,14 @@ import { CommonModule } from '@angular/common';
 import { CategoriaEnum } from '../../../core/models/categoria/categoriaEnum';
 import { User } from '../../../core/models/user/user';
 import { UserService } from '../../../core/auth/user/user.service';
-import moment, { Moment } from 'moment/moment';
+import moment from 'moment/moment';
 import { CompraService } from '../../services/compra/compra.service';
 import { MatSnackBar } from '@angular/material/snack-bar';
 
 @Component({
   selector: 'dialog-content-example-dialog',
-  styleUrl: 'form-compra.component.scss',
-  templateUrl: 'form-compra.component.html',
+  styleUrl: 'form-transacao.component.scss',
+  templateUrl: 'form-transacao.component.html',
   imports: [
     MatDialogModule, 
     MatButtonModule, 
@@ -41,7 +41,8 @@ import { MatSnackBar } from '@angular/material/snack-bar';
   providers: [provideNativeDateAdapter()],
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
-export class FormCompraComponent {
+export class FormTransacaoComponent {
+  constructor(@Optional() @Inject(MAT_DIALOG_DATA) public data: { tipo?: 'compra' | 'despesa' } | null) {}
   
   userService = inject(UserService)
   compraService = inject(CompraService)
@@ -55,14 +56,26 @@ export class FormCompraComponent {
   usuarios!: User[];
   pagadores: string[] = [];
   pagadoresRestantes: string[] = [];
-  comprador: string = this.userService.getUser().id
-  formCompra!: FormGroup;
+  responsavel: string = this.userService.getUser().id
+  formTransacao!: FormGroup;
+
+  get isDespesa(): boolean {
+    return this.data?.tipo === 'despesa';
+  }
+
+  get tituloDialog(): string {
+    return this.isDespesa ? 'Cadastro de despesa' : 'Cadastro de compra';
+  }
+
+  get textoBotaoConfirmacao(): string {
+    return this.isDespesa ? 'Cadastrar despesa' : 'Cadastrar';
+  }
   
 
   ngOnInit(): void {
     this.listarUsuarios();
     this.listarCategorias();
-    this.formCompra = new FormGroup({
+    this.formTransacao = new FormGroup({
       titulo: new FormControl(""),
       categoria: new FormControl(""),
       valor: new FormControl(""),
@@ -108,32 +121,40 @@ export class FormCompraComponent {
     })
   } 
 
-  cadastrarCompra() {
-    const categoriaSelecionada = this.formCompra.value.categoria;
+  cadastrarTransacao() {
+    const categoriaSelecionada = this.formTransacao.value.categoria;
     const categoriaOriginal = this.categoriasOriginal.find(
       categoria => CategoriaEnum[categoria as keyof typeof CategoriaEnum] === categoriaSelecionada
-    );  
-    const nomeUsuarioLogado = this.userService.getUser().name
+    ) ?? categoriaSelecionada;
+    const usuarioLogado = this.userService.getUser();
+    const familyId = usuarioLogado.familyId ?? usuarioLogado.familyCode;
     this.pagadoresRestantes = [...this.pagadores];
-    if (this.pagadoresRestantes.indexOf(nomeUsuarioLogado) !== -1) {
-      this.pagadoresRestantes.splice(this.pagadoresRestantes.indexOf(nomeUsuarioLogado), 1);
-    }
+
     const formData = {
-      title: this.formCompra.value.titulo,
+      title: this.formTransacao.value.titulo,
       category: categoriaOriginal,
-      value: this.formCompra.value.valor,
+      value: Number(this.formTransacao.value.valor),
       payers: this.pagadores,
-      paymentDate: moment(this.formCompra.value.dataPagamento).format('YYYY-MM-DD'),
+      paymentDate: moment(this.formTransacao.value.dataPagamento).format('YYYY-MM-DDTHH:mm:ss'),
       remainingPayers: this.pagadoresRestantes,
-      purchaserId: this.comprador,
-      purchaseDate: new Date(),
+      familyId,
+      ...(this.isDespesa
+        ? { responsibleId: this.responsavel }
+        : {
+          purchaserId: this.responsavel,
+          purchaseDate: moment(new Date()).format('YYYY-MM-DDTHH:mm:ss')
+        })
     }
-    this.compraService.cadastrarCompra(formData).pipe(takeUntilDestroyed(this.destroyRef)).subscribe({
+    const request = this.isDespesa
+      ? this.compraService.cadastrarDespesa(formData)
+      : this.compraService.cadastrarCompra(formData);
+
+    request.pipe(takeUntilDestroyed(this.destroyRef)).subscribe({
       next: response => {
-        this.openSnackBar("Compra cadastrada com sucesso!")
+        this.openSnackBar(this.isDespesa ? "Despesa cadastrada com sucesso!" : "Compra cadastrada com sucesso!")
       },
       error: error => {
-        this.openSnackBar("Erro ao cadastrar compra!")
+        this.openSnackBar(this.isDespesa ? "Erro ao cadastrar despesa!" : "Erro ao cadastrar compra!")
       }
     });
   }
@@ -142,4 +163,3 @@ export class FormCompraComponent {
     this._snackBar.open(message, '', { duration: 5000 });
   }
 }
-

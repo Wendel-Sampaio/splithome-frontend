@@ -5,7 +5,7 @@ import { CompraService } from '../../services/compra/compra.service';
 import { Compra } from '../../../core/models/compra/compra';
 import { CommonModule } from '@angular/common';
 import { MatDialog, MatDialogModule } from '@angular/material/dialog';
-import { FormCompraComponent } from '../form-compra/form-compra.component';
+import { FormTransacaoComponent } from '../form-transacao/form-transacao.component';
 import { UserService } from '../../../core/auth/user/user.service';
 import { MatCardTitle } from '@angular/material/card';
 import { DialogPagamentoComponent } from '../dialog-pagamento/dialog-pagamento.component';
@@ -50,7 +50,7 @@ export class ComprasComponent implements OnInit {
   readonly dialog = inject(MatDialog);
 
   abrirFormCompra() {
-    const formRef = this.dialog.open(FormCompraComponent, {
+    const formRef = this.dialog.open(FormTransacaoComponent, {
       width: '550px',
     });
     formRef.afterClosed().pipe(takeUntilDestroyed(this.destroyRef)).subscribe(result => {

@@ -35,7 +35,8 @@ export class DialogPagamentoComponent implements OnInit {
   }
 
   pegarComprador() {
-    this.userService.getUserById(this.data.purchaserId).pipe(takeUntilDestroyed(this.destroyRef)).subscribe({
+    const userId = this.data.responsibleId ?? this.data.purchaserId;
+    this.userService.getUserById(userId).pipe(takeUntilDestroyed(this.destroyRef)).subscribe({
       next: user => {
         this.user = user;
       }
@@ -52,7 +53,11 @@ export class DialogPagamentoComponent implements OnInit {
       id: this.data.id,
       remainingPayers: this.data.remainingPayers
     }
-    this.compraService.atualizarCompra(modeloPagamento).pipe(takeUntilDestroyed(this.destroyRef)).subscribe({
+    const request = this.data.tipo === 'despesa'
+      ? this.compraService.atualizarDespesa(modeloPagamento)
+      : this.compraService.atualizarCompra(modeloPagamento);
+
+    request.pipe(takeUntilDestroyed(this.destroyRef)).subscribe({
       next: response => {
         console.log('Compra atualizada com sucesso', response);
       },
