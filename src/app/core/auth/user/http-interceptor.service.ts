@@ -8,11 +8,11 @@ export const meuhttpInterceptor: HttpInterceptorFn = (request, next) => {
   let router = inject(Router);
 
   let token = localStorage.getItem('token');
+  const headers: Record<string, string> = { 'ngrok-skip-browser-warning': 'true' };
   if (token && !router.url.includes('/login') && !router.url.includes('/cadastro')) {
-    request = request.clone({
-      setHeaders: { Authorization: 'Bearer ' + token },
-    });
+    headers['Authorization'] = 'Bearer ' + token;
   }
+  request = request.clone({ setHeaders: headers });
 
   return next(request).pipe(
     catchError((err: any) => {
