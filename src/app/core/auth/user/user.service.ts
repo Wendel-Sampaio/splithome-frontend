@@ -57,7 +57,7 @@ export class UserService {
     return localStorage.getItem('token');
   }
 
-  jwtDecode() : User | '' {
+  jwtDecode() : User | null {
     const token = this.getToken();
     if (token) {
       const userFromToken = jwtDecode<JwtUserPayload>(token);
@@ -72,17 +72,24 @@ export class UserService {
         plan: userFromToken.plan === 'PREMIUM' ? 'PREMIUM' : 'FREE'
       } as User;
     }
-    return "";
+    return null;
   }
 
   getUser() : User {
-    const user = this.jwtDecode();
-    return user === '' ? new User() : user;
+    return this.jwtDecode() ?? {
+      id: '',
+      name: '',
+      email: '',
+      phoneNumber: '',
+      pixKey: '',
+      familyCode: '',
+      plan: 'FREE'
+    };
   }
 
   isPremium(): boolean {
     const user = this.jwtDecode();
-    return user !== '' && user.plan === 'PREMIUM';
+    return user !== null && user.plan === 'PREMIUM';
   }
 
 }
