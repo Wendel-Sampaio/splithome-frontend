@@ -1,7 +1,0 @@
-{
-  "version": 3,
-  "sources": ["src/app/shared/components/logout/logout.component.scss"],
-  "sourcesContent": [".title {\n    color: #777777;\n}\n\n.cancel-button {\n    background-color: #48A75A !important;\n    color: #ffffff !important;\n    border: solid 2px;\n    border-color: #48A75A;\n    box-shadow: 2px 2px 5px rgb(131, 131, 131);\n}\n\n.confirm-button {\n    background-color: #b61b1b !important;\n    color: #ffffff !important;\n    box-shadow: 2px 2px 5px rgb(131, 131, 131);\n    border: solid 2px;\n    border-color: #b61b1b;\n}\n\n.confirm-button:hover {\n    background-color: white !important;\n    color: #b61b1b !important;\n}\n\n.cancel-button:hover {\n    background-color: white !important;\n    color: #48A75A !important;\n}"],
-  "mappings": ";AAAA,CAAA;AACI,SAAA;;AAGJ,CAAA;AACI,oBAAA;AACA,SAAA;AACA,UAAA,MAAA;AACA,gBAAA;AACA,cAAA,IAAA,IAAA,IAAA,IAAA,GAAA,EAAA,GAAA,EAAA;;AAGJ,CAAA;AACI,oBAAA;AACA,SAAA;AACA,cAAA,IAAA,IAAA,IAAA,IAAA,GAAA,EAAA,GAAA,EAAA;AACA,UAAA,MAAA;AACA,gBAAA;;AAGJ,CARA,cAQA;AACI,oBAAA;AACA,SAAA;;AAGJ,CArBA,aAqBA;AACI,oBAAA;AACA,SAAA;;",
-  "names": []
-}
