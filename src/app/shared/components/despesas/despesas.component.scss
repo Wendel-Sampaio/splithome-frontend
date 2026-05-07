@@ -1,0 +1,105 @@
+$primary-color: #4caf50;
+$primary-hover: #45a049;
+$secondary-color: #4caf50;
+$secondary-hover: #21f321;
+$paid-background: #e8f5e9;
+$paid-border-color: #66bb6a;
+$remove-button-color: #f443369f;
+$remove-button-hover: #f44336;
+$header-background: #f4f4f4;
+$header-text-color: #777777;
+$error-text-color: #f44336;
+$white-color: #ffffff;
+
+.card-body {
+    display: flex;
+
+  .titulo-menu-despesas {
+    margin: 2.4%;
+    font-size: 34px;
+    font-weight: bold;
+    margin-bottom: 20px;
+    color: $header-text-color;
+  }
+
+  .cadastrar-despesa {
+    margin-top: 2%;
+    margin-left: auto;
+    margin-right: 3%;
+    background-color: $primary-color;
+    color: $white-color;
+    font-weight: bold;
+    font-size: 18px;
+
+    &:hover {
+      background-color: $primary-hover;
+    }
+  }
+}
+
+.table {
+  margin-top: 20px;
+
+  table {
+    width: 100%;
+    border-collapse: collapse;
+    border: 1px solid #ddd;
+
+    .column-name {
+      text-align: left;
+      font-weight: bold;
+      background-color: $header-background;
+      padding: 10px;
+    }
+
+    td {
+      padding: 10px;
+      text-align: left;
+      border-bottom: 1px solid #ddd;
+    }
+
+    .payed-style {
+      background-color: $paid-background;
+    }
+
+    .payment-button {
+      background-color: $secondary-color;
+      color: $white-color;
+      padding: 8px 17px;
+      border: none;
+      cursor: pointer;
+      border-radius: 4px;
+      font-weight: bold;
+
+      &:hover {
+        background-color: $secondary-hover;
+      }
+
+      &.payed-button {
+        background-color: $paid-border-color;
+        cursor: not-allowed;
+
+        &:hover {
+          background-color: $primary-color;
+        }
+      }
+    }
+
+    span {
+      color: $error-text-color;
+    }
+
+    button {
+      padding: 5px 10px;
+      background-color: $remove-button-color;
+      color: $white-color;
+      border: none;
+      cursor: pointer;
+      border-radius: 4px;
+
+      &:hover {
+        background-color: $remove-button-hover;
+      }
+    }
+  }
+}

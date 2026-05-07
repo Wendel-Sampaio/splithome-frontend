@@ -1,11 +1,13 @@
 import { HttpClient } from '@angular/common/http';
 import { Injectable, inject } from '@angular/core';
-import { Observable } from 'rxjs';
+import { map, Observable } from 'rxjs';
 import { jwtDecode, JwtPayload } from "jwt-decode";
 import { Login } from './login';
 import { Register } from './register';
 import { User } from '../../models/user/user';
 import { API_URL } from '../../../../../api-url';
+
+type JwtUserPayload = JwtPayload & Partial<User>;
 
 @Injectable({
   providedIn: 'root'
@@ -31,7 +33,12 @@ export class UserService {
   }
 
   getUserById(id: string): Observable<User> {
-    return this.http.get<User>(`${this.API}/${id}`);
+    return this.http.get<User>(`${this.API}/${id}`).pipe(
+      map((user) => ({
+        ...user,
+        plan: user.plan === 'PREMIUM' ? 'PREMIUM' : 'FREE'
+      }))
+    );
   }
   
   getAllUsers(): Observable<User[]> {
@@ -50,16 +57,39 @@ export class UserService {
     return localStorage.getItem('token');
   }
 
-  jwtDecode() {
-    let token = this.getToken();
+  jwtDecode() : User | null {
+    const token = this.getToken();
     if (token) {
-      return jwtDecode<JwtPayload>(token);
+      const userFromToken = jwtDecode<JwtUserPayload>(token);
+
+      return {
+        id: userFromToken.id ?? '',
+        name: userFromToken.name ?? '',
+        email: userFromToken.email ?? '',
+        phoneNumber: userFromToken.phoneNumber ?? '',
+        pixKey: userFromToken.pixKey ?? '',
+        familyCode: userFromToken.familyCode ?? '',
+        plan: userFromToken.plan === 'PREMIUM' ? 'PREMIUM' : 'FREE'
+      } as User;
     }
-    return "";
+    return null;
   }
 
-  getUser() {
-    return this.jwtDecode() as User;
+  getUser() : User {
+    return this.jwtDecode() ?? {
+      id: '',
+      name: '',
+      email: '',
+      phoneNumber: '',
+      pixKey: '',
+      familyCode: '',
+      plan: 'FREE'
+    };
+  }
+
+  isPremium(): boolean {
+    const user = this.jwtDecode();
+    return user !== null && user.plan === 'PREMIUM';
   }
 
 }
