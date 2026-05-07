@@ -1,14 +1,19 @@
 import { HttpErrorResponse, HttpInterceptorFn } from '@angular/common/http';
 import { inject } from '@angular/core';
+import { MatSnackBar } from '@angular/material/snack-bar';
 import { Router } from '@angular/router';
 import { catchError, throwError } from 'rxjs';
+import { UserService } from './user.service';
 
 export const meuhttpInterceptor: HttpInterceptorFn = (request, next) => {
 
-  let router = inject(Router);
+  const router = inject(Router);
+  const userService = inject(UserService);
+  const snackBar = inject(MatSnackBar);
 
-  let token = localStorage.getItem('token');
+  const token = userService.getToken();
   const headers: Record<string, string> = { 'ngrok-skip-browser-warning': 'true' };
+
   if (token && !router.url.includes('/login') && !router.url.includes('/cadastro')) {
     headers['Authorization'] = 'Bearer ' + token;
   }
@@ -17,14 +22,11 @@ export const meuhttpInterceptor: HttpInterceptorFn = (request, next) => {
   return next(request).pipe(
     catchError((err: any) => {
       if (err instanceof HttpErrorResponse) {
-	  
-	  
         if (err.status === 401) {
-          console.log('401 - tratar aqui');
+          userService.removerToken();
           router.navigate(['/login']);
         } else if (err.status === 403) {
-          console.log('403 - tratar aqui');
-		  router.navigate(['/login']);
+          snackBar.open('Acesso Negado', '', { duration: 5000 });
         } else {
           console.error('HTTP error:', err);
         }
