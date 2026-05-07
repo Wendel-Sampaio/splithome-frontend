@@ -89,9 +89,9 @@ export class CadastroComponent {
       error: (error) => {
         if (error.status === 409 || error.status === 404) {
           const errorMessage = JSON.parse(error.error)?.message;
-          this,this.mensagemErro = errorMessage;
+          this.mensagemErro = errorMessage;
         } else {
-          this,this.mensagemErro = "Tivemos um erro interno, lamentamos.";
+          this.mensagemErro = "Tivemos um erro interno, lamentamos.";
           console.error('Erro interno', error);
         }
       }
