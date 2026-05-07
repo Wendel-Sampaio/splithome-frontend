@@ -1,7 +1,7 @@
-<h2 class="title">Cadastro de compra</h2>
+<h2 class="title">{{ tituloDialog }}</h2>
 <mat-dialog-content class="form-body">
   <div>
-    <form [formGroup]="formCompra" (ngSubmit)="cadastrarCompra()">
+    <form [formGroup]="formTransacao" (ngSubmit)="cadastrarTransacao()">
 
       <div class="title-input">
         <mat-form-field class="input-name" appearance="outline">
@@ -58,5 +58,5 @@
 </mat-dialog-content>
 <mat-dialog-actions>
   <button mat-button class="cancel-button" mat-dialog-close>Cancelar</button>
-  <button mat-button class="confirm-button" [mat-dialog-close]="true" cdkFocusInitial (click)="cadastrarCompra()">Cadastrar</button>
+  <button mat-button class="confirm-button" [mat-dialog-close]="true" cdkFocusInitial (click)="cadastrarTransacao()">{{ textoBotaoConfirmacao }}</button>
 </mat-dialog-actions>
