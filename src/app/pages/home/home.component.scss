@@ -163,7 +163,7 @@
 
     .tabela-compras {
         background-color: white;
-        width: calc(100% - 40px);
+        width: auto;
         margin-top: 120px;
         margin-left: 20px;
         margin-right: 20px;
@@ -177,8 +177,33 @@
         }
     }
 
+    .tabela-boas-vindas {
+        padding: 20px 30px;
+
+        h2 {
+            color: #48A75A;
+            margin-bottom: 8px;
+        }
+
+        p {
+            color: #9F9D9D;
+        }
+    }
+
     .meu-perfil {
         margin-top: 120px;
         margin-left: 20px;
+    }
+}
+
+@media (max-width: 500px) {
+    #navbar #titulo-nav {
+        margin-left: 0;
+        font-size: 24px;
+    }
+
+    .body {
+        padding-left: 0;
+        overflow-x: auto;
     }
 }
