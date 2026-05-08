@@ -6,7 +6,7 @@ import { UserService } from '../../../core/auth/user/user.service';
 
 @Component({
   selector: 'app-logout',
-  imports: [MatButtonModule, MatDialogActions, MatDialogClose, MatDialogTitle],
+  imports: [MatButtonModule, MatDialogActions, MatDialogClose, MatDialogTitle, MatDialogContent],
   templateUrl: './logout.component.html',
   styleUrl: './logout.component.scss'
 })
