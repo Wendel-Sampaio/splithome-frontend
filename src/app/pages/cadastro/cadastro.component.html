@@ -18,7 +18,7 @@
             <mat-error *ngIf="cadastroForm.get('name')?.hasError('required')">
               O nome é obrigatório.
             </mat-error>
-            <mat-error *ngIf="cadastroForm.get('name')?.hasError('maxLenght')">
+            <mat-error *ngIf="cadastroForm.get('name')?.hasError('maxlength')">
               O nome não deve ter mais do que 20 caracteres.
             </mat-error>
           </mat-form-field>
