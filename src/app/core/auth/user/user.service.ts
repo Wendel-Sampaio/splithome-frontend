@@ -5,7 +5,7 @@ import { jwtDecode, JwtPayload } from "jwt-decode";
 import { Login } from './login';
 import { Register } from './register';
 import { User } from '../../models/user/user';
-import { API_URL } from '../../../../../api-url';
+import { environment } from '../../../../environments/environment';
 
 type JwtUserPayload = JwtPayload & Partial<User>;
 
@@ -15,7 +15,7 @@ type JwtUserPayload = JwtPayload & Partial<User>;
 export class UserService {
 
   http = inject(HttpClient);
-  API = `${API_URL}/user`;
+  API = `${environment.apiUrl}/user`;
 
 
   constructor() { }

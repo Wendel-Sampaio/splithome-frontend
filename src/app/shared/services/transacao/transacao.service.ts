@@ -1,7 +1,7 @@
 import { HttpClient } from '@angular/common/http';
 import { inject, Injectable } from '@angular/core';
-import { Observable, Observer } from 'rxjs';
-import { API_URL } from '../../../../../api-url';
+import { Observable } from 'rxjs';
+import { environment } from '../../../../environments/environment';
 import { Despesa } from '../../../core/models/despesa/despesa';
 
 @Injectable({
@@ -12,7 +12,7 @@ export class TransacaoService {
   constructor() { }
 
   http = inject(HttpClient)
-  API = `${API_URL}/transactions`;
+  API = `${environment.apiUrl}/transactions`;
 
   listarCategorias(): Observable<string[]> {
     return this.http.get<string[]>(this.API+"/categories");
