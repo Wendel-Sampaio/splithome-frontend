@@ -1,4 +1,5 @@
-import { Component, inject, signal } from '@angular/core';
+import { Component, DestroyRef, inject, signal } from '@angular/core';
+import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { MatCardModule } from '@angular/material/card';
 import { Router } from '@angular/router';
 import { MatButtonModule } from '@angular/material/button';
@@ -21,6 +22,7 @@ export class LoginComponent {
 
 
   private _snackBar = inject(MatSnackBar);
+  private destroyRef = inject(DestroyRef);
   router = inject(Router);
   userService = inject(UserService);
   hide1 = signal(true);
@@ -49,7 +51,7 @@ export class LoginComponent {
       return;
     }
 
-    this.userService.logar(login).subscribe({
+    this.userService.logar(login).pipe(takeUntilDestroyed(this.destroyRef)).subscribe({
       next: token => {
         this.userService.addToken(token);
         this.router.navigate(["/home"]);

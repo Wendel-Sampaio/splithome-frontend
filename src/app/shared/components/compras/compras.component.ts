@@ -1,4 +1,5 @@
-import { ChangeDetectorRef, Component, inject, OnInit } from '@angular/core';
+import { ChangeDetectorRef, Component, DestroyRef, inject, OnInit } from '@angular/core';
+import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { MatTableModule } from '@angular/material/table';
 import { CompraService } from '../../services/compra/compra.service';
 import { Compra } from '../../../core/models/compra/compra';
@@ -45,13 +46,14 @@ export class ComprasComponent implements OnInit {
 
   constructor(private cdr: ChangeDetectorRef) { }
 
+  private destroyRef = inject(DestroyRef);
   readonly dialog = inject(MatDialog);
 
   abrirFormCompra() {
     const formRef = this.dialog.open(FormTransacaoComponent, {
       width: '550px',
     });
-    formRef.afterClosed().subscribe(result => {
+    formRef.afterClosed().pipe(takeUntilDestroyed(this.destroyRef)).subscribe(result => {
       console.log(`Dialog result: ${result}`);
       this.pegarCompras()
     });
@@ -65,7 +67,7 @@ export class ComprasComponent implements OnInit {
       this.compraService.atualizarCompra({
         id: element.id,
         remainingPayers: element.remainingPayers
-      }).subscribe({
+      }).pipe(takeUntilDestroyed(this.destroyRef)).subscribe({
         next: (response) => {
           this.pegarCompras()
         },
@@ -77,7 +79,7 @@ export class ComprasComponent implements OnInit {
     const dialogRef = this.dialog.open(DialogPagamentoComponent, {
       data: element
     });
-    dialogRef.afterClosed().subscribe(result => {
+    dialogRef.afterClosed().pipe(takeUntilDestroyed(this.destroyRef)).subscribe(result => {
       this.pegarCompras()
       console.log(`Dialog result: ${result}`);
     });
@@ -106,7 +108,7 @@ export class ComprasComponent implements OnInit {
   userService = inject(UserService)
 
   pegarCompras() {
-    this.compraService.listarCompras().subscribe({
+    this.compraService.listarCompras().pipe(takeUntilDestroyed(this.destroyRef)).subscribe({
       next: compras => {
         this.tratamentoLista(compras)
         this.compras = compras
@@ -157,7 +159,7 @@ export class ComprasComponent implements OnInit {
 
   pagamentoDisponivel(compra: Compra) {
     const userName = this.userService.getUser().name;
-    this.userService.getUserById(compra.purchaserId).subscribe({
+    this.userService.getUserById(compra.purchaserId).pipe(takeUntilDestroyed(this.destroyRef)).subscribe({
       next: user => {
         if (user.name === userName) {
           compra.showPaymentButton = false
@@ -173,7 +175,7 @@ export class ComprasComponent implements OnInit {
   }
 
   formatPagador(compra: Compra) {
-    this.userService.getUserById(compra.purchaserId).subscribe({
+    this.userService.getUserById(compra.purchaserId).pipe(takeUntilDestroyed(this.destroyRef)).subscribe({
       next: user => {
         compra.purchaserName = user.name
       }
@@ -238,7 +240,7 @@ export class ComprasComponent implements OnInit {
   }
 
   deleteCompra(contaId: string): void {
-    this.compraService.deleteCompra(contaId).subscribe({
+    this.compraService.deleteCompra(contaId).pipe(takeUntilDestroyed(this.destroyRef)).subscribe({
       next: (response: string) => {
         console.log('Compra deletada com sucesso:', response);
         this.pegarCompras();
