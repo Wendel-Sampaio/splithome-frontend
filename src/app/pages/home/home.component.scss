@@ -24,9 +24,12 @@
 
 .body {
     width: 100%;
-    height: 100%;
-    display: grid;
-    justify-content: center;
+    min-height: 100vh;
+    display: flex;
+    flex-direction: column;
+    align-items: flex-start;
+    padding-left: 390px;
+    box-sizing: border-box;
     background-color: #F2F2F2;
     
     .menu-lateral {
@@ -160,20 +163,47 @@
 
     .tabela-compras, .tabela-despesas {
         background-color: white;
-        height: min-content;
-        width: min-content;
+        width: auto;
         margin-top: 120px;
-        margin-left: -10%;
+        margin-left: 20px;
+        margin-right: 20px;
         box-shadow: 0px 2px 5px rgb(99, 99, 99);
         border-radius: 20px;
         border: none;
+        overflow-x: auto;
 
         .mat-mdc-card-content {
             padding: 0;
         }
     }
-    
+
+    .tabela-boas-vindas {
+        padding: 20px 30px;
+
+        h2 {
+            color: #48A75A;
+            margin-bottom: 8px;
+        }
+
+        p {
+            color: #9F9D9D;
+        }
+    }
+
     .meu-perfil {
-        margin-left: -450px;
+        margin-top: 120px;
+        margin-left: 20px;
+    }
+}
+
+@media (max-width: 500px) {
+    #navbar #titulo-nav {
+        margin-left: 0;
+        font-size: 24px;
+    }
+
+    .body {
+        padding-left: 0;
+        overflow-x: auto;
     }
 }

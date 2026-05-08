@@ -62,8 +62,11 @@
             </div>
         </mat-card-content>
     </mat-card>
-    <mat-card class="tabela-compras" appearance="outlined" *ngIf="currentView === 'inicio'">
-        <mat-card-content><tabela-compras></tabela-compras></mat-card-content>
+    <mat-card class="tabela-compras tabela-boas-vindas" appearance="outlined" *ngIf="currentView === 'inicio'">
+        <mat-card-content>
+            <h2>Bem-vindo ao SplitHome</h2>
+            <p>Selecione uma opção no menu lateral para acessar compras, despesas, recados ou o seu perfil.</p>
+        </mat-card-content>
     </mat-card>
     <mat-card class="tabela-compras" appearance="outlined" *ngIf="currentView === 'compras'">
         <mat-card-content><tabela-compras></tabela-compras></mat-card-content>
