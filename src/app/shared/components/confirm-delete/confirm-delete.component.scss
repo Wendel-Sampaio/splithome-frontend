@@ -1,0 +1,45 @@
+:host {
+  display: block;
+}
+
+.title {
+  align-items: center;
+  color: var(--mat-sys-error, #ba1a1a);
+  display: flex;
+  font-size: 24px;
+  font-weight: 600;
+  gap: 8px;
+  line-height: 1.2;
+}
+
+.content {
+  color: var(--mat-sys-on-surface, #1b1b1f);
+  padding-top: 4px;
+}
+
+.content p {
+  margin: 0;
+}
+
+.content p + p {
+  margin-top: 10px;
+}
+
+.value {
+  color: var(--mat-sys-primary, #005cbb);
+}
+
+.warning {
+  color: var(--mat-sys-on-surface-variant, #44474e);
+  font-size: 14px;
+}
+
+.actions {
+  gap: 8px;
+  padding-top: 12px;
+}
+
+.confirm-button {
+  background-color: var(--mat-sys-error, #ba1a1a) !important;
+  color: var(--mat-sys-on-error, #ffffff) !important;
+}
