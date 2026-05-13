@@ -28,7 +28,9 @@ export class PlanService {
     }
 
     this.dialog.open(UpgradeComponent, {
-      width: '420px',
+      width: '460px',
+      maxWidth: 'calc(100vw - 32px)',
+      panelClass: 'upgrade-dialog',
       data: { feature }
     });
   }

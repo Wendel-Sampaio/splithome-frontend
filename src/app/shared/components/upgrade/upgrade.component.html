@@ -1,9 +1,32 @@
-<h2 mat-dialog-title>Recurso premium</h2>
+<h2 class="upgrade-title" mat-dialog-title>Recurso exclusivo do plano Premium</h2>
 
-<mat-dialog-content>
-  <p>{{ message }}</p>
+<mat-dialog-content class="upgrade-content">
+  <p class="feature-message">{{ message }}</p>
+
+  <ul class="benefits-list" aria-label="Benefícios do plano Premium">
+    @for (benefit of benefits; track benefit.title) {
+      <li>
+        <span class="benefit-icon">
+          <mat-icon aria-hidden="true">{{ benefit.icon }}</mat-icon>
+        </span>
+
+        <span class="benefit-text">
+          <strong>{{ benefit.title }}</strong>
+          <span>{{ benefit.description }}</span>
+        </span>
+      </li>
+    }
+  </ul>
+
+  @if (showInstructions) {
+    <div class="upgrade-instructions" role="status">
+      <strong>Como fazer upgrade</strong>
+      <span>Entre em contato pelo canal de atendimento da SplitHome e solicite a ativação do plano Premium para sua conta.</span>
+    </div>
+  }
 </mat-dialog-content>
 
-<mat-dialog-actions align="end">
-  <button mat-button mat-dialog-close>Fechar</button>
+<mat-dialog-actions class="upgrade-actions" align="end">
+  <button mat-button mat-dialog-close>Agora não</button>
+  <button mat-flat-button color="primary" cdkFocusInitial (click)="showUpgradeInstructions()">Fazer upgrade</button>
 </mat-dialog-actions>

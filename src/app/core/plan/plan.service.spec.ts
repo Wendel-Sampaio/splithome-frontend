@@ -43,7 +43,9 @@ describe('PlanService', () => {
     service.requiresPremium('split-payments');
 
     expect(dialogSpy.open).toHaveBeenCalledWith(UpgradeComponent, {
-      width: '420px',
+      width: '460px',
+      maxWidth: 'calc(100vw - 32px)',
+      panelClass: 'upgrade-dialog',
       data: { feature: 'split-payments' }
     });
   });
