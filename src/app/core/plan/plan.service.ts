@@ -13,23 +13,17 @@ export type PlanFeature =
 export class PlanService {
   private readonly userService = inject(UserService);
   private readonly dialog = inject(MatDialog);
-  private readonly premiumFeatures: readonly PlanFeature[] = [
-    'family-sharing',
-    'split-payments',
-    'family-management',
-    'messages'
-  ];
 
   isPremium(): boolean {
     return this.userService.isPremium();
   }
 
-  canAccess(feature: PlanFeature): boolean {
-    return !this.premiumFeatures.includes(feature) || this.isPremium();
+  canAccess(): boolean {
+    return this.isPremium();
   }
 
   requiresPremium(feature: PlanFeature): void {
-    if (this.canAccess(feature)) {
+    if (this.canAccess()) {
       return;
     }
 

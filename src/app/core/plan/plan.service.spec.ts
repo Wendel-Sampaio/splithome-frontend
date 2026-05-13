@@ -2,6 +2,7 @@ import { TestBed } from '@angular/core/testing';
 import { MatDialog } from '@angular/material/dialog';
 import { PlanService } from './plan.service';
 import { UserService } from '../auth/user/user.service';
+import { UpgradeComponent } from '../../shared/components/upgrade/upgrade.component';
 
 describe('PlanService', () => {
   let service: PlanService;
@@ -33,8 +34,7 @@ describe('PlanService', () => {
   it('should deny premium features for free users', () => {
     userServiceSpy.isPremium.and.returnValue(false);
 
-    expect(service.canAccess('messages')).toBeFalse();
-    expect(service.canAccess('family-sharing')).toBeFalse();
+    expect(service.canAccess()).toBeFalse();
   });
 
   it('should open the upgrade dialog when a free user needs premium access', () => {
@@ -42,7 +42,10 @@ describe('PlanService', () => {
 
     service.requiresPremium('split-payments');
 
-    expect(dialogSpy.open).toHaveBeenCalled();
+    expect(dialogSpy.open).toHaveBeenCalledWith(UpgradeComponent, {
+      width: '420px',
+      data: { feature: 'split-payments' }
+    });
   });
 
   it('should not open the upgrade dialog for premium users', () => {
