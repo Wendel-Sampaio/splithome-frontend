@@ -21,7 +21,7 @@ export class PlanService {
   ];
 
   isPremium(): boolean {
-    return this.userService.getUser().plan === 'PREMIUM';
+    return this.userService.isPremium();
   }
 
   canAccess(feature: PlanFeature): boolean {
