@@ -27,11 +27,7 @@ export const meuhttpInterceptor: HttpInterceptorFn = (request, next) => {
           router.navigate(['/login']);
         } else if (err.status === 403) {
           snackBar.open('Acesso Negado', '', { duration: 5000 });
-        } else {
-          console.error('HTTP error:', err);
         }
-      } else {
-        console.error('An error occurred:', err);
       }
 
       return throwError(() => err);
