@@ -44,6 +44,15 @@ $white-color: #ffffff;          // Cor branca
   }
 }
 
+.table table .edit-buttom {
+  background-color: #005cbb;
+  margin-right: 6px;
+
+  &:hover {
+    background-color: #004494;
+  }
+}
+
 // Estilos para a tabela de compras
 .table {
   margin-top: 20px;

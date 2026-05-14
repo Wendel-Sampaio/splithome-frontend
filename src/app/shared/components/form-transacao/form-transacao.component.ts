@@ -3,7 +3,7 @@ import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { FormControl, FormGroup, FormsModule, ReactiveFormsModule } from '@angular/forms';
 import { MatButtonModule } from '@angular/material/button';
 import { MatCardModule } from '@angular/material/card';
-import { MAT_DIALOG_DATA, MatDialogModule } from '@angular/material/dialog';
+import { MAT_DIALOG_DATA, MatDialogModule, MatDialogRef } from '@angular/material/dialog';
 import { MatFormFieldModule } from '@angular/material/form-field';
 import { MatInputModule } from '@angular/material/input';
 import { MatSelectModule } from '@angular/material/select';
@@ -18,6 +18,12 @@ import { UserService } from '../../../core/auth/user/user.service';
 import moment from 'moment/moment';
 import { CompraService } from '../../services/compra/compra.service';
 import { MatSnackBar } from '@angular/material/snack-bar';
+import { Compra } from '../../../core/models/compra/compra';
+
+type FormTransacaoData = {
+  tipo?: 'compra' | 'despesa';
+  compra?: Compra;
+};
 
 @Component({
   selector: 'dialog-content-example-dialog',
@@ -42,12 +48,13 @@ import { MatSnackBar } from '@angular/material/snack-bar';
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class FormTransacaoComponent {
-  constructor(@Optional() @Inject(MAT_DIALOG_DATA) public data: { tipo?: 'compra' | 'despesa' } | null) {}
+  constructor(@Optional() @Inject(MAT_DIALOG_DATA) public data: FormTransacaoData | null) {}
   
   userService = inject(UserService)
   compraService = inject(CompraService)
   transacaoService = inject(TransacaoService)
   private _snackBar = inject(MatSnackBar);
+  private dialogRef = inject(MatDialogRef<FormTransacaoComponent>, { optional: true });
   cdRef = inject(ChangeDetectorRef)
   private destroyRef = inject(DestroyRef);
 
@@ -59,15 +66,27 @@ export class FormTransacaoComponent {
   responsavel: string = this.userService.getUser().id
   formTransacao!: FormGroup;
 
+  get isEdicaoCompra(): boolean {
+    return !!this.data?.compra;
+  }
+
   get isDespesa(): boolean {
     return this.data?.tipo === 'despesa';
   }
 
   get tituloDialog(): string {
+    if (this.isEdicaoCompra) {
+      return 'Editar compra';
+    }
+
     return this.isDespesa ? 'Cadastro de despesa' : 'Cadastro de compra';
   }
 
   get textoBotaoConfirmacao(): string {
+    if (this.isEdicaoCompra) {
+      return 'Salvar alterações';
+    }
+
     return this.isDespesa ? 'Cadastrar despesa' : 'Cadastrar';
   }
   
@@ -81,6 +100,7 @@ export class FormTransacaoComponent {
       valor: new FormControl(""),
       dataPagamento: new FormControl(""),
     })
+    this.preencherFormularioEdicao();
   }
 
   mudarSelecaoUsuario(usuario: User): void {
@@ -116,6 +136,7 @@ export class FormTransacaoComponent {
     this.userService.getAllUsers().pipe(takeUntilDestroyed(this.destroyRef)).subscribe({
       next: usuarios => {
         this.usuarios = usuarios;
+        this.preencherPagadoresEdicao();
         this.cdRef.detectChanges();
       }
     })
@@ -128,9 +149,12 @@ export class FormTransacaoComponent {
     ) ?? categoriaSelecionada;
     const usuarioLogado = this.userService.getUser();
     const familyId = usuarioLogado.familyId ?? usuarioLogado.familyCode;
-    this.pagadoresRestantes = [...this.pagadores];
+    this.pagadoresRestantes = this.isEdicaoCompra
+      ? this.getPagadoresRestantesEdicao()
+      : [...this.pagadores];
 
     const formData = {
+      ...(this.isEdicaoCompra ? { id: this.data?.compra?.id } : {}),
       title: this.formTransacao.value.titulo,
       category: categoriaOriginal,
       value: Number(this.formTransacao.value.valor),
@@ -142,24 +166,83 @@ export class FormTransacaoComponent {
         ? { responsibleId: this.responsavel }
         : {
           purchaserId: this.responsavel,
-          purchaseDate: moment(new Date()).format('YYYY-MM-DDTHH:mm:ss')
+          purchaseDate: this.isEdicaoCompra && this.data?.compra?.purchaseDate
+            ? moment(this.data.compra.purchaseDate).format('YYYY-MM-DDTHH:mm:ss')
+            : moment(new Date()).format('YYYY-MM-DDTHH:mm:ss')
         })
     }
-    const request = this.isDespesa
+    const request = this.isEdicaoCompra
+      ? this.compraService.atualizarCompra(formData)
+      : this.isDespesa
       ? this.compraService.cadastrarDespesa(formData)
       : this.compraService.cadastrarCompra(formData);
 
     request.pipe(takeUntilDestroyed(this.destroyRef)).subscribe({
       next: response => {
-        this.openSnackBar(this.isDespesa ? "Despesa cadastrada com sucesso!" : "Compra cadastrada com sucesso!")
+        this.openSnackBar(this.getMensagemSucesso())
+        this.dialogRef?.close(true);
       },
       error: error => {
-        this.openSnackBar(this.isDespesa ? "Erro ao cadastrar despesa!" : "Erro ao cadastrar compra!")
+        this.openSnackBar(this.getMensagemErro())
       }
     });
   }
 
   openSnackBar(message: string) {
     this._snackBar.open(message, '', { duration: 5000 });
+  }
+
+  private preencherFormularioEdicao(): void {
+    if (!this.data?.compra) {
+      return;
+    }
+
+    this.responsavel = this.data.compra.purchaserId;
+    this.formTransacao.patchValue({
+      titulo: this.data.compra.title,
+      categoria: this.data.compra.category,
+      valor: this.data.compra.value,
+      dataPagamento: this.data.compra.paymentDate ? new Date(this.data.compra.paymentDate) : ''
+    });
+    this.preencherPagadoresEdicao();
+  }
+
+  private preencherPagadoresEdicao(): void {
+    if (!this.data?.compra) {
+      return;
+    }
+
+    this.pagadores = [...this.data.compra.payers];
+  }
+
+  private getPagadoresRestantesEdicao(): string[] {
+    const compra = this.data?.compra;
+
+    if (!compra) {
+      return [...this.pagadores];
+    }
+
+    const pagadoresAntigos = compra.payers ?? [];
+    const pagadoresRestantesAntigos = compra.remainingPayers ?? [];
+    const novosPagadores = this.pagadores.filter(pagador => !pagadoresAntigos.includes(pagador));
+    const pagadoresRestantesMantidos = pagadoresRestantesAntigos.filter(pagador => this.pagadores.includes(pagador));
+
+    return [...new Set([...pagadoresRestantesMantidos, ...novosPagadores])];
+  }
+
+  private getMensagemSucesso(): string {
+    if (this.isEdicaoCompra) {
+      return 'Compra atualizada com sucesso!';
+    }
+
+    return this.isDespesa ? 'Despesa cadastrada com sucesso!' : 'Compra cadastrada com sucesso!';
+  }
+
+  private getMensagemErro(): string {
+    if (this.isEdicaoCompra) {
+      return 'Erro ao atualizar compra!';
+    }
+
+    return this.isDespesa ? 'Erro ao cadastrar despesa!' : 'Erro ao cadastrar compra!';
   }
 }
