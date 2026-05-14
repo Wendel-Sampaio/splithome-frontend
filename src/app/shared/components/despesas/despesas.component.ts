@@ -8,6 +8,7 @@ import { MatTableModule } from "@angular/material/table";
 import { UserService } from "../../../core/auth/user/user.service";
 import { Despesa } from "../../../core/models/despesa/despesa";
 import { CompraService } from "../../services/compra/compra.service";
+import { ConfirmDeleteComponent, ConfirmDeleteDialogData } from "../confirm-delete/confirm-delete.component";
 import { DialogPagamentoComponent } from "../dialog-pagamento/dialog-pagamento.component";
 import { FormTransacaoComponent } from "../form-transacao/form-transacao.component";
 
@@ -212,7 +213,27 @@ export class DespesasComponent implements OnInit {
     }
   }
 
-  deleteDespesa(contaId: string): void {
+  deleteDespesa(despesa: Despesa): void {
+    const dialogRef = this.dialog.open<ConfirmDeleteComponent, ConfirmDeleteDialogData, boolean>(ConfirmDeleteComponent, {
+      width: '420px',
+      maxWidth: 'calc(100vw - 32px)',
+      data: {
+        itemType: 'a despesa',
+        title: despesa.title,
+        valueLabel: this.formatCurrency(despesa.value)
+      }
+    });
+
+    dialogRef.afterClosed().subscribe(confirmed => {
+      if (!confirmed) {
+        return;
+      }
+
+      this.confirmDeleteDespesa(despesa.id);
+    });
+  }
+
+  private confirmDeleteDespesa(contaId: string): void {
     this.despesaService.deleteDespesa(contaId).subscribe({
       next: (response: string) => {
         console.log('Despesa deletada com sucesso:', response);
@@ -222,5 +243,12 @@ export class DespesasComponent implements OnInit {
         console.error('Erro ao deletar despesa', err);
       }
     });
+  }
+
+  private formatCurrency(value: number): string {
+    return new Intl.NumberFormat('pt-BR', {
+      style: 'currency',
+      currency: 'BRL'
+    }).format(value);
   }
 }

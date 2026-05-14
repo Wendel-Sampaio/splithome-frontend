@@ -11,6 +11,7 @@ import { MatCardTitle } from '@angular/material/card';
 import { DialogPagamentoComponent } from '../dialog-pagamento/dialog-pagamento.component';
 import { MatIconModule } from '@angular/material/icon';
 import { MatButtonModule } from '@angular/material/button';
+import { ConfirmDeleteComponent, ConfirmDeleteDialogData } from '../confirm-delete/confirm-delete.component';
 
 export interface CompraModel {
   id: string;
@@ -239,7 +240,27 @@ export class ComprasComponent implements OnInit {
     }
   }
 
-  deleteCompra(contaId: string): void {
+  deleteCompra(compra: Compra): void {
+    const dialogRef = this.dialog.open<ConfirmDeleteComponent, ConfirmDeleteDialogData, boolean>(ConfirmDeleteComponent, {
+      width: '420px',
+      maxWidth: 'calc(100vw - 32px)',
+      data: {
+        itemType: 'a compra',
+        title: compra.title,
+        valueLabel: this.formatCurrency(compra.value)
+      }
+    });
+
+    dialogRef.afterClosed().pipe(takeUntilDestroyed(this.destroyRef)).subscribe(confirmed => {
+      if (!confirmed) {
+        return;
+      }
+
+      this.confirmDeleteCompra(compra.id);
+    });
+  }
+
+  private confirmDeleteCompra(contaId: string): void {
     this.compraService.deleteCompra(contaId).pipe(takeUntilDestroyed(this.destroyRef)).subscribe({
       next: (response: string) => {
         console.log('Compra deletada com sucesso:', response);
@@ -249,6 +270,13 @@ export class ComprasComponent implements OnInit {
         console.error('Erro ao deletar compra', err);
       }
     });
+  }
+
+  private formatCurrency(value: number): string {
+    return new Intl.NumberFormat('pt-BR', {
+      style: 'currency',
+      currency: 'BRL'
+    }).format(value);
   }
 
 }

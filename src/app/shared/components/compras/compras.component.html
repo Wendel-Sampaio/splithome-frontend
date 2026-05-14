@@ -79,7 +79,7 @@
         <ng-container matColumnDef="actions">
             <th class="column-name" mat-header-cell *matHeaderCellDef></th>
             <td [ngClass]="{'payed-style': verificarPagamento(element)}" mat-cell *matCellDef="let element">
-                <button class="remove-buttom" (click)="deleteCompra(element.id)">
+                <button class="remove-buttom" (click)="deleteCompra(element)">
                     <mat-icon>delete</mat-icon>
                 </button>
             </td>
