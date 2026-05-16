@@ -60,6 +60,25 @@ export class ComprasComponent implements OnInit {
     });
   }
 
+  editarCompra(compra: Compra): void {
+    const formRef = this.dialog.open(FormTransacaoComponent, {
+      width: '550px',
+      data: {
+        tipo: 'compra',
+        compra: {
+          ...compra,
+          payers: [...compra.payers],
+          remainingPayers: [...compra.remainingPayers]
+        }
+      }
+    });
+
+    formRef.afterClosed().pipe(takeUntilDestroyed(this.destroyRef)).subscribe(result => {
+      console.log(`Dialog result: ${result}`);
+      this.pegarCompras()
+    });
+  }
+
   efetuarPagamento(element: any) {
     if (!this.verificaUserRemainingPayers(element)) {
       const userName = this.userService.getUser().name;
@@ -111,6 +130,7 @@ export class ComprasComponent implements OnInit {
   pegarCompras() {
     this.compraService.listarCompras().pipe(takeUntilDestroyed(this.destroyRef)).subscribe({
       next: compras => {
+        console.log(compras)
         this.tratamentoLista(compras)
         this.compras = compras
       }, error: error => {
