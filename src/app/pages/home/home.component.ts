@@ -1,17 +1,18 @@
 import { Component, inject } from '@angular/core';
+import { CommonModule } from '@angular/common';
+import { Router } from '@angular/router';
 import { MatButtonModule } from '@angular/material/button';
 import { MatCardModule } from '@angular/material/card';
-import { MatIcon } from '@angular/material/icon';
-import { ComprasComponent } from '../../shared/components/compras/compras.component';
-import { User } from '../../core/models/user/user';
-import { Router } from '@angular/router';
-import { LogoutComponent } from '../../shared/components/logout/logout.component';
 import { MatDialog } from '@angular/material/dialog';
+import { MatIcon } from '@angular/material/icon';
+import { MatToolbarModule } from '@angular/material/toolbar';
 import { UserService } from '../../core/auth/user/user.service';
-import { MeuPerfilComponent } from '../../shared/components/meu-perfil/meu-perfil.component';
-import { CommonModule } from '@angular/common';
-import {MatToolbarModule} from '@angular/material/toolbar';
+import { User } from '../../core/models/user/user';
+import { PlanFeature, PlanService } from '../../core/plan/plan.service';
+import { ComprasComponent } from '../../shared/components/compras/compras.component';
 import { DespesasComponent } from '../../shared/components/despesas/despesas.component';
+import { LogoutComponent } from '../../shared/components/logout/logout.component';
+import { MeuPerfilComponent } from '../../shared/components/meu-perfil/meu-perfil.component';
 
 @Component({
   selector: 'app-home',
@@ -20,45 +21,66 @@ import { DespesasComponent } from '../../shared/components/despesas/despesas.com
   styleUrl: './home.component.scss'
 })
 export class HomeComponent {
+  loginService = inject(UserService);
+  router = inject(Router);
+  planService = inject(PlanService);
+  readonly dialog = inject(MatDialog);
 
-  loginService = inject(UserService)
-  router = inject(Router)
   user!: User;
+  currentView = 'inicio';
+  currentViewTitle = 'In\u00edcio';
 
-  currentView: string = 'inicio';
-  currentViewTitle: string = 'Início'; 
-
-  constructor () {
+  constructor() {
     this.user = this.loginService.getUser();
   }
 
-  readonly dialog = inject(MatDialog);
-  
-  abrirInicio () {
-    this.currentView = 'inicio';
-    this.currentViewTitle = 'Início';
+  get isPremium(): boolean {
+    return this.planService.isPremium();
   }
 
-  // Função para abrir "Compras"
-  abrirCompras() {
+  get planLabel(): string {
+    return this.isPremium ? 'PREMIUM' : 'GR\u00c1TIS';
+  }
+
+  abrirInicio(): void {
+    this.currentView = 'inicio';
+    this.currentViewTitle = 'In\u00edcio';
+  }
+
+  abrirCompras(): void {
     this.currentView = 'compras';
     this.currentViewTitle = 'Compras';
   }
 
-  // Função para abrir "Despesas"
-  abrirDespesas() {
+  abrirDespesas(): void {
     this.currentView = 'despesas';
     this.currentViewTitle = 'Despesas';
   }
 
-  // Função para abrir "Recados"
-  abrirRecados() {
+  abrirGraficos(): void {
+    this.currentView = 'graficos';
+    this.currentViewTitle = 'Gr\u00e1ficos';
+  }
+
+  abrirFamilia(): void {
+    if (!this.canOpenPremiumFeature('family-sharing')) {
+      return;
+    }
+
+    this.currentView = 'familia';
+    this.currentViewTitle = 'Fam\u00edlia';
+  }
+
+  abrirRecados(): void {
+    if (!this.canOpenPremiumFeature('messages')) {
+      return;
+    }
+
     this.currentView = 'recados';
     this.currentViewTitle = 'Recados';
   }
 
-  // Função para abrir "Meu Perfil"
-  abrirMeuPerfil() {
+  abrirMeuPerfil(): void {
     this.currentView = 'meuPerfil';
     this.currentViewTitle = 'Meu perfil';
   }
@@ -71,4 +93,12 @@ export class HomeComponent {
     });
   }
 
+  private canOpenPremiumFeature(feature: PlanFeature): boolean {
+    if (this.isPremium) {
+      return true;
+    }
+
+    this.planService.requiresPremium(feature);
+    return false;
+  }
 }

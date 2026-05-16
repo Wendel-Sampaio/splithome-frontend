@@ -93,16 +93,42 @@
             font-weight: 700;
         }
 
+        .user-plan {
+            align-items: center;
+            display: flex;
+            gap: 8px;
+            justify-content: center;
+            margin-top: 4px;
+        }
+
+        .plan-badge {
+            border-radius: 999px;
+            font-size: 11px;
+            font-weight: 800;
+            letter-spacing: 0;
+            line-height: 1;
+            padding: 5px 8px;
+        }
+
+        .plan-badge.free {
+            background-color: #e8f5e9;
+            color: #2f7d3a;
+        }
+
+        .plan-badge.premium {
+            background-color: #48A75A;
+            color: #ffffff;
+        }
+
         .botoes-menu-lateral {
-            font-size: 22px;
+            font-size: 18px;
             font-family: Arial, Helvetica, sans-serif;
             font-weight: 600;
             color: #9F9D9D;
-            min-width: 250px;
+            min-width: 300px;
             min-height: 60px;
             position: relative;
             display: inline-flex;
-            justify-items: center;
             align-items: center;
             padding: 10px 15px;
             border: none;
@@ -124,13 +150,50 @@
         
         .icones-botao {
             color: #9F9D9D;
-            margin-right: 20px;
+            margin-right: 10px;
             min-width: 30px;
             min-height: 30px;
+        }
+
+        .menu-label {
+            flex: 1;
+            line-height: 1.2;
+            text-align: left;
+        }
+
+        .lock-icon {
+            color: #48A75A;
+            font-size: 16px;
+            height: 16px;
+            width: 16px;
+        }
+
+        .premium-lock {
+            align-items: center;
+            color: #48A75A;
+            display: inline-flex;
+            font-size: 12px;
+            font-weight: 800;
+            gap: 4px;
+            margin-left: auto;
+            text-transform: uppercase;
+        }
+
+        .botoes-menu-lateral.premium-locked {
+            background-color: #f0fbf2;
+            color: #6c7480;
+        }
+
+        .botoes-menu-lateral.premium-locked .icones-botao {
+            color: #6c7480;
         }
         
         .material-icons{
             font-size: 32px;
+        }
+
+        .lock-icon.material-icons {
+            font-size: 16px;
         }
 
         .conteudo-card {
@@ -157,6 +220,11 @@
         }
         
         .botoes-menu-lateral:hover .mat-icon {
+            color: white;
+        }
+
+        .botoes-menu-lateral:hover .lock-icon,
+        .botoes-menu-lateral:hover .premium-lock {
             color: white;
         }
     }
