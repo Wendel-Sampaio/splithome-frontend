@@ -7,4 +7,5 @@ export class User {
     familyId?: string;
     familyCode!: string;
     plan!: 'FREE' | 'PREMIUM';
+    profilePhoto?: string;
 }

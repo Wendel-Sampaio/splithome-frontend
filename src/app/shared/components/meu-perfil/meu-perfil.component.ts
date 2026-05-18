@@ -1,5 +1,5 @@
 import { CommonModule } from '@angular/common';
-import { ChangeDetectionStrategy, ChangeDetectorRef, Component, DestroyRef, inject, OnInit } from '@angular/core';
+import { ChangeDetectionStrategy, ChangeDetectorRef, Component, DestroyRef, EventEmitter, inject, OnInit, Output } from '@angular/core';
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { MatButtonModule } from '@angular/material/button';
 import { MatCardModule } from '@angular/material/card';
@@ -21,6 +21,8 @@ import { MatSnackBar } from '@angular/material/snack-bar';
 export class MeuPerfilComponent implements OnInit {
 
   isEditable: boolean = false;
+  readonly acceptProfilePhoto = 'image/png,image/jpeg,image/webp';
+  @Output() profilePhotoUpdated = new EventEmitter<string>();
   private cdr = inject(ChangeDetectorRef);
   private _snackBar = inject(MatSnackBar);
   private destroyRef = inject(DestroyRef);
@@ -32,12 +34,18 @@ export class MeuPerfilComponent implements OnInit {
     phoneNumber: '',
     pixKey: '',
     familyCode: '',
-    plan: 'FREE'
+    plan: 'FREE',
+    profilePhoto: ''
   };
 
   userService = inject(UserService)
 
   ngOnInit(): void {
+    const loggedUser = this.userService.getUser();
+    this.userData = {
+      ...loggedUser,
+      profilePhoto: this.userService.getProfilePhoto(loggedUser)
+    };
     this.loadUserData();
   }
 
@@ -48,6 +56,44 @@ export class MeuPerfilComponent implements OnInit {
   cancelEdit() {
     this.isEditable = false;
     this.loadUserData();
+  }
+
+  get profilePhotoUrl(): string {
+    return this.userService.getProfilePhoto(this.userData);
+  }
+
+  onProfilePhotoSelected(event: Event) {
+    const input = event.target as HTMLInputElement;
+    const file = input.files?.[0];
+
+    if (!file) {
+      return;
+    }
+
+    if (!file.type.startsWith('image/')) {
+      this.openSnackBar('Selecione um arquivo de imagem.');
+      input.value = '';
+      return;
+    }
+
+    this.resizeProfilePhoto(file)
+      .then((profilePhoto) => {
+        const userId = this.userData.id || this.userService.getUser().id;
+        this.userData = {
+          ...this.userData,
+          id: userId,
+          profilePhoto
+        };
+        this.userService.saveProfilePhoto(userId, profilePhoto);
+        this.profilePhotoUpdated.emit(profilePhoto);
+        this.persistProfilePhoto();
+        this.openSnackBar('Foto de perfil atualizada com sucesso!');
+        this.cdr.markForCheck();
+      })
+      .catch(() => this.openSnackBar('Não foi possível carregar a foto selecionada.'))
+      .finally(() => {
+        input.value = '';
+      });
   }
 
   copyToClipboard() {
@@ -83,6 +129,45 @@ export class MeuPerfilComponent implements OnInit {
 
   openSnackBar(message: string) {
     this._snackBar.open(message, '', { duration: 5000 });
+  }
+
+  private persistProfilePhoto() {
+    const userId = this.userData.id || this.userService.getUser().id;
+
+    if (!userId) {
+      return;
+    }
+
+    this.userService.atualizarUsuario(userId, {
+      ...this.userData,
+      id: userId
+    }).pipe(takeUntilDestroyed(this.destroyRef)).subscribe();
+  }
+
+  private resizeProfilePhoto(file: File): Promise<string> {
+    const maxSize = 320;
+
+    return new Promise((resolve, reject) => {
+      const reader = new FileReader();
+      reader.onerror = () => reject();
+      reader.onload = () => {
+        const image = new Image();
+        image.onerror = () => reject();
+        image.onload = () => {
+          const canvas = document.createElement('canvas');
+          const scale = Math.min(maxSize / image.width, maxSize / image.height, 1);
+          const width = Math.round(image.width * scale);
+          const height = Math.round(image.height * scale);
+
+          canvas.width = width;
+          canvas.height = height;
+          canvas.getContext('2d')?.drawImage(image, 0, 0, width, height);
+          resolve(canvas.toDataURL('image/jpeg', 0.85));
+        };
+        image.src = reader.result as string;
+      };
+      reader.readAsDataURL(file);
+    });
   }
 
 }

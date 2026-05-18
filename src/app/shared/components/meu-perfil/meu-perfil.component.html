@@ -38,7 +38,17 @@
                 
             </div>
             <div id="foto-container">
-                <img id="foto-perfil" src="../../../../assets/perfil.png" alt="">
+                <label id="foto-upload" for="profile-photo-input" aria-label="Alterar foto de perfil">
+                    <img id="foto-perfil" [src]="profilePhotoUrl" alt="Foto de perfil">
+                    <span id="foto-upload-icon">
+                        <mat-icon>photo_camera</mat-icon>
+                    </span>
+                </label>
+                <input
+                    id="profile-photo-input"
+                    type="file"
+                    [accept]="acceptProfilePhoto"
+                    (change)="onProfilePhotoSelected($event)">
             </div>
         </div>
     </mat-card-content>

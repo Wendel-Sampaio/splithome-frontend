@@ -47,7 +47,7 @@
             *ngFor="let usuario of usuarios"
             [selected]="usuarioSelecionado(usuario)" 
             (click)="mudarSelecaoUsuario(usuario)">
-            <img matChipAvatar src="../../../../assets/perfil.png" alt="Foto do Usuário"/>
+            <img matChipAvatar [src]="getProfilePhoto(usuario)" alt="Foto do Usuário"/>
             {{ usuario.name }}
           </mat-chip-option>
         </mat-chip-listbox>

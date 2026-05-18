@@ -1,6 +1,6 @@
 import { HttpClient } from '@angular/common/http';
 import { Injectable, inject } from '@angular/core';
-import { map, Observable } from 'rxjs';
+import { BehaviorSubject, map, Observable } from 'rxjs';
 import { jwtDecode, JwtPayload } from "jwt-decode";
 import { Login } from './login';
 import { Register } from './register';
@@ -16,6 +16,10 @@ export class UserService {
 
   http = inject(HttpClient);
   API = `${environment.apiUrl}/user`;
+  readonly defaultProfilePhoto = 'assets/perfil.png';
+  private readonly profilePhotoStoragePrefix = 'profilePhoto:';
+  private readonly profilePhotoUpdatesSubject = new BehaviorSubject<void>(undefined);
+  readonly profilePhotoUpdates$ = this.profilePhotoUpdatesSubject.asObservable();
 
 
   constructor() { }
@@ -29,20 +33,21 @@ export class UserService {
   }
 
   atualizarUsuario(id: string, user: User): Observable<User> {
-    return this.http.put<User>(`${this.API}/${id}/edit-user`, user)
+    return this.http.put<User>(`${this.API}/${id}/edit-user`, user).pipe(
+      map((updatedUser) => this.normalizeUser(updatedUser))
+    )
   }
 
   getUserById(id: string): Observable<User> {
     return this.http.get<User>(`${this.API}/${id}`).pipe(
-      map((user) => ({
-        ...user,
-        plan: user.plan === 'PREMIUM' ? 'PREMIUM' : 'FREE'
-      }))
+      map((user) => this.normalizeUser(user))
     );
   }
   
   getAllUsers(): Observable<User[]> {
-    return this.http.get<User[]>(this.API+"/listall")
+    return this.http.get<User[]>(this.API+"/listall").pipe(
+      map((users) => users.map((user) => this.normalizeUser(user)))
+    )
   }
 
   addToken(token: string) {
@@ -69,7 +74,8 @@ export class UserService {
         phoneNumber: userFromToken.phoneNumber ?? '',
         pixKey: userFromToken.pixKey ?? '',
         familyCode: userFromToken.familyCode ?? '',
-        plan: userFromToken.plan === 'PREMIUM' ? 'PREMIUM' : 'FREE'
+        plan: userFromToken.plan === 'PREMIUM' ? 'PREMIUM' : 'FREE',
+        profilePhoto: userFromToken.profilePhoto ?? this.getStoredProfilePhoto(userFromToken.id)
       } as User;
     }
     return null;
@@ -83,13 +89,47 @@ export class UserService {
       phoneNumber: '',
       pixKey: '',
       familyCode: '',
-      plan: 'FREE'
+      plan: 'FREE',
+      profilePhoto: this.defaultProfilePhoto
     };
+  }
+
+  getProfilePhoto(user?: Partial<User> | null): string {
+    return user?.profilePhoto || this.getStoredProfilePhoto(user?.id) || this.defaultProfilePhoto;
+  }
+
+  saveProfilePhoto(userId: string, profilePhoto: string): void {
+    if (!userId) {
+      return;
+    }
+
+    localStorage.setItem(this.getProfilePhotoStorageKey(userId), profilePhoto);
+    this.profilePhotoUpdatesSubject.next();
   }
 
   isPremium(): boolean {
     const user = this.jwtDecode();
     return user !== null && user.plan === 'PREMIUM';
+  }
+
+  private normalizeUser(user: User): User {
+    return {
+      ...user,
+      plan: user.plan === 'PREMIUM' ? 'PREMIUM' : 'FREE',
+      profilePhoto: user.profilePhoto || this.getStoredProfilePhoto(user.id)
+    };
+  }
+
+  private getStoredProfilePhoto(userId?: string): string | undefined {
+    if (!userId) {
+      return undefined;
+    }
+
+    return localStorage.getItem(this.getProfilePhotoStorageKey(userId)) ?? undefined;
+  }
+
+  private getProfilePhotoStorageKey(userId: string): string {
+    return `${this.profilePhotoStoragePrefix}${userId}`;
   }
 
 }

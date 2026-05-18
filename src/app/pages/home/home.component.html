@@ -13,7 +13,7 @@
                     <img class="icon-title" src="../../../assets/icon.png" alt="">
                     <mat-card-title class="titulo-menu-lateral">SplitHome</mat-card-title>
                 </div>
-                <img class="profile-photo" src="../../../assets/perfil.png" alt="">
+                <img class="profile-photo" [src]="profilePhotoUrl" alt="Foto de perfil">
                 <mat-card-subtitle class="subtitulo-menu">
                     Bem vindo
                     <div class="user-plan">
@@ -132,5 +132,5 @@
             <p>Centralize avisos importantes para todos da casa.</p>
         </mat-card-content>
     </mat-card>
-    <meu-perfil class="meu-perfil" *ngIf="currentView === 'meuPerfil'"></meu-perfil>
+    <meu-perfil class="meu-perfil" *ngIf="currentView === 'meuPerfil'" (profilePhotoUpdated)="atualizarFotoPerfil($event)"></meu-perfil>
 </div>

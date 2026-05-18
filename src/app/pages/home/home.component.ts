@@ -1,5 +1,6 @@
-import { Component, inject } from '@angular/core';
+import { ChangeDetectorRef, Component, DestroyRef, inject } from '@angular/core';
 import { CommonModule } from '@angular/common';
+import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { Router } from '@angular/router';
 import { MatButtonModule } from '@angular/material/button';
 import { MatCardModule } from '@angular/material/card';
@@ -24,6 +25,8 @@ export class HomeComponent {
   loginService = inject(UserService);
   router = inject(Router);
   planService = inject(PlanService);
+  private cdr = inject(ChangeDetectorRef);
+  private destroyRef = inject(DestroyRef);
   readonly dialog = inject(MatDialog);
 
   user!: User;
@@ -32,6 +35,13 @@ export class HomeComponent {
 
   constructor() {
     this.user = this.loginService.getUser();
+    this.loginService.profilePhotoUpdates$.pipe(takeUntilDestroyed(this.destroyRef)).subscribe(() => {
+      this.user = {
+        ...this.user,
+        profilePhoto: this.loginService.getProfilePhoto(this.user)
+      };
+      this.cdr.markForCheck();
+    });
   }
 
   get isPremium(): boolean {
@@ -40,6 +50,17 @@ export class HomeComponent {
 
   get planLabel(): string {
     return this.isPremium ? 'PREMIUM' : 'GR\u00c1TIS';
+  }
+
+  get profilePhotoUrl(): string {
+    return this.loginService.getProfilePhoto(this.user);
+  }
+
+  atualizarFotoPerfil(profilePhoto: string): void {
+    this.user = {
+      ...this.user,
+      profilePhoto
+    };
   }
 
   abrirInicio(): void {

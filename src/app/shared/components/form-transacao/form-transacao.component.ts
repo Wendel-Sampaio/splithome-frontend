@@ -116,6 +116,10 @@ export class FormTransacaoComponent {
     return this.pagadores.includes(usuario.name);
   }
 
+  getProfilePhoto(usuario: User): string {
+    return this.userService.getProfilePhoto(usuario);
+  }
+
 
   getPagadoresSelecionados(): string[] {
     return this.pagadores;
