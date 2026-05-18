@@ -59,9 +59,45 @@
     width: 44%;
 }
 
+#foto-upload {
+    cursor: pointer;
+    display: inline-flex;
+    position: relative;
+}
+
 #foto-perfil {
-    max-width: 100%; 
-    max-height: 150px;
+    border: 4px solid #ffffff;
+    border-radius: 50%;
+    box-shadow: 0 2px 8px rgb(150, 150, 150);
+    height: 150px;
+    object-fit: cover;
+    width: 150px;
+}
+
+#foto-upload-icon {
+    align-items: center;
+    background-color: #48A75A;
+    border: 2px solid white;
+    border-radius: 50%;
+    bottom: 5px;
+    box-shadow: 0 1px 4px rgb(125, 125, 125);
+    color: white;
+    display: inline-flex;
+    height: 38px;
+    justify-content: center;
+    position: absolute;
+    right: 5px;
+    width: 38px;
+}
+
+#foto-upload-icon mat-icon {
+    font-size: 22px;
+    height: 22px;
+    width: 22px;
+}
+
+#profile-photo-input {
+    display: none;
 }
 
 .input-name,

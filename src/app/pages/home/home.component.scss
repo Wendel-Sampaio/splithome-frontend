@@ -75,7 +75,11 @@
         }
         
         .profile-photo {
+            border-radius: 50%;
+            height: 150px;
             margin-top: 40px;
+            object-fit: cover;
+            width: 150px;
         }
         
         .subtitulo-menu {
