@@ -1,5 +1,3 @@
-import { Data } from "@angular/router";
-
 export class Compra {
     id!: string;
     title!: string;
@@ -7,10 +5,8 @@ export class Compra {
     value!: number;
     unitValue!: number;
     payers!: Array<string>;
-    formatedPayers!: string;
     paymentDate!: string;
     remainingPayers!: Array<string>;
-    formatedRemainingPayers!: string;
     purchaserId!: string;
     purchaserName!: string;
     purchaseDate!: string;

@@ -15,8 +15,8 @@
           <mat-label>Categoria</mat-label>
           <mat-select formControlName="categoria">        
             <!-- O [value]="categoria" é usado para atribuir o valor do select à variável categoria. -->
-            <mat-option *ngFor="let categoria of categorias" [value]="categoria"> 
-              {{ categoria }}
+            <mat-option *ngFor="let categoria of categorias$ | async" [value]="categoria"> 
+              {{ categoria | categoria }}
             </mat-option>
           </mat-select>
         </mat-form-field>
@@ -44,7 +44,7 @@
         <mat-chip-listbox class="users-layout" [multiple]="true" aria-label="Seleção de pagadores">
           <mat-chip-option 
             class="users"
-            *ngFor="let usuario of usuarios"
+            *ngFor="let usuario of usuarios$ | async"
             [selected]="usuarioSelecionado(usuario)" 
             (click)="mudarSelecaoUsuario(usuario)">
             <img matChipAvatar [src]="getProfilePhoto(usuario)" alt="Foto do Usuário"/>

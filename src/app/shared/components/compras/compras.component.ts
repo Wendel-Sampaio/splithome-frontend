@@ -1,4 +1,4 @@
-import { ChangeDetectorRef, Component, DestroyRef, inject, OnInit } from '@angular/core';
+import { Component, DestroyRef, inject } from '@angular/core';
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { MatTableModule } from '@angular/material/table';
 import { CompraService } from '../../services/compra/compra.service';
@@ -12,23 +12,9 @@ import { DialogPagamentoComponent } from '../dialog-pagamento/dialog-pagamento.c
 import { MatIconModule } from '@angular/material/icon';
 import { MatButtonModule } from '@angular/material/button';
 import { ConfirmDeleteComponent, ConfirmDeleteDialogData } from '../confirm-delete/confirm-delete.component';
-
-export interface CompraModel {
-  id: string;
-  title: string;
-  category: string;
-  purchaseDate: Date;
-  paymentDate: Date;
-  value: number;
-  remainingPayers: string[];
-  formatedPayers: string;
-  unitValue: number;
-  purchaserName: string;
-  payment: string;
-  formatedRemainingPayers: string;
-  showPaymentButton: boolean;
-  isPaid: boolean;
-}
+import { BehaviorSubject, catchError, forkJoin, map, Observable, of, switchMap } from 'rxjs';
+import { PagadoresPipe } from '../../pipes/pagadores.pipe';
+import { CategoriaPipe } from '../../pipes/categoria.pipe';
 
 @Component({
   selector: 'tabela-compras',
@@ -40,15 +26,26 @@ export interface CompraModel {
     MatDialogModule,
     MatCardTitle,
     MatIconModule,
-    MatButtonModule
+    MatButtonModule,
+    PagadoresPipe,
+    CategoriaPipe
   ],
 })
-export class ComprasComponent implements OnInit {
-
-  constructor(private cdr: ChangeDetectorRef) { }
-
+export class ComprasComponent {
   private destroyRef = inject(DestroyRef);
   readonly dialog = inject(MatDialog);
+  compraService = inject(CompraService);
+  userService = inject(UserService);
+  private readonly recarregarComprasSubject = new BehaviorSubject<void>(undefined);
+  readonly compras$ = this.recarregarComprasSubject.pipe(
+    switchMap(() => this.compraService.listarCompras().pipe(
+      switchMap(compras => this.tratamentoLista(compras)),
+      catchError(() => {
+        console.log("Erro ao carregar lista de compras!");
+        return of([]);
+      })
+    ))
+  );
 
   abrirFormCompra() {
     const formRef = this.dialog.open(FormTransacaoComponent, {
@@ -56,7 +53,7 @@ export class ComprasComponent implements OnInit {
     });
     formRef.afterClosed().pipe(takeUntilDestroyed(this.destroyRef)).subscribe(result => {
       console.log(`Dialog result: ${result}`);
-      this.pegarCompras()
+      this.recarregarCompras();
     });
   }
 
@@ -75,7 +72,7 @@ export class ComprasComponent implements OnInit {
 
     formRef.afterClosed().pipe(takeUntilDestroyed(this.destroyRef)).subscribe(result => {
       console.log(`Dialog result: ${result}`);
-      this.pegarCompras()
+      this.recarregarCompras();
     });
   }
 
@@ -89,7 +86,7 @@ export class ComprasComponent implements OnInit {
         remainingPayers: element.remainingPayers
       }).pipe(takeUntilDestroyed(this.destroyRef)).subscribe({
         next: (response) => {
-          this.pegarCompras()
+          this.recarregarCompras();
         },
         error: (error) => {
         }
@@ -100,13 +97,9 @@ export class ComprasComponent implements OnInit {
       data: element
     });
     dialogRef.afterClosed().pipe(takeUntilDestroyed(this.destroyRef)).subscribe(result => {
-      this.pegarCompras()
+      this.recarregarCompras();
       console.log(`Dialog result: ${result}`);
     });
-  }
-
-  ngOnInit(): void {
-    this.pegarCompras()
   }
 
   displayedColumns: string[] = [
@@ -115,53 +108,28 @@ export class ComprasComponent implements OnInit {
     'purchaseDate',
     'paymentDate',
     'value',
-    'formatedPayers',
+    'payers',
     'unitValue',
     'purchaserName',
     'payment',
-    'formatedRemainingPayers',
+    'remainingPayers',
     'actions'
   ];
 
-  compras: Compra[] = [];
-  compraService = inject(CompraService)
-  userService = inject(UserService)
-
-  pegarCompras() {
-    this.compraService.listarCompras().pipe(takeUntilDestroyed(this.destroyRef)).subscribe({
-      next: compras => {
-        console.log(compras)
-        this.tratamentoLista(compras)
-        this.compras = compras
-      }, error: error => {
-        console.log("Erro ao carregar lista de compras!")
-      }
-    })
+  recarregarCompras() {
+    this.recarregarComprasSubject.next();
   }
 
-  tratamentoLista(compras: Compra[]) {
-    compras.forEach(compra => {
-      this.formatPagador(compra)
-      this.pagamentoDisponivel(compra)
-      this.formatCategoria(compra)
-      this.calculaValorUnitario(compra)
-      this.formatNomesPagadores(compra)
-      this.formatNomesPagadoresRestantes(compra)
-      this.verificaUserRemainingPayers(compra)
-      this.mudarStatusDaCompra(compra)
-    })
-  }
-
-  mudarStatusDaCompra(compra: Compra) {
-    if (this.verificaUserRemainingPayers(compra)) {
-      compra.isPaid = false;
-    } else {
-      compra.isPaid = true;
+  tratamentoLista(compras: Compra[]): Observable<Compra[]> {
+    if (!compras.length) {
+      return of([]);
     }
+
+    return forkJoin(compras.map(compra => this.prepararCompra(compra)));
   }
 
-  isLastCompra(compra: Compra): boolean {
-    return this.compras[this.compras.length - 1] === compra;
+  isLastCompra(compra: Compra, compras: Compra[]): boolean {
+    return compras[compras.length - 1] === compra;
   }
 
   verificaUserRemainingPayers(compra: Compra): boolean {
@@ -176,88 +144,6 @@ export class ComprasComponent implements OnInit {
       }
     }
     return element.isPaid;
-  }
-
-  pagamentoDisponivel(compra: Compra) {
-    const userName = this.userService.getUser().name;
-    this.userService.getUserById(compra.purchaserId).pipe(takeUntilDestroyed(this.destroyRef)).subscribe({
-      next: user => {
-        if (user.name === userName) {
-          compra.showPaymentButton = false
-        } else {
-          compra.showPaymentButton = compra.payers.includes(this.userService.getUser().name);
-        }
-      }
-    })
-  }
-
-  calculaValorUnitario(compra: Compra) {
-    compra.unitValue = (compra.value / compra.payers.length)
-  }
-
-  formatPagador(compra: Compra) {
-    this.userService.getUserById(compra.purchaserId).pipe(takeUntilDestroyed(this.destroyRef)).subscribe({
-      next: user => {
-        compra.purchaserName = user.name
-      }
-    })
-  }
-
-  formatNomesPagadores(compra: Compra) {
-    if (compra.payers.length === 1) {
-      compra.formatedPayers = compra.payers[0];
-      return;
-    }
-    const listaPagadoresOriginal = [...compra.payers];
-    const lastPayer = compra.payers.pop();
-    compra.formatedPayers = `${compra.payers.join(', ')} e ${lastPayer}`;
-    compra.payers = listaPagadoresOriginal
-  }
-
-  formatNomesPagadoresRestantes(compra: Compra) {
-    if (compra.remainingPayers.length === 1) {
-      compra.formatedRemainingPayers = compra.remainingPayers[0]
-      return;
-    } else if (compra.remainingPayers.length === 0) {
-      compra.formatedRemainingPayers = 'Todos efetuaram o pagamento.'
-      return;
-    }
-    const listaPagadoresRestantesOriginal = [...compra.remainingPayers];
-    const lastRemainingPayer = compra.remainingPayers.pop();
-    compra.formatedRemainingPayers = `${compra.remainingPayers.join(', ')} e ${lastRemainingPayer}`;
-    compra.remainingPayers = listaPagadoresRestantesOriginal
-  }
-
-  formatCategoria(compra: Compra) {
-    switch (compra.category) {
-      case "CLEANING":
-        compra.category = "Limpeza"
-        break
-      case "FOOD":
-        compra.category = "Alimento"
-        break
-      case "UTILITIES":
-        compra.category = "Utilitários"
-        break
-      case "RENT":
-        compra.category = "Aluguel"
-        break
-      case "INTERNET":
-        compra.category = "Internet"
-        break
-      case "ENERGY":
-        compra.category = "Energia"
-        break
-      case "WATER":
-        compra.category = "Água"
-        break
-      case "GAS":
-        compra.category = "Gás"
-        break
-      case "OTHERS":
-        compra.category = "Outros"
-        break
-    }
   }
 
   deleteCompra(compra: Compra): void {
@@ -284,7 +170,7 @@ export class ComprasComponent implements OnInit {
     this.compraService.deleteCompra(contaId).pipe(takeUntilDestroyed(this.destroyRef)).subscribe({
       next: (response: string) => {
         console.log('Compra deletada com sucesso:', response);
-        this.pegarCompras();
+        this.recarregarCompras();
       },
       error: (err) => {
         console.error('Erro ao deletar compra', err);
@@ -299,6 +185,27 @@ export class ComprasComponent implements OnInit {
     }).format(value);
   }
 
+  private prepararCompra(compra: Compra): Observable<Compra> {
+    const currentUser = this.userService.getUser();
+    const userName = currentUser.name;
+    const isNotPurchaser = compra.purchaserId !== currentUser.id;
+
+    return this.userService.getUserById(compra.purchaserId).pipe(
+      map(user => ({
+        ...compra,
+        unitValue: compra.value / compra.payers.length,
+        purchaserName: user.name,
+        showPaymentButton: isNotPurchaser && compra.payers.includes(userName),
+        isPaid: !this.verificaUserRemainingPayers(compra)
+      })),
+      catchError(() => of({
+        ...compra,
+        unitValue: compra.value / compra.payers.length,
+        purchaserName: '',
+        showPaymentButton: isNotPurchaser && compra.payers.includes(userName),
+        isPaid: !this.verificaUserRemainingPayers(compra)
+      }))
+    );
+  }
+
 }
-
-

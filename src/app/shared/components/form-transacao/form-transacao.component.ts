@@ -1,4 +1,4 @@
-import { ChangeDetectionStrategy, ChangeDetectorRef, Component, DestroyRef, Inject, inject, Optional } from '@angular/core';
+import { ChangeDetectionStrategy, Component, DestroyRef, Inject, inject, Optional } from '@angular/core';
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { FormControl, FormGroup, FormsModule, ReactiveFormsModule } from '@angular/forms';
 import { MatButtonModule } from '@angular/material/button';
@@ -12,13 +12,14 @@ import { provideNativeDateAdapter } from '@angular/material/core';
 import {MatChipsModule} from '@angular/material/chips';
 import { TransacaoService } from '../../services/transacao/transacao.service';
 import { CommonModule } from '@angular/common';
-import { CategoriaEnum } from '../../../core/models/categoria/categoriaEnum';
 import { User } from '../../../core/models/user/user';
 import { UserService } from '../../../core/auth/user/user.service';
 import moment from 'moment/moment';
 import { CompraService } from '../../services/compra/compra.service';
 import { MatSnackBar } from '@angular/material/snack-bar';
 import { Compra } from '../../../core/models/compra/compra';
+import { shareReplay } from 'rxjs';
+import { CategoriaPipe } from '../../pipes/categoria.pipe';
 
 type FormTransacaoData = {
   tipo?: 'compra' | 'despesa';
@@ -30,19 +31,18 @@ type FormTransacaoData = {
   styleUrl: 'form-transacao.component.scss',
   templateUrl: 'form-transacao.component.html',
   imports: [
-    MatDialogModule, 
-    MatButtonModule, 
-    MatCardModule, 
-    MatSelectModule, 
-    MatButtonModule, 
-    FormsModule, 
-    MatFormFieldModule, 
+    MatDialogModule,
+    MatButtonModule,
+    MatCardModule,
+    MatSelectModule,
+    FormsModule,
+    MatFormFieldModule,
     MatInputModule,
     MatDatepickerModule,
     ReactiveFormsModule,
     MatChipsModule,
     CommonModule,
-    MatSelectModule,
+    CategoriaPipe,
   ],
   providers: [provideNativeDateAdapter()],
   changeDetection: ChangeDetectionStrategy.OnPush,
@@ -55,12 +55,14 @@ export class FormTransacaoComponent {
   transacaoService = inject(TransacaoService)
   private _snackBar = inject(MatSnackBar);
   private dialogRef = inject(MatDialogRef<FormTransacaoComponent>, { optional: true });
-  cdRef = inject(ChangeDetectorRef)
   private destroyRef = inject(DestroyRef);
+  readonly categorias$ = this.transacaoService.listarCategorias().pipe(
+    shareReplay({ bufferSize: 1, refCount: true })
+  );
+  readonly usuarios$ = this.userService.getAllUsers().pipe(
+    shareReplay({ bufferSize: 1, refCount: true })
+  );
 
-  categorias!: string[];
-  categoriasOriginal!: string[];
-  usuarios!: User[];
   pagadores: string[] = [];
   pagadoresRestantes: string[] = [];
   responsavel: string = this.userService.getUser().id
@@ -92,8 +94,6 @@ export class FormTransacaoComponent {
   
 
   ngOnInit(): void {
-    this.listarUsuarios();
-    this.listarCategorias();
     this.formTransacao = new FormGroup({
       titulo: new FormControl(""),
       categoria: new FormControl(""),
@@ -125,32 +125,8 @@ export class FormTransacaoComponent {
     return this.pagadores;
   }
 
-  listarCategorias() {
-    this.transacaoService.listarCategorias().pipe(takeUntilDestroyed(this.destroyRef)).subscribe({
-      next: categorias => {
-        this.categorias = categorias.map(categoria => 
-          CategoriaEnum[categoria as keyof typeof CategoriaEnum] || categoria
-        );
-        this.categoriasOriginal = categorias;
-      }
-    });
-  }
-
-  listarUsuarios() {
-    this.userService.getAllUsers().pipe(takeUntilDestroyed(this.destroyRef)).subscribe({
-      next: usuarios => {
-        this.usuarios = usuarios;
-        this.preencherPagadoresEdicao();
-        this.cdRef.detectChanges();
-      }
-    })
-  } 
-
   cadastrarTransacao() {
     const categoriaSelecionada = this.formTransacao.value.categoria;
-    const categoriaOriginal = this.categoriasOriginal.find(
-      categoria => CategoriaEnum[categoria as keyof typeof CategoriaEnum] === categoriaSelecionada
-    ) ?? categoriaSelecionada;
     const usuarioLogado = this.userService.getUser();
     const familyId = usuarioLogado.familyId ?? usuarioLogado.familyCode;
     this.pagadoresRestantes = this.isEdicaoCompra
@@ -160,7 +136,7 @@ export class FormTransacaoComponent {
     const formData = {
       ...(this.isEdicaoCompra ? { id: this.data?.compra?.id } : {}),
       title: this.formTransacao.value.titulo,
-      category: categoriaOriginal,
+      category: categoriaSelecionada,
       value: Number(this.formTransacao.value.valor),
       payers: this.pagadores,
       paymentDate: moment(this.formTransacao.value.dataPagamento).format('YYYY-MM-DDTHH:mm:ss'),
