@@ -1,13 +1,17 @@
 import { CommonModule } from "@angular/common";
-import { Component, inject, OnInit } from "@angular/core";
+import { Component, DestroyRef, inject } from "@angular/core";
+import { takeUntilDestroyed } from "@angular/core/rxjs-interop";
 import { MatButtonModule } from "@angular/material/button";
 import { MatCardTitle } from "@angular/material/card";
 import { MatDialog, MatDialogModule } from "@angular/material/dialog";
 import { MatIconModule } from "@angular/material/icon";
 import { MatTableModule } from "@angular/material/table";
+import { BehaviorSubject, catchError, forkJoin, map, Observable, of, switchMap } from "rxjs";
 import { UserService } from "../../../core/auth/user/user.service";
 import { Despesa } from "../../../core/models/despesa/despesa";
 import { CompraService } from "../../services/compra/compra.service";
+import { CategoriaPipe } from "../../pipes/categoria.pipe";
+import { PagadoresPipe } from "../../pipes/pagadores.pipe";
 import { ConfirmDeleteComponent, ConfirmDeleteDialogData } from "../confirm-delete/confirm-delete.component";
 import { DialogPagamentoComponent } from "../dialog-pagamento/dialog-pagamento.component";
 import { FormTransacaoComponent } from "../form-transacao/form-transacao.component";
@@ -20,43 +24,50 @@ import { FormTransacaoComponent } from "../form-transacao/form-transacao.compone
     MatButtonModule,
     MatIconModule,
     MatDialogModule,
-    MatCardTitle
+    MatCardTitle,
+    CategoriaPipe,
+    PagadoresPipe
   ],
   templateUrl: './despesas.component.html',
   styleUrl: './despesas.component.scss'
 })
-export class DespesasComponent implements OnInit {
+export class DespesasComponent {
   readonly dialog = inject(MatDialog);
+  private destroyRef = inject(DestroyRef);
   despesaService = inject(CompraService);
   userService = inject(UserService);
+  private readonly recarregarDespesasSubject = new BehaviorSubject<void>(undefined);
+  readonly despesas$ = this.recarregarDespesasSubject.pipe(
+    switchMap(() => this.despesaService.listarDespesas().pipe(
+      switchMap(despesas => this.tratamentoLista(despesas)),
+      catchError(() => {
+        console.log("Erro ao carregar lista de despesas!");
+        return of([]);
+      })
+    ))
+  );
 
   displayedColumns: string[] = [
     'title',
     'category',
     'paymentDate',
     'value',
-    'formatedPayers',
+    'payers',
     'unitValue',
     'responsibleName',
     'payment',
-    'formatedRemainingPayers',
+    'remainingPayers',
     'actions'
   ];
-
-  despesas: Despesa[] = [];
-
-  ngOnInit(): void {
-    this.pegarDespesas();
-  }
 
   abrirFormDespesa(): void {
     const formRef = this.dialog.open(FormTransacaoComponent, {
       width: '550px',
       data: { tipo: 'despesa' }
     });
-    formRef.afterClosed().subscribe(result => {
+    formRef.afterClosed().pipe(takeUntilDestroyed(this.destroyRef)).subscribe(result => {
       console.log(`Dialog result: ${result}`);
-      this.pegarDespesas();
+      this.recarregarDespesas();
     });
   }
 
@@ -68,8 +79,8 @@ export class DespesasComponent implements OnInit {
       this.despesaService.atualizarDespesa({
         id: element.id,
         remainingPayers: element.remainingPayers
-      }).subscribe({
-        next: () => this.pegarDespesas(),
+      }).pipe(takeUntilDestroyed(this.destroyRef)).subscribe({
+        next: () => this.recarregarDespesas(),
       });
       return;
     }
@@ -77,43 +88,30 @@ export class DespesasComponent implements OnInit {
     const dialogRef = this.dialog.open(DialogPagamentoComponent, {
       data: { ...element, tipo: 'despesa' }
     });
-    dialogRef.afterClosed().subscribe(result => {
-      this.pegarDespesas();
+    dialogRef.afterClosed().pipe(takeUntilDestroyed(this.destroyRef)).subscribe(result => {
+      this.recarregarDespesas();
       console.log(`Dialog result: ${result}`);
     });
   }
 
-  pegarDespesas(): void {
-    this.despesaService.listarDespesas().subscribe({
-      next: despesas => {
-        this.tratamentoLista(despesas);
-        this.despesas = despesas;
-      },
-      error: () => {
-        console.log("Erro ao carregar lista de despesas!");
-      }
-    });
+  recarregarDespesas(): void {
+    this.recarregarDespesasSubject.next();
   }
 
-  tratamentoLista(despesas: Despesa[]): void {
-    despesas.forEach(despesa => {
-      this.formatPagador(despesa);
-      this.pagamentoDisponivel(despesa);
-      this.formatCategoria(despesa);
-      this.calculaValorUnitario(despesa);
-      this.formatNomesPagadores(despesa);
-      this.formatNomesPagadoresRestantes(despesa);
-      this.verificaUserRemainingPayers(despesa);
-      this.mudarStatusDaDespesa(despesa);
-    });
+  tratamentoLista(despesas: Despesa[]): Observable<Despesa[]> {
+    if (!despesas.length) {
+      return of([]);
+    }
+
+    return forkJoin(despesas.map(despesa => this.prepararDespesa(despesa)));
   }
 
   mudarStatusDaDespesa(despesa: Despesa): void {
     despesa.isPaid = !this.verificaUserRemainingPayers(despesa);
   }
 
-  isLastDespesa(despesa: Despesa): boolean {
-    return this.despesas[this.despesas.length - 1] === despesa;
+  isLastDespesa(despesa: Despesa, despesas: Despesa[]): boolean {
+    return despesas[despesas.length - 1] === despesa;
   }
 
   verificaUserRemainingPayers(despesa: Despesa): boolean {
@@ -128,91 +126,6 @@ export class DespesasComponent implements OnInit {
     return element.isPaid;
   }
 
-  pagamentoDisponivel(despesa: Despesa): void {
-    const userName = this.userService.getUser().name;
-    this.userService.getUserById(despesa.responsibleId).subscribe({
-      next: user => {
-        if (user.name === userName) {
-          despesa.showPaymentButton = false;
-        } else {
-          despesa.showPaymentButton = despesa.payers.includes(userName);
-        }
-      }
-    });
-  }
-
-  calculaValorUnitario(despesa: Despesa): void {
-    despesa.unitValue = despesa.value / despesa.payers.length;
-  }
-
-  formatPagador(despesa: Despesa): void {
-    this.userService.getUserById(despesa.responsibleId).subscribe({
-      next: user => {
-        despesa.responsibleName = user.name;
-      }
-    });
-  }
-
-  formatNomesPagadores(despesa: Despesa): void {
-    if (despesa.payers.length === 1) {
-      despesa.formatedPayers = despesa.payers[0];
-      return;
-    }
-    const listaPagadoresOriginal = [...despesa.payers];
-    const lastPayer = despesa.payers.pop();
-    despesa.formatedPayers = `${despesa.payers.join(', ')} e ${lastPayer}`;
-    despesa.payers = listaPagadoresOriginal;
-  }
-
-  formatNomesPagadoresRestantes(despesa: Despesa): void {
-    if (despesa.remainingPayers.length === 1) {
-      despesa.formatedRemainingPayers = despesa.remainingPayers[0];
-      return;
-    }
-
-    if (despesa.remainingPayers.length === 0) {
-      despesa.formatedRemainingPayers = 'Todos efetuaram o pagamento.';
-      return;
-    }
-
-    const listaPagadoresRestantesOriginal = [...despesa.remainingPayers];
-    const lastRemainingPayer = despesa.remainingPayers.pop();
-    despesa.formatedRemainingPayers = `${despesa.remainingPayers.join(', ')} e ${lastRemainingPayer}`;
-    despesa.remainingPayers = listaPagadoresRestantesOriginal;
-  }
-
-  formatCategoria(despesa: Despesa): void {
-    switch (despesa.category) {
-      case "CLEANING":
-        despesa.category = "Limpeza";
-        break;
-      case "FOOD":
-        despesa.category = "Alimento";
-        break;
-      case "UTILITIES":
-        despesa.category = "Utilitarios";
-        break;
-      case "RENT":
-        despesa.category = "Aluguel";
-        break;
-      case "INTERNET":
-        despesa.category = "Internet";
-        break;
-      case "ENERGY":
-        despesa.category = "Energia";
-        break;
-      case "WATER":
-        despesa.category = "Agua";
-        break;
-      case "GAS":
-        despesa.category = "Gas";
-        break;
-      case "OTHERS":
-        despesa.category = "Outros";
-        break;
-    }
-  }
-
   deleteDespesa(despesa: Despesa): void {
     const dialogRef = this.dialog.open<ConfirmDeleteComponent, ConfirmDeleteDialogData, boolean>(ConfirmDeleteComponent, {
       width: '420px',
@@ -224,7 +137,7 @@ export class DespesasComponent implements OnInit {
       }
     });
 
-    dialogRef.afterClosed().subscribe(confirmed => {
+    dialogRef.afterClosed().pipe(takeUntilDestroyed(this.destroyRef)).subscribe(confirmed => {
       if (!confirmed) {
         return;
       }
@@ -234,10 +147,10 @@ export class DespesasComponent implements OnInit {
   }
 
   private confirmDeleteDespesa(contaId: string): void {
-    this.despesaService.deleteDespesa(contaId).subscribe({
+    this.despesaService.deleteDespesa(contaId).pipe(takeUntilDestroyed(this.destroyRef)).subscribe({
       next: (response: string) => {
         console.log('Despesa deletada com sucesso:', response);
-        this.pegarDespesas();
+        this.recarregarDespesas();
       },
       error: (err) => {
         console.error('Erro ao deletar despesa', err);
@@ -250,5 +163,26 @@ export class DespesasComponent implements OnInit {
       style: 'currency',
       currency: 'BRL'
     }).format(value);
+  }
+
+  private prepararDespesa(despesa: Despesa): Observable<Despesa> {
+    const userName = this.userService.getUser().name;
+
+    return this.userService.getUserById(despesa.responsibleId).pipe(
+      map(user => ({
+        ...despesa,
+        unitValue: despesa.value / despesa.payers.length,
+        responsibleName: user.name,
+        showPaymentButton: user.name !== userName && despesa.payers.includes(userName),
+        isPaid: !this.verificaUserRemainingPayers(despesa)
+      })),
+      catchError(() => of({
+        ...despesa,
+        unitValue: despesa.value / despesa.payers.length,
+        responsibleName: '',
+        showPaymentButton: despesa.payers.includes(userName),
+        isPaid: !this.verificaUserRemainingPayers(despesa)
+      }))
+    );
   }
 }

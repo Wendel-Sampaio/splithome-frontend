@@ -5,10 +5,8 @@ export class Despesa {
     value!: number;
     unitValue!: number;
     payers!: Array<string>;
-    formatedPayers!: string;
     paymentDate!: string;
     remainingPayers!: Array<string>;
-    formatedRemainingPayers!: string;
     familyId!: string;
     responsibleId!: string;
     responsibleName!: string;
