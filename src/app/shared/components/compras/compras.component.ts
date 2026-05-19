@@ -128,14 +128,6 @@ export class ComprasComponent {
     return forkJoin(compras.map(compra => this.prepararCompra(compra)));
   }
 
-  mudarStatusDaCompra(compra: Compra) {
-    if (this.verificaUserRemainingPayers(compra)) {
-      compra.isPaid = false;
-    } else {
-      compra.isPaid = true;
-    }
-  }
-
   isLastCompra(compra: Compra, compras: Compra[]): boolean {
     return compras[compras.length - 1] === compra;
   }
@@ -194,21 +186,23 @@ export class ComprasComponent {
   }
 
   private prepararCompra(compra: Compra): Observable<Compra> {
-    const userName = this.userService.getUser().name;
+    const currentUser = this.userService.getUser();
+    const userName = currentUser.name;
+    const isNotPurchaser = compra.purchaserId !== currentUser.id;
 
     return this.userService.getUserById(compra.purchaserId).pipe(
       map(user => ({
         ...compra,
         unitValue: compra.value / compra.payers.length,
         purchaserName: user.name,
-        showPaymentButton: user.name !== userName && compra.payers.includes(userName),
+        showPaymentButton: isNotPurchaser && compra.payers.includes(userName),
         isPaid: !this.verificaUserRemainingPayers(compra)
       })),
       catchError(() => of({
         ...compra,
         unitValue: compra.value / compra.payers.length,
         purchaserName: '',
-        showPaymentButton: compra.payers.includes(userName),
+        showPaymentButton: isNotPurchaser && compra.payers.includes(userName),
         isPaid: !this.verificaUserRemainingPayers(compra)
       }))
     );

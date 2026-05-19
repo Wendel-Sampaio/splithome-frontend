@@ -15,7 +15,7 @@
         </ng-container>
 
         <ng-container matColumnDef="category">
-            <th class="column-name" lass="column-name" mat-header-cell *matHeaderCellDef> Categoria </th>
+            <th class="column-name" mat-header-cell *matHeaderCellDef> Categoria </th>
             <td [ngClass]="{'payed-style': verificarPagamento(element)}" mat-cell *matCellDef="let element">
                 {{ element.category | categoria }} </td>
         </ng-container>

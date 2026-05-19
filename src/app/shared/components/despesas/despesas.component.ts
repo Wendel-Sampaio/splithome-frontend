@@ -106,10 +106,6 @@ export class DespesasComponent {
     return forkJoin(despesas.map(despesa => this.prepararDespesa(despesa)));
   }
 
-  mudarStatusDaDespesa(despesa: Despesa): void {
-    despesa.isPaid = !this.verificaUserRemainingPayers(despesa);
-  }
-
   isLastDespesa(despesa: Despesa, despesas: Despesa[]): boolean {
     return despesas[despesas.length - 1] === despesa;
   }
@@ -166,21 +162,23 @@ export class DespesasComponent {
   }
 
   private prepararDespesa(despesa: Despesa): Observable<Despesa> {
-    const userName = this.userService.getUser().name;
+    const currentUser = this.userService.getUser();
+    const userName = currentUser.name;
+    const isNotResponsible = despesa.responsibleId !== currentUser.id;
 
     return this.userService.getUserById(despesa.responsibleId).pipe(
       map(user => ({
         ...despesa,
         unitValue: despesa.value / despesa.payers.length,
         responsibleName: user.name,
-        showPaymentButton: user.name !== userName && despesa.payers.includes(userName),
+        showPaymentButton: isNotResponsible && despesa.payers.includes(userName),
         isPaid: !this.verificaUserRemainingPayers(despesa)
       })),
       catchError(() => of({
         ...despesa,
         unitValue: despesa.value / despesa.payers.length,
         responsibleName: '',
-        showPaymentButton: despesa.payers.includes(userName),
+        showPaymentButton: isNotResponsible && despesa.payers.includes(userName),
         isPaid: !this.verificaUserRemainingPayers(despesa)
       }))
     );
