@@ -45,7 +45,8 @@ export class UserService {
   }
   
   getAllUsers(): Observable<User[]> {
-    return this.http.get<User[]>(this.API+"/listall").pipe(
+    return this.http.get<unknown>(this.API+"/listall").pipe(
+      map((response) => this.extractList<User>(response)),
       map((users) => users.map((user) => this.normalizeUser(user)))
     )
   }
@@ -118,6 +119,28 @@ export class UserService {
       plan: user.plan === 'PREMIUM' ? 'PREMIUM' : 'FREE',
       profilePhoto: user.profilePhoto || this.getStoredProfilePhoto(user.id)
     };
+  }
+
+  private extractList<T>(response: unknown): T[] {
+    if (Array.isArray(response)) {
+      return response;
+    }
+
+    if (!response || typeof response !== 'object') {
+      console.warn('Resposta inesperada ao listar usuarios:', response);
+      return [];
+    }
+
+    const responseObject = response as Record<string, unknown>;
+    const possibleKeys = ['content', 'users', 'usuarios', 'data', 'items', 'results'];
+    const listKey = possibleKeys.find(key => Array.isArray(responseObject[key]));
+
+    if (listKey) {
+      return responseObject[listKey] as T[];
+    }
+
+    console.warn('Resposta inesperada ao listar usuarios:', response);
+    return [];
   }
 
   private getStoredProfilePhoto(userId?: string): string | undefined {
