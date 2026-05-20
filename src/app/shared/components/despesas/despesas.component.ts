@@ -112,11 +112,11 @@ export class DespesasComponent {
 
   verificaUserRemainingPayers(despesa: Despesa): boolean {
     const userName = this.userService.getUser().name;
-    return despesa.remainingPayers.includes(userName);
+    return (despesa.remainingPayers ?? []).includes(userName);
   }
 
   verificarPagamento(element: Despesa): boolean {
-    if (element.responsibleId === this.userService.getUser().id && element.remainingPayers.length !== 0) {
+    if (element.responsibleId === this.userService.getUser().id && (element.remainingPayers ?? []).length !== 0) {
       return element.isPaid = false;
     }
     return element.isPaid;
@@ -165,21 +165,25 @@ export class DespesasComponent {
     const currentUser = this.userService.getUser();
     const userName = currentUser.name;
     const isNotResponsible = despesa.responsibleId !== currentUser.id;
+    const payers = despesa.payers ?? [];
+    const remainingPayers = despesa.remainingPayers ?? [];
+    const unitValue = payers.length ? despesa.value / payers.length : 0;
+    const despesaNormalizada = { ...despesa, payers, remainingPayers };
 
     return this.userService.getUserById(despesa.responsibleId).pipe(
       map(user => ({
-        ...despesa,
-        unitValue: despesa.value / despesa.payers.length,
+        ...despesaNormalizada,
+        unitValue,
         responsibleName: user.name,
-        showPaymentButton: isNotResponsible && despesa.payers.includes(userName),
-        isPaid: !this.verificaUserRemainingPayers(despesa)
+        showPaymentButton: isNotResponsible && payers.includes(userName),
+        isPaid: !this.verificaUserRemainingPayers(despesaNormalizada)
       })),
       catchError(() => of({
-        ...despesa,
-        unitValue: despesa.value / despesa.payers.length,
+        ...despesaNormalizada,
+        unitValue,
         responsibleName: '',
-        showPaymentButton: isNotResponsible && despesa.payers.includes(userName),
-        isPaid: !this.verificaUserRemainingPayers(despesa)
+        showPaymentButton: isNotResponsible && payers.includes(userName),
+        isPaid: !this.verificaUserRemainingPayers(despesaNormalizada)
       }))
     );
   }

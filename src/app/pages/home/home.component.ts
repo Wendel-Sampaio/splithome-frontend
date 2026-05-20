@@ -14,10 +14,11 @@ import { ComprasComponent } from '../../shared/components/compras/compras.compon
 import { DespesasComponent } from '../../shared/components/despesas/despesas.component';
 import { LogoutComponent } from '../../shared/components/logout/logout.component';
 import { MeuPerfilComponent } from '../../shared/components/meu-perfil/meu-perfil.component';
+import { EstatisticasComponent } from '../estatisticas/estatisticas.component';
 
 @Component({
   selector: 'app-home',
-  imports: [MatCardModule, MatIcon, MatButtonModule, ComprasComponent, DespesasComponent, MeuPerfilComponent, CommonModule, MatToolbarModule],
+  imports: [MatCardModule, MatIcon, MatButtonModule, ComprasComponent, DespesasComponent, MeuPerfilComponent, EstatisticasComponent, CommonModule, MatToolbarModule],
   templateUrl: './home.component.html',
   styleUrl: './home.component.scss'
 })
