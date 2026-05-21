@@ -130,6 +130,11 @@ export class FormTransacaoComponent {
   }
 
   cadastrarTransacao() {
+    if (!this.pagadores.length) {
+      this.openSnackBar('Selecione pelo menos um pagador.');
+      return;
+    }
+
     const categoriaSelecionada = this.formTransacao.value.categoria;
     const usuarioLogado = this.userService.getUser();
     const familyId = usuarioLogado.familyId ?? usuarioLogado.familyCode;

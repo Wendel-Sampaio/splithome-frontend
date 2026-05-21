@@ -1,0 +1,100 @@
+<section class="estatisticas">
+  <header class="estatisticas-header">
+    <div>
+      <h2>Estat&iacute;sticas</h2>
+      <p>Resumo dos seus gastos por categoria e por m&ecirc;s.</p>
+    </div>
+
+    <form class="periodo-form" [formGroup]="periodoForm" (ngSubmit)="carregarResumo()">
+      <mat-form-field appearance="outline">
+        <mat-label>Per&iacute;odo</mat-label>
+        <mat-date-range-input [rangePicker]="picker">
+          <input matStartDate formControlName="dataInicio" placeholder="In&iacute;cio">
+          <input matEndDate formControlName="dataFim" placeholder="Fim">
+        </mat-date-range-input>
+        <mat-datepicker-toggle matIconSuffix [for]="picker"></mat-datepicker-toggle>
+        <mat-date-range-picker #picker></mat-date-range-picker>
+      </mat-form-field>
+
+      <div class="periodo-acoes">
+        <button mat-flat-button color="primary" type="submit">
+          <mat-icon>filter_alt</mat-icon>
+          Filtrar
+        </button>
+        <button mat-button type="button" (click)="limparFiltro()">
+          Limpar
+        </button>
+      </div>
+    </form>
+  </header>
+
+  <div class="mensagem-status" *ngIf="carregando">
+    Carregando estat&iacute;sticas...
+  </div>
+
+  <div class="mensagem-status erro" *ngIf="erro">
+    {{ erro }}
+  </div>
+
+  <ng-container *ngIf="!carregando && !erro && resumo as dados">
+    <div class="resumo-grid">
+      <article class="resumo-card">
+        <span>Gasto no m&ecirc;s atual</span>
+        <strong>{{ dados.totalMesAtual | currency:'BRL':'symbol':'1.2-2' }}</strong>
+      </article>
+
+      <article class="resumo-card">
+        <span>Maior categoria</span>
+        <strong>{{ dados.maiorCategoria?.categoria | categoria }}</strong>
+        <small *ngIf="dados.maiorCategoria">
+          {{ dados.maiorCategoria.total | currency:'BRL':'symbol':'1.2-2' }}
+        </small>
+      </article>
+    </div>
+
+    <div class="graficos-grid">
+      <section class="grafico-card">
+        <div class="grafico-titulo">
+          <h3>Total por categoria</h3>
+          <span>{{ totalCategorias | currency:'BRL':'symbol':'1.2-2' }}</span>
+        </div>
+
+        <div class="pizza-layout" *ngIf="dados.totaisPorCategoria.length; else semCategorias">
+          <div class="pizza" [style.background]="pieGradient"></div>
+          <div class="legenda">
+            <div class="legenda-item" *ngFor="let item of dados.totaisPorCategoria; let i = index">
+              <span class="legenda-cor" [style.background-color]="getCor(i)"></span>
+              <span class="legenda-nome">{{ item.categoria | categoria }}</span>
+              <strong>{{ item.total | currency:'BRL':'symbol':'1.2-2' }}</strong>
+            </div>
+          </div>
+        </div>
+
+        <ng-template #semCategorias>
+          <p class="vazio">Nenhum gasto por categoria encontrado.</p>
+        </ng-template>
+      </section>
+
+      <section class="grafico-card">
+        <div class="grafico-titulo">
+          <h3>Total por m&ecirc;s</h3>
+          <span>&Uacute;ltimos 6 meses</span>
+        </div>
+
+        <div class="barras" *ngIf="totaisPorMes.length; else semMeses">
+          <div class="barra-item" *ngFor="let item of totaisPorMes">
+            <span class="barra-valor">{{ item.total | currency:'BRL':'symbol':'1.0-0' }}</span>
+            <div class="barra-trilho">
+              <div class="barra" [style.height.%]="getAlturaBarra(item.total)"></div>
+            </div>
+            <span class="barra-label">{{ formatarMes(item.mes) }}</span>
+          </div>
+        </div>
+
+        <ng-template #semMeses>
+          <p class="vazio">Nenhum gasto mensal encontrado.</p>
+        </ng-template>
+      </section>
+    </div>
+  </ng-container>
+</section>

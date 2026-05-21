@@ -154,12 +154,12 @@ export class ComprasComponent {
 
   verificaUserRemainingPayers(compra: Compra): boolean {
     const userName = this.userService.getUser().name;
-    return compra.remainingPayers.includes(userName);
+    return (compra.remainingPayers ?? []).includes(userName);
   }
 
   verificarPagamento(element: Compra): boolean {
     if (element.purchaserId === this.userService.getUser().id) {
-      if (element.remainingPayers.length !== 0) {
+      if ((element.remainingPayers ?? []).length !== 0) {
         return element.isPaid = false;
       }
     }
@@ -209,21 +209,25 @@ export class ComprasComponent {
     const currentUser = this.userService.getUser();
     const userName = currentUser.name;
     const isNotPurchaser = compra.purchaserId !== currentUser.id;
+    const payers = compra.payers ?? [];
+    const remainingPayers = compra.remainingPayers ?? [];
+    const unitValue = payers.length ? compra.value / payers.length : 0;
+    const compraNormalizada = { ...compra, payers, remainingPayers };
 
     return this.userService.getUserById(compra.purchaserId).pipe(
       map(user => ({
-        ...compra,
-        unitValue: compra.value / compra.payers.length,
+        ...compraNormalizada,
+        unitValue,
         purchaserName: user.name,
-        showPaymentButton: isNotPurchaser && compra.payers.includes(userName),
-        isPaid: !this.verificaUserRemainingPayers(compra)
+        showPaymentButton: isNotPurchaser && payers.includes(userName),
+        isPaid: !this.verificaUserRemainingPayers(compraNormalizada)
       })),
       catchError(() => of({
-        ...compra,
-        unitValue: compra.value / compra.payers.length,
+        ...compraNormalizada,
+        unitValue,
         purchaserName: '',
-        showPaymentButton: isNotPurchaser && compra.payers.includes(userName),
-        isPaid: !this.verificaUserRemainingPayers(compra)
+        showPaymentButton: isNotPurchaser && payers.includes(userName),
+        isPaid: !this.verificaUserRemainingPayers(compraNormalizada)
       }))
     );
   }
