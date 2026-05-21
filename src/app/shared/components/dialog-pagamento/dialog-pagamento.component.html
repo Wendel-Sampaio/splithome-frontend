@@ -2,11 +2,11 @@
   <h2 class="title">Pagamento</h2>
   <mat-dialog-content class="card-content">
     <h3>Você irá pagar para:</h3>
-    <p> ⮕ {{ user?.name }} </p>
+    <p> ⮕ {{ user.name }} </p>
     <h3>O valor de:</h3>
     <p> ⮕ {{ data.unitValue | currency:'BRL':'symbol':'1.2-2':'pt-BR' }} </p>
     <h3>Chave pix do comprador:</h3>
-    <p> ⮕ {{ user?.pixKey }} </p>
+    <p> ⮕ {{ user.pixKey }} </p>
   </mat-dialog-content>
   <mat-dialog-actions>
     <button class="cancel-button" mat-button mat-dialog-close>Cancelar </button>
