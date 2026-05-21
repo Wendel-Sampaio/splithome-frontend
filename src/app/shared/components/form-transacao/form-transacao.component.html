@@ -39,7 +39,7 @@
         </mat-form-field>
       </div>
   
-      <div>
+      <div *ngIf="isPremium">
         <label> Selecione os pagadores </label>
         <mat-chip-listbox class="users-layout" [multiple]="true" aria-label="Seleção de pagadores">
           <mat-chip-option 

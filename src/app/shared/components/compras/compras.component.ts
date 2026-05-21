@@ -15,6 +15,7 @@ import { ConfirmDeleteComponent, ConfirmDeleteDialogData } from '../confirm-dele
 import { BehaviorSubject, catchError, forkJoin, map, Observable, of, switchMap } from 'rxjs';
 import { PagadoresPipe } from '../../pipes/pagadores.pipe';
 import { CategoriaPipe } from '../../pipes/categoria.pipe';
+import { PlanService } from '../../../core/plan/plan.service';
 
 @Component({
   selector: 'tabela-compras',
@@ -36,6 +37,7 @@ export class ComprasComponent {
   readonly dialog = inject(MatDialog);
   compraService = inject(CompraService);
   userService = inject(UserService);
+  planService = inject(PlanService);
   private readonly recarregarComprasSubject = new BehaviorSubject<void>(undefined);
   readonly compras$ = this.recarregarComprasSubject.pipe(
     switchMap(() => this.compraService.listarCompras().pipe(
@@ -102,7 +104,7 @@ export class ComprasComponent {
     });
   }
 
-  displayedColumns: string[] = [
+  private readonly premiumColumns: string[] = [
     'title',
     'category',
     'purchaseDate',
@@ -115,6 +117,24 @@ export class ComprasComponent {
     'remainingPayers',
     'actions'
   ];
+
+  private readonly freeColumns: string[] = [
+    'title',
+    'category',
+    'purchaseDate',
+    'paymentDate',
+    'value',
+    'purchaserName',
+    'actions'
+  ];
+
+  get isPremium(): boolean {
+    return this.planService.isPremium();
+  }
+
+  get displayedColumns(): string[] {
+    return this.isPremium ? this.premiumColumns : this.freeColumns;
+  }
 
   recarregarCompras() {
     this.recarregarComprasSubject.next();

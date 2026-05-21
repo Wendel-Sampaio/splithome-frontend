@@ -18,8 +18,9 @@ import moment from 'moment/moment';
 import { CompraService } from '../../services/compra/compra.service';
 import { MatSnackBar } from '@angular/material/snack-bar';
 import { Compra } from '../../../core/models/compra/compra';
-import { shareReplay } from 'rxjs';
+import { map, of, shareReplay } from 'rxjs';
 import { CategoriaPipe } from '../../pipes/categoria.pipe';
+import { PlanService } from '../../../core/plan/plan.service';
 
 type FormTransacaoData = {
   tipo?: 'compra' | 'despesa';
@@ -53,15 +54,18 @@ export class FormTransacaoComponent {
   userService = inject(UserService)
   compraService = inject(CompraService)
   transacaoService = inject(TransacaoService)
+  planService = inject(PlanService)
   private _snackBar = inject(MatSnackBar);
   private dialogRef = inject(MatDialogRef<FormTransacaoComponent>, { optional: true });
   private destroyRef = inject(DestroyRef);
+  readonly isPremium = this.planService.isPremium();
   readonly categorias$ = this.transacaoService.listarCategorias().pipe(
     shareReplay({ bufferSize: 1, refCount: true })
   );
-  readonly usuarios$ = this.userService.getAllUsers().pipe(
+  readonly usuarios$ = this.isPremium ? this.userService.getAllUsers().pipe(
+    map((usuarios) => usuarios.filter((usuario) => this.usuarioPodeSerPagador(usuario))),
     shareReplay({ bufferSize: 1, refCount: true })
-  );
+  ) : of([]);
 
   pagadores: string[] = [];
   pagadoresRestantes: string[] = [];
@@ -134,16 +138,19 @@ export class FormTransacaoComponent {
     const categoriaSelecionada = this.formTransacao.value.categoria;
     const usuarioLogado = this.userService.getUser();
     const familyId = usuarioLogado.familyId ?? usuarioLogado.familyCode;
-    this.pagadoresRestantes = this.isEdicaoCompra
+    const pagadores = this.isPremium ? this.pagadores : [usuarioLogado.name];
+    this.pagadoresRestantes = !this.isPremium
+      ? []
+      : this.isEdicaoCompra
       ? this.getPagadoresRestantesEdicao()
-      : [...this.pagadores];
+      : [...pagadores];
 
     const formData = {
       ...(this.isEdicaoCompra ? { id: this.data?.compra?.id } : {}),
       title: this.formTransacao.value.titulo,
       category: categoriaSelecionada,
       value: Number(this.formTransacao.value.valor),
-      payers: this.pagadores,
+      payers: pagadores,
       paymentDate: moment(this.formTransacao.value.dataPagamento).format('YYYY-MM-DDTHH:mm:ss'),
       remainingPayers: this.pagadoresRestantes,
       familyId,
@@ -213,6 +220,14 @@ export class FormTransacaoComponent {
     const pagadoresRestantesMantidos = pagadoresRestantesAntigos.filter(pagador => this.pagadores.includes(pagador));
 
     return [...new Set([...pagadoresRestantesMantidos, ...novosPagadores])];
+  }
+
+  private usuarioPodeSerPagador(usuario: User): boolean {
+    const usuarioLogado = this.userService.getUser();
+    const familyCodeLogado = usuarioLogado.familyId ?? usuarioLogado.familyCode;
+    const familyCodeUsuario = usuario.familyId ?? usuario.familyCode;
+
+    return usuario.plan === 'PREMIUM' && familyCodeUsuario === familyCodeLogado;
   }
 
   private getMensagemSucesso(): string {
