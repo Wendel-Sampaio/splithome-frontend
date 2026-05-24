@@ -35,7 +35,11 @@
             </div>
           </mat-card-content>
           <mat-card-actions>
-            <button mat-raised-button id="register-button" (click)="login()">Entrar</button>
+            <button mat-raised-button id="register-button" (click)="login()"
+                    [disabled]="loading() || loginForm.invalid">
+              <mat-spinner *ngIf="loading()" diameter="20"></mat-spinner>
+              <span *ngIf="!loading()">Entrar</span>
+            </button>
           </mat-card-actions>
           <mat-card-subtitle id="subtitle">Não tem uma conta? cadastre-se <a id="aqui"
             href="/cadastro">aqui.</a></mat-card-subtitle>
