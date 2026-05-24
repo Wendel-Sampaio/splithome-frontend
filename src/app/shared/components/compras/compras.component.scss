@@ -129,3 +129,10 @@ $white-color: #ffffff;          // Cor branca
     }
   }
 }
+
+
+.loading-overlay {
+  display: flex;
+  justify-content: center;
+  padding: 2rem 0;
+}
