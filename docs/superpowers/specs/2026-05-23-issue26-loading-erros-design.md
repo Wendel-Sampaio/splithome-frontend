@@ -104,18 +104,17 @@ Para dialogs: `<mat-progress-bar mode="indeterminate">` no topo.
 |---|---|
 | `pages/login/login.component.ts` | remove `alert()`, `loading` signal, `NotificationService.error` |
 | `pages/cadastro/cadastro.component.ts` | `loading` signal, success/error via `NotificationService` |
-| `pages/home/home.component.ts` | `loading` signal em fetches |
-| `pages/estatisticas/estatisticas.component.ts` | `loading` signal em gráficos |
+| `pages/estatisticas/estatisticas.component.ts` | migra `carregando` boolean para `loading` signal, usa `NotificationService.error` em vez de `erro` string |
 | `shared/components/form-transacao/form-transacao.component.ts` | substitui `_snackBar` por `NotificationService`, `loading` signal |
 | `shared/components/compras/compras.component.ts` | `loading` signal em lista, notificações em ações |
 | `shared/components/despesas/despesas.component.ts` | mesmo padrão |
 | `shared/components/dialog-pagamento/dialog-pagamento.component.ts` | `loading` signal, `NotificationService` |
 | `shared/components/meu-perfil/meu-perfil.component.ts` | substitui `_snackBar` por `NotificationService`, `loading` signal |
 
-Componentes sem HTTP direto (sem mudança lógica): `logout.component`, `confirm-delete.component`, `upgrade.component`.
+Componentes sem HTTP direto (sem mudança lógica): `home.component` (apenas subscribe a `Subject`), `logout.component`, `confirm-delete.component`, `upgrade.component`.
 Services sem mudança: `compra.service`, `transacao.service`, `estatisticas.service`, `user.service`, `plan.service` (só repassam observables).
 
-**Total componentes alterados:** 9 (4 pages + 5 shared).
+**Total componentes alterados:** 8 (3 pages + 5 shared).
 
 ## Contrato de erros
 
@@ -155,7 +154,7 @@ Services sem mudança: `compra.service`, `transacao.service`, `estatisticas.serv
   - 401 → `removerToken` + `router.navigate(['/login'])`, sem notify
   - 403 → `notify.error('Acesso negado')`
   - 400/404/422 → nenhum notify
-- Specs dos 9 componentes alterados:
+- Specs dos 8 componentes alterados:
   - `loading()` vira `true` ao submit, `false` após `next`/`error`
   - botão fica `[disabled]` durante request
   - asserts trocam `alert`/`_snackBar` por `notify.success`/`notify.error`
@@ -183,6 +182,6 @@ src/app/core/auth/user/
 
 src/styles.scss                    (modificado: 4 panelClass globais)
 
-+ 9 componentes alterados (ver tabela)
-+ 9 specs atualizados
++ 8 componentes alterados (ver tabela)
++ 8 specs atualizados
 ```
