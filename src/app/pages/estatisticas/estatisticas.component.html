@@ -28,15 +28,11 @@
     </form>
   </header>
 
-  <div class="mensagem-status" *ngIf="carregando">
+  <div class="mensagem-status" *ngIf="loading()">
     Carregando estat&iacute;sticas...
   </div>
 
-  <div class="mensagem-status erro" *ngIf="erro">
-    {{ erro }}
-  </div>
-
-  <ng-container *ngIf="!carregando && !erro && resumo as dados">
+  <ng-container *ngIf="!loading() && resumo as dados">
     <div class="resumo-grid">
       <article class="resumo-card">
         <span>Gasto no m&ecirc;s atual</span>
