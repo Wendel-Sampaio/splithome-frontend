@@ -12,7 +12,7 @@ import { DialogPagamentoComponent } from '../dialog-pagamento/dialog-pagamento.c
 import { MatIconModule } from '@angular/material/icon';
 import { MatButtonModule } from '@angular/material/button';
 import { ConfirmDeleteComponent, ConfirmDeleteDialogData } from '../confirm-delete/confirm-delete.component';
-import { BehaviorSubject, catchError, forkJoin, map, Observable, of, switchMap, tap } from 'rxjs';
+import { BehaviorSubject, catchError, finalize, forkJoin, map, Observable, of, switchMap, tap } from 'rxjs';
 import { MatProgressSpinnerModule } from '@angular/material/progress-spinner';
 import { NotificationService } from '../../services/notification/notification.service';
 import { PagadoresPipe } from '../../pipes/pagadores.pipe';
@@ -99,7 +99,7 @@ export class ComprasComponent {
         id: element.id,
         remainingPayers: element.remainingPayers
       }).pipe(
-        tap({ complete: () => this.loadingAcao.set(false), error: () => this.loadingAcao.set(false) }),
+        finalize(() => this.loadingAcao.set(false)),
         takeUntilDestroyed(this.destroyRef)
       ).subscribe({
         next: () => {
