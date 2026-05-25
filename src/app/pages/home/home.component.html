@@ -75,7 +75,7 @@
             <div>
                 <button (click)="abrirRecados()"
                         class="botoes-menu-lateral"
-                        [ngClass]="{'selected': currentView === 'recados', 'premium-locked': !isPremium}">
+                        [ngClass]="{'premium-locked': !isPremium}">
                     <mat-icon class="icones-botao" matSuffix>forum</mat-icon>
                     <span class="menu-label">Recados</span>
                     <span *ngIf="!isPremium" class="premium-lock">
@@ -121,12 +121,6 @@
         <mat-card-content>
             <h2>Fam&iacute;lia</h2>
             <p>Gerencie seu grupo familiar e compartilhe a organiza&ccedil;&atilde;o da casa.</p>
-        </mat-card-content>
-    </mat-card>
-    <mat-card class="tabela-compras tabela-boas-vindas" appearance="outlined" *ngIf="currentView === 'recados'">
-        <mat-card-content>
-            <h2>Recados</h2>
-            <p>Centralize avisos importantes para todos da casa.</p>
         </mat-card-content>
     </mat-card>
     <meu-perfil class="meu-perfil" *ngIf="currentView === 'meuPerfil'" (profilePhotoUpdated)="atualizarFotoPerfil($event)"></meu-perfil>

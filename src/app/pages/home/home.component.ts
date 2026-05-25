@@ -98,8 +98,7 @@ export class HomeComponent {
       return;
     }
 
-    this.currentView = 'recados';
-    this.currentViewTitle = 'Recados';
+    this.router.navigate(['/recados']);
   }
 
   abrirMeuPerfil(): void {
