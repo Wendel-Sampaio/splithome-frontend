@@ -14,7 +14,7 @@ import { TransacaoService } from '../../services/transacao/transacao.service';
 import { CommonModule } from '@angular/common';
 import { User } from '../../../core/models/user/user';
 import { UserService } from '../../../core/auth/user/user.service';
-import moment from 'moment/moment';
+import { format } from 'date-fns';
 import { CompraService } from '../../services/compra/compra.service';
 import { MatSnackBar } from '@angular/material/snack-bar';
 import { Compra } from '../../../core/models/compra/compra';
@@ -151,7 +151,7 @@ export class FormTransacaoComponent {
       category: categoriaSelecionada,
       value: Number(this.formTransacao.value.valor),
       payers: pagadores,
-      paymentDate: moment(this.formTransacao.value.dataPagamento).format('YYYY-MM-DDTHH:mm:ss'),
+      paymentDate: format(this.formTransacao.value.dataPagamento, "yyyy-MM-dd'T'HH:mm:ss"),
       remainingPayers: this.pagadoresRestantes,
       familyId,
       ...(this.isDespesa
@@ -159,8 +159,8 @@ export class FormTransacaoComponent {
         : {
           purchaserId: this.responsavel,
           purchaseDate: this.isEdicaoCompra && this.data?.compra?.purchaseDate
-            ? moment(this.data.compra.purchaseDate).format('YYYY-MM-DDTHH:mm:ss')
-            : moment(new Date()).format('YYYY-MM-DDTHH:mm:ss')
+            ? format(this.data.compra.purchaseDate, "yyyy-MM-dd'T'HH:mm:ss")
+            : format(new Date(), "yyyy-MM-dd'T'HH:mm:ss")
         })
     }
     const request = this.isEdicaoCompra
