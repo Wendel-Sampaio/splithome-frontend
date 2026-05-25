@@ -1,0 +1,90 @@
+<section class="familia-page">
+  <mat-card class="familia-card" appearance="outlined">
+    <mat-card-content>
+      @if (!isPremiumWithFamily) {
+        <div class="header">
+          <h1>Gerencie sua família</h1>
+          <p>Crie uma família premium ou entre com um código para compartilhar tudo no SplitHome.</p>
+        </div>
+
+        <div class="benefits" aria-label="Benefícios premium">
+          @for (benefit of premiumBenefits; track benefit.title) {
+            <div class="benefit-item">
+              <mat-icon aria-hidden="true">{{ benefit.icon }}</mat-icon>
+              <div>
+                <strong>{{ benefit.title }}</strong>
+                <span>{{ benefit.description }}</span>
+              </div>
+            </div>
+          }
+        </div>
+
+        <div class="actions">
+          <button mat-flat-button color="primary" (click)="criarMinhaFamilia()" [disabled]="!podeCriarFamilia">
+            {{ criandoFamilia ? 'Criando família...' : 'Criar minha família' }}
+          </button>
+        </div>
+
+        <div class="join-box">
+          <mat-form-field appearance="outline">
+            <mat-label>Código da família</mat-label>
+            <input matInput maxlength="20" [(ngModel)]="codigoEntrada" placeholder="Ex: ABCD1234">
+          </mat-form-field>
+
+          <button mat-stroked-button color="primary" (click)="entrarComCodigo()" [disabled]="!podeCriarFamilia">
+            {{ entrandoFamilia ? 'Entrando...' : 'Entrar com código' }}
+          </button>
+        </div>
+      } @else {
+        <div class="header">
+          <h1>{{ family?.name || 'Minha família' }}</h1>
+          <p>Dados da sua família premium no SplitHome.</p>
+        </div>
+
+        @if (carregandoFamilia) {
+          <p class="status">Carregando dados da família...</p>
+        } @else {
+          <div class="family-code">
+            <div>
+              <span class="label">Código da família</span>
+              <strong>{{ family?.familyCode || user.familyCode }}</strong>
+            </div>
+
+            <div class="code-actions">
+              <button mat-stroked-button color="primary" (click)="copiarCodigo()">
+                <mat-icon aria-hidden="true">content_copy</mat-icon>
+                Copiar código
+              </button>
+
+              <button mat-flat-button color="primary" (click)="compartilharCodigo()">
+                <mat-icon aria-hidden="true">share</mat-icon>
+                Compartilhar link
+              </button>
+            </div>
+          </div>
+
+          <div class="members">
+            <h2>Membros</h2>
+
+            @if (familyMembers.length) {
+              <ul>
+                @for (member of familyMembers; track member.id) {
+                  <li>
+                    <strong>{{ member.name }}</strong>
+                    <span>{{ member.email }}</span>
+                  </li>
+                }
+              </ul>
+            } @else {
+              <p class="status">Nenhum membro encontrado.</p>
+            }
+          </div>
+        }
+      }
+
+      @if (mensagemErro) {
+        <p class="erro">{{ mensagemErro }}</p>
+      }
+    </mat-card-content>
+  </mat-card>
+</section>
