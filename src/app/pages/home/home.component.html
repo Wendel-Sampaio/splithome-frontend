@@ -59,6 +59,14 @@
                     <span class="menu-label">Gr&aacute;ficos</span>
                 </button>
             </div>
+            <div>
+                <button (click)="abrirResumoFinanceiro()"
+                        class="botoes-menu-lateral"
+                        [ngClass]="{'selected': currentView === 'resumoFinanceiro'}">
+                    <mat-icon class="icones-botao" matSuffix>account_balance_wallet</mat-icon>
+                    <span class="menu-label">Resumo financeiro</span>
+                </button>
+            </div>
 
             <div>
                 <button (click)="abrirFamilia()"
@@ -116,6 +124,9 @@
     </mat-card>
     <mat-card class="tabela-compras" appearance="outlined" *ngIf="currentView === 'graficos'">
         <mat-card-content><app-estatisticas></app-estatisticas></mat-card-content>
+    </mat-card>
+    <mat-card class="tabela-compras" appearance="outlined" *ngIf="currentView === 'resumoFinanceiro'">
+        <mat-card-content><app-resumo-financeiro></app-resumo-financeiro></mat-card-content>
     </mat-card>
     <mat-card class="tabela-compras tabela-boas-vindas" appearance="outlined" *ngIf="currentView === 'familia'">
         <mat-card-content>
