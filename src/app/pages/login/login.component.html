@@ -12,7 +12,7 @@
                 <mat-label>Insira seu email</mat-label>
                 <input matInput formControlName="email" required>
                 <mat-error *ngIf="loginForm.get('email')?.hasError('required')">
-                  Por favor insira o email.
+                  Por favor insira o Email.
                 </mat-error>  
                 <mat-error *ngIf="loginForm.get('email')?.hasError('email')">
                   Por favor insira um email válido.
