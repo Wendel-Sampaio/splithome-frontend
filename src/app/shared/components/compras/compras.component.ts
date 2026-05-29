@@ -51,7 +51,9 @@ export class ComprasComponent {
 
   abrirFormCompra() {
     const formRef = this.dialog.open(FormTransacaoComponent, {
-      width: '550px',
+      width: '760px',
+      maxWidth: '95vw',
+      disableClose: true,
     });
     formRef.afterClosed().pipe(takeUntilDestroyed(this.destroyRef)).subscribe(result => {
       console.log(`Dialog result: ${result}`);
@@ -61,7 +63,9 @@ export class ComprasComponent {
 
   editarCompra(compra: Compra): void {
     const formRef = this.dialog.open(FormTransacaoComponent, {
-      width: '550px',
+      width: '760px',
+      maxWidth: '95vw',
+      disableClose: true,
       data: {
         tipo: 'compra',
         compra: {

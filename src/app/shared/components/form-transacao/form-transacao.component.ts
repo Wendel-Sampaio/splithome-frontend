@@ -1,6 +1,6 @@
 import { ChangeDetectionStrategy, Component, DestroyRef, Inject, inject, Optional } from '@angular/core';
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
-import { FormControl, FormGroup, FormsModule, ReactiveFormsModule } from '@angular/forms';
+import { FormControl, FormGroup, FormsModule, ReactiveFormsModule, Validators } from '@angular/forms';
 import { MatButtonModule } from '@angular/material/button';
 import { MatCardModule } from '@angular/material/card';
 import { MAT_DIALOG_DATA, MatDialogModule, MatDialogRef } from '@angular/material/dialog';
@@ -70,6 +70,8 @@ export class FormTransacaoComponent {
   pagadores: string[] = [];
   pagadoresRestantes: string[] = [];
   responsavel: string = this.userService.getUser().id
+  tentouEnviar = false;
+  isSubmitting = false;
   formTransacao!: FormGroup;
 
   get isEdicaoCompra(): boolean {
@@ -99,10 +101,10 @@ export class FormTransacaoComponent {
 
   ngOnInit(): void {
     this.formTransacao = new FormGroup({
-      titulo: new FormControl(""),
-      categoria: new FormControl(""),
-      valor: new FormControl(""),
-      dataPagamento: new FormControl(""),
+      titulo: new FormControl('', [Validators.required]),
+      categoria: new FormControl('', [Validators.required]),
+      valor: new FormControl('', [Validators.required, Validators.min(0.01)]),
+      dataPagamento: new FormControl('', [Validators.required]),
     })
     this.preencherFormularioEdicao();
   }
@@ -129,12 +131,55 @@ export class FormTransacaoComponent {
     return this.pagadores;
   }
 
+  get isFormularioProntoParaEnvio(): boolean {
+    if (!this.formTransacao) {
+      return false;
+    }
+
+    return this.formTransacao.valid && (!this.isPremium || this.pagadores.length > 0);
+  }
+
+  controlInvalido(controlName: string): boolean {
+    if (!this.formTransacao) {
+      return false;
+    }
+
+    const control = this.formTransacao.get(controlName);
+    return !!control && control.invalid && (control.touched || this.tentouEnviar);
+  }
+
+  getMensagemErroCampo(controlName: string): string {
+    const control = this.formTransacao.get(controlName);
+    if (!control?.errors) {
+      return '';
+    }
+
+    if (control.errors['required']) {
+      return 'Campo obrigatório.';
+    }
+
+    if (control.errors['min']) {
+      return 'Informe um valor maior que zero.';
+    }
+
+    return 'Valor inválido.';
+  }
+
   cadastrarTransacao() {
-    if (!this.pagadores.length) {
+    this.tentouEnviar = true;
+
+    if (this.formTransacao.invalid) {
+      this.formTransacao.markAllAsTouched();
+      this.openSnackBar('Preencha todos os campos obrigatórios antes de continuar.');
+      return;
+    }
+
+    if (this.isPremium && !this.pagadores.length) {
       this.openSnackBar('Selecione pelo menos um pagador.');
       return;
     }
 
+    this.isSubmitting = true;
     const categoriaSelecionada = this.formTransacao.value.categoria;
     const usuarioLogado = this.userService.getUser();
     const familyId = usuarioLogado.familyId ?? usuarioLogado.familyCode;
@@ -171,11 +216,13 @@ export class FormTransacaoComponent {
 
     request.pipe(takeUntilDestroyed(this.destroyRef)).subscribe({
       next: response => {
+        this.isSubmitting = false;
         this.openSnackBar(this.getMensagemSucesso())
         this.dialogRef?.close(true);
       },
       error: error => {
-        this.openSnackBar(this.getMensagemErro())
+        this.isSubmitting = false;
+        this.openSnackBar(this.getMensagemErro(error))
       }
     });
   }
@@ -238,11 +285,35 @@ export class FormTransacaoComponent {
     return this.isDespesa ? 'Despesa cadastrada com sucesso!' : 'Compra cadastrada com sucesso!';
   }
 
-  private getMensagemErro(): string {
+  private getMensagemErro(error?: any): string {
+    const detalhe = this.extrairMensagemErro(error);
+
     if (this.isEdicaoCompra) {
-      return 'Erro ao atualizar compra!';
+      return `Erro ao atualizar compra${detalhe ? `: ${detalhe}` : '!'}`;
     }
 
-    return this.isDespesa ? 'Erro ao cadastrar despesa!' : 'Erro ao cadastrar compra!';
+    return this.isDespesa
+      ? `Erro ao cadastrar despesa${detalhe ? `: ${detalhe}` : '!'}`
+      : `Erro ao cadastrar compra${detalhe ? `: ${detalhe}` : '!'}`;
+  }
+
+  private extrairMensagemErro(error: any): string {
+    if (!error) {
+      return '';
+    }
+
+    if (typeof error?.error === 'string' && error.error.trim()) {
+      return error.error.trim();
+    }
+
+    if (typeof error?.error?.message === 'string' && error.error.message.trim()) {
+      return error.error.message.trim();
+    }
+
+    if (typeof error?.message === 'string' && error.message.trim()) {
+      return error.message.trim();
+    }
+
+    return '';
   }
 }
