@@ -11,6 +11,7 @@ import { Login } from '../../core/auth/user/login';
 import { UserService } from '../../core/auth/user/user.service';
 import { MatSnackBar } from '@angular/material/snack-bar';
 import { CommonModule } from '@angular/common';
+import { UserStateService } from '../../core/auth/user/user-state.service';
 
 @Component({
   selector: 'app-login',
@@ -25,6 +26,7 @@ export class LoginComponent {
   private destroyRef = inject(DestroyRef);
   router = inject(Router);
   userService = inject(UserService);
+  userStateService = inject(UserStateService);
   hide1 = signal(true);
   loginForm: FormGroup;
 
@@ -53,6 +55,7 @@ export class LoginComponent {
 
     this.userService.logar(login).pipe(takeUntilDestroyed(this.destroyRef)).subscribe({
       next: token => {
+        this.userStateService.clearCache();
         this.userService.addToken(token);
         this.router.navigate(["/home"]);
       },

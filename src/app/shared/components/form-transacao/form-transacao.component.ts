@@ -18,9 +18,10 @@ import { format } from 'date-fns';
 import { CompraService } from '../../services/compra/compra.service';
 import { MatSnackBar } from '@angular/material/snack-bar';
 import { Compra } from '../../../core/models/compra/compra';
-import { map, of, shareReplay } from 'rxjs';
+import { map, shareReplay } from 'rxjs';
 import { CategoriaPipe } from '../../pipes/categoria.pipe';
 import { PlanService } from '../../../core/plan/plan.service';
+import { UserStateService } from '../../../core/auth/user/user-state.service';
 
 type FormTransacaoData = {
   tipo?: 'compra' | 'despesa';
@@ -55,6 +56,7 @@ export class FormTransacaoComponent {
   compraService = inject(CompraService)
   transacaoService = inject(TransacaoService)
   planService = inject(PlanService)
+  userStateService = inject(UserStateService);
   private _snackBar = inject(MatSnackBar);
   private dialogRef = inject(MatDialogRef<FormTransacaoComponent>, { optional: true });
   private destroyRef = inject(DestroyRef);
@@ -62,10 +64,10 @@ export class FormTransacaoComponent {
   readonly categorias$ = this.transacaoService.listarCategorias().pipe(
     shareReplay({ bufferSize: 1, refCount: true })
   );
-  readonly usuarios$ = this.isPremium ? this.userService.getAllUsers().pipe(
+  readonly usuarios$ = this.userStateService.getFamilyUsers().pipe(
     map((usuarios) => usuarios.filter((usuario) => this.usuarioPodeSerPagador(usuario))),
     shareReplay({ bufferSize: 1, refCount: true })
-  ) : of([]);
+  );
 
   pagadores: string[] = [];
   pagadoresRestantes: string[] = [];

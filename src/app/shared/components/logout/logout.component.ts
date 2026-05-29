@@ -3,6 +3,7 @@ import { MatButtonModule } from '@angular/material/button';
 import { MatDialogActions, MatDialogClose, MatDialogContent, MatDialogRef, MatDialogTitle } from '@angular/material/dialog';
 import { Router } from '@angular/router';
 import { UserService } from '../../../core/auth/user/user.service';
+import { UserStateService } from '../../../core/auth/user/user-state.service';
 
 @Component({
   selector: 'app-logout',
@@ -15,8 +16,10 @@ export class LogoutComponent {
 
     router = inject(Router)
     userService = inject(UserService)
+    userStateService = inject(UserStateService)
 
     logout() {
+      this.userStateService.clearCache();
       this.userService.removerToken();
       this.router.navigate(["/login"])
     } 
