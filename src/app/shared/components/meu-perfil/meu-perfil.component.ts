@@ -1,44 +1,44 @@
 import { CommonModule } from '@angular/common';
-import { ChangeDetectionStrategy, ChangeDetectorRef, Component, DestroyRef, EventEmitter, inject, OnInit, Output } from '@angular/core';
+import { ChangeDetectionStrategy, ChangeDetectorRef, Component, DestroyRef, EventEmitter, inject, OnInit, Output, signal } from '@angular/core';
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { MatButtonModule } from '@angular/material/button';
 import { MatCardModule } from '@angular/material/card';
 import { MatFormFieldModule } from '@angular/material/form-field';
 import { MatIcon } from '@angular/material/icon';
 import { MatInputModule } from '@angular/material/input';
+import { MatProgressSpinnerModule } from '@angular/material/progress-spinner';
+import { finalize } from 'rxjs';
 import { User } from '../../../core/models/user/user';
 import { UserService } from '../../../core/auth/user/user.service';
 import { FormsModule } from '@angular/forms';
-import { MatSnackBar } from '@angular/material/snack-bar';
+import { NotificationService } from '../../services/notification/notification.service';
 
 @Component({
   selector: 'meu-perfil',
   templateUrl: 'meu-perfil.component.html',
   styleUrl: 'meu-perfil.component.scss',
-  imports: [MatCardModule, MatButtonModule, MatIcon, MatFormFieldModule, MatInputModule, CommonModule, FormsModule],
+  imports: [
+    MatCardModule, MatButtonModule, MatIcon, MatFormFieldModule,
+    MatInputModule, MatProgressSpinnerModule, CommonModule, FormsModule
+  ],
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class MeuPerfilComponent implements OnInit {
 
   isEditable: boolean = false;
   readonly acceptProfilePhoto = 'image/png,image/jpeg,image/webp';
+  loading = signal(false);
   @Output() profilePhotoUpdated = new EventEmitter<string>();
   private cdr = inject(ChangeDetectorRef);
-  private _snackBar = inject(MatSnackBar);
+  private notify = inject(NotificationService);
   private destroyRef = inject(DestroyRef);
 
   userData: User = {
-    id: '',
-    name: '',
-    email: '',
-    phoneNumber: '',
-    pixKey: '',
-    familyCode: '',
-    plan: 'FREE',
-    profilePhoto: ''
+    id: '', name: '', email: '', phoneNumber: '', pixKey: '',
+    familyCode: '', plan: 'FREE', profilePhoto: ''
   };
 
-  userService = inject(UserService)
+  userService = inject(UserService);
 
   ngOnInit(): void {
     const loggedUser = this.userService.getUser();
@@ -71,7 +71,7 @@ export class MeuPerfilComponent implements OnInit {
     }
 
     if (!file.type.startsWith('image/')) {
-      this.openSnackBar('Selecione um arquivo de imagem.');
+      this.notify.error('Selecione um arquivo de imagem.');
       input.value = '';
       return;
     }
@@ -79,33 +79,26 @@ export class MeuPerfilComponent implements OnInit {
     this.resizeProfilePhoto(file)
       .then((profilePhoto) => {
         const userId = this.userData.id || this.userService.getUser().id;
-        this.userData = {
-          ...this.userData,
-          id: userId,
-          profilePhoto
-        };
+        this.userData = { ...this.userData, id: userId, profilePhoto };
         this.userService.saveProfilePhoto(userId, profilePhoto);
         this.profilePhotoUpdated.emit(profilePhoto);
         this.persistProfilePhoto();
-        this.openSnackBar('Foto de perfil atualizada com sucesso!');
+        this.notify.success('Foto de perfil atualizada com sucesso!');
         this.cdr.markForCheck();
       })
-      .catch(() => this.openSnackBar('Não foi possível carregar a foto selecionada.'))
-      .finally(() => {
-        input.value = '';
-      });
+      .catch(() => this.notify.error('Não foi possível carregar a foto selecionada.'))
+      .finally(() => { input.value = ''; });
   }
 
   copyToClipboard() {
     if (navigator.clipboard) {
       navigator.clipboard.writeText(this.userData.familyCode)
-        .then(() => this.openSnackBar('Código da família copiado com sucesso!'))
-        .catch(err => console.error('Erro ao copiar código:', err));
+        .then(() => this.notify.success('Código da família copiado com sucesso!'))
+        .catch(() => this.notify.error('Não foi possível copiar o código.'));
     } else {
-      console.warn('API Clipboard não suportada.');
+      this.notify.warning('Recurso de cópia não suportado neste navegador.');
     }
   }
-
 
   loadUserData() {
     const userId = this.userService.getUser().id;
@@ -116,19 +109,27 @@ export class MeuPerfilComponent implements OnInit {
   }
 
   atualizarUsuario() {
-    if (this.isEditable === true) {
-      const userId = this.userService.getUser().id;
-      this.userService.atualizarUsuario(userId, this.userData).pipe(takeUntilDestroyed(this.destroyRef)).subscribe({
-        next: message => {
-          this.openSnackBar("Usuário atualizado com sucesso!")
-          this.loadUserData();
-        }
-      });
+    if (this.isEditable !== true) {
+      return;
     }
-  }
 
-  openSnackBar(message: string) {
-    this._snackBar.open(message, '', { duration: 5000 });
+    const userId = this.userService.getUser().id;
+    this.loading.set(true);
+    this.userService.atualizarUsuario(userId, this.userData).pipe(
+      finalize(() => {
+        this.loading.set(false);
+        this.cdr.markForCheck();
+      }),
+      takeUntilDestroyed(this.destroyRef)
+    ).subscribe({
+      next: () => {
+        this.notify.success('Usuário atualizado com sucesso!');
+        this.loadUserData();
+      },
+      error: () => {
+        this.notify.error('Não foi possível atualizar o perfil.');
+      }
+    });
   }
 
   private persistProfilePhoto() {
@@ -146,7 +147,6 @@ export class MeuPerfilComponent implements OnInit {
 
   private resizeProfilePhoto(file: File): Promise<string> {
     const maxSize = 320;
-
     return new Promise((resolve, reject) => {
       const reader = new FileReader();
       reader.onerror = () => reject();
@@ -158,7 +158,6 @@ export class MeuPerfilComponent implements OnInit {
           const scale = Math.min(maxSize / image.width, maxSize / image.height, 1);
           const width = Math.round(image.width * scale);
           const height = Math.round(image.height * scale);
-
           canvas.width = width;
           canvas.height = height;
           canvas.getContext('2d')?.drawImage(image, 0, 0, width, height);
@@ -169,5 +168,4 @@ export class MeuPerfilComponent implements OnInit {
       reader.readAsDataURL(file);
     });
   }
-
 }
