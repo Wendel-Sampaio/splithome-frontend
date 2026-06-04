@@ -1,16 +1,35 @@
 import { TestBed } from '@angular/core/testing';
-import { CanActivateFn } from '@angular/router';
+import { ActivatedRouteSnapshot, provideRouter, Router, RouterStateSnapshot } from '@angular/router';
+import { provideHttpClient } from '@angular/common/http';
+import { provideHttpClientTesting } from '@angular/common/http/testing';
+
 import { loginGuard } from './login.guard';
 
 describe('loginGuard', () => {
-  const executeGuard: CanActivateFn = (...guardParameters) => 
-      TestBed.runInInjectionContext(() => loginGuard(...guardParameters));
+  let router: Router;
 
   beforeEach(() => {
-    TestBed.configureTestingModule({});
+    TestBed.configureTestingModule({
+      providers: [provideRouter([]), provideHttpClient(), provideHttpClientTesting()]
+    });
+    router = TestBed.inject(Router);
+    localStorage.clear();
   });
 
-  it('should be created', () => {
-    expect(executeGuard).toBeTruthy();
+  afterEach(() => localStorage.clear());
+
+  const run = () => TestBed.runInInjectionContext(
+    () => loginGuard({} as ActivatedRouteSnapshot, {} as RouterStateSnapshot)
+  );
+
+  it('deve bloquear e redirecionar para /login quando NÃO há token', () => {
+    const navigate = spyOn(router, 'navigate');
+    expect(run()).toBeFalse();
+    expect(navigate).toHaveBeenCalledWith(['/login']);
+  });
+
+  it('deve permitir acesso quando há token', () => {
+    localStorage.setItem('token', 'qualquer.token');
+    expect(run()).toBeTrue();
   });
 });
