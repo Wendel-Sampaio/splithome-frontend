@@ -115,12 +115,14 @@ describe('UserService', () => {
     it('getUserById deve fazer GET para /user/{id}', () => {
       service.getUserById('uuid-123').subscribe();
       const req = httpMock.expectOne(r => r.method === 'GET' && r.url.includes('/user/uuid-123'));
+      expect(req.request.method).toBe('GET');
       req.flush({ id: 'uuid-123', name: 'João', email: 'joao@test.com', phoneNumber: '', pixKey: '', familyCode: 'ABC' });
     });
 
     it('getAllUsers deve fazer GET para /user/listall', () => {
       service.getAllUsers().subscribe();
       const req = httpMock.expectOne(r => r.method === 'GET' && r.url.includes('/user/listall'));
+      expect(req.request.method).toBe('GET');
       req.flush([]);
     });
   });
