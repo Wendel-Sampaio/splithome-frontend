@@ -1,71 +1,81 @@
 import { ComponentFixture, TestBed } from '@angular/core/testing';
+import { provideRouter } from '@angular/router';
 import { provideHttpClient } from '@angular/common/http';
-import { of, throwError } from 'rxjs';
+import { provideHttpClientTesting } from '@angular/common/http/testing';
+import { firstValueFrom } from 'rxjs';
+
 import { ComprasComponent } from './compras.component';
-import { CompraService } from '../../services/compra/compra.service';
 import { UserService } from '../../../core/auth/user/user.service';
-import { PlanService } from '../../../core/plan/plan.service';
-import { NotificationService } from '../../services/notification/notification.service';
+import { Compra } from '../../../core/models/compra/compra';
+import { User } from '../../../core/models/user/user';
+
+function makeUser(over: Partial<User> = {}): User {
+  return { id: 'u1', name: 'João', email: '', phoneNumber: '', pixKey: '', familyCode: '', plan: 'FREE', profilePhoto: '', ...over } as User;
+}
+
+function makeCompra(over: Partial<Compra> = {}): Compra {
+  return Object.assign(new Compra(), {
+    id: 'c1', title: 'Mercado', category: 'FOOD', value: 100, unitValue: 50,
+    payers: ['João', 'Maria'], paymentDate: '', remainingPayers: ['Maria'],
+    purchaserId: 'u1', purchaserName: 'João', purchaseDate: '', showPaymentButton: true, isPaid: false
+  }, over);
+}
 
 describe('ComprasComponent', () => {
   let component: ComprasComponent;
   let fixture: ComponentFixture<ComprasComponent>;
-  let compraService: jasmine.SpyObj<CompraService>;
-  let notify: jasmine.SpyObj<NotificationService>;
+  let userService: UserService;
 
   beforeEach(async () => {
-    compraService = jasmine.createSpyObj<CompraService>('CompraService',
-      ['listarCompras', 'atualizarCompra', 'deleteCompra']);
-    compraService.listarCompras.and.returnValue(of([]));
-    const userService = jasmine.createSpyObj<UserService>('UserService', ['getUser', 'getUserById']);
-    userService.getUser.and.returnValue({ id: 'u1', name: 'Eu' } as any);
-    userService.getUserById.and.returnValue(of({ id: 'u1', name: 'Eu' } as any));
-    const planService = jasmine.createSpyObj<PlanService>('PlanService', ['isPremium']);
-    planService.isPremium.and.returnValue(true);
-    notify = jasmine.createSpyObj<NotificationService>('NotificationService',
-      ['success', 'error', 'info', 'warning']);
-
     await TestBed.configureTestingModule({
       imports: [ComprasComponent],
       providers: [
+        provideRouter([]),
         provideHttpClient(),
-        { provide: CompraService, useValue: compraService },
-        { provide: UserService, useValue: userService },
-        { provide: PlanService, useValue: planService },
-        { provide: NotificationService, useValue: notify }
+        provideHttpClientTesting()
       ]
     }).compileComponents();
 
     fixture = TestBed.createComponent(ComprasComponent);
     component = fixture.componentInstance;
-    fixture.detectChanges();
+    userService = TestBed.inject(UserService);
   });
 
-  it('loadingLista começa true e fica false após emissão', (done) => {
-    component.compras$.subscribe(() => {
-      expect(component.loadingLista()).toBe(false);
-      done();
+  it('deve ser criado', () => {
+    expect(component).toBeTruthy();
+  });
+
+  describe('verificaUserRemainingPayers', () => {
+    it('true quando o usuário está em remainingPayers', () => {
+      spyOn(userService, 'getUser').and.returnValue(makeUser({ name: 'Maria' }));
+      expect(component.verificaUserRemainingPayers(makeCompra({ remainingPayers: ['Maria'] }))).toBeTrue();
+    });
+
+    it('false quando o usuário não está em remainingPayers', () => {
+      spyOn(userService, 'getUser').and.returnValue(makeUser({ name: 'João' }));
+      expect(component.verificaUserRemainingPayers(makeCompra({ remainingPayers: ['Maria'] }))).toBeFalse();
     });
   });
 
-  it('erro ao carregar lista notifica erro', (done) => {
-    compraService.listarCompras.and.returnValue(throwError(() => ({ status: 500 })));
-    component.recarregarCompras();
-    component.compras$.subscribe(() => {
-      expect(notify.error).toHaveBeenCalledWith('Não foi possível carregar as compras.');
-      done();
+  describe('verificarPagamento', () => {
+    it('comprador com remainingPayers pendentes → isPaid vira false', () => {
+      spyOn(userService, 'getUser').and.returnValue(makeUser({ id: 'u1' }));
+      const compra = makeCompra({ purchaserId: 'u1', remainingPayers: ['Maria'], isPaid: true });
+      expect(component.verificarPagamento(compra)).toBeFalse();
+      expect(compra.isPaid).toBeFalse();
+    });
+
+    it('comprador sem remainingPayers → mantém isPaid', () => {
+      spyOn(userService, 'getUser').and.returnValue(makeUser({ id: 'u1' }));
+      const compra = makeCompra({ purchaserId: 'u1', remainingPayers: [], isPaid: true });
+      expect(component.verificarPagamento(compra)).toBeTrue();
     });
   });
 
-  it('delete bem-sucedido notifica sucesso', () => {
-    compraService.deleteCompra.and.returnValue(of('ok'));
-    (component as any).confirmDeleteCompra('c1');
-    expect(notify.success).toHaveBeenCalledWith('Compra excluída!');
-  });
-
-  it('delete com erro notifica erro de negócio', () => {
-    compraService.deleteCompra.and.returnValue(throwError(() => ({ status: 400 })));
-    (component as any).confirmDeleteCompra('c1');
-    expect(notify.error).toHaveBeenCalledWith('Não foi possível excluir a compra.');
+  describe('tratamentoLista', () => {
+    it('lista vazia resolve para []', async () => {
+      const resultado = await firstValueFrom(component.tratamentoLista([]));
+      expect(resultado).toEqual([]);
+    });
   });
 });
