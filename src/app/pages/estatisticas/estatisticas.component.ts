@@ -1,5 +1,5 @@
 import { CommonModule } from '@angular/common';
-import { Component, DestroyRef, OnInit, inject } from '@angular/core';
+import { Component, DestroyRef, OnInit, inject, signal } from '@angular/core';
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { FormControl, FormGroup, ReactiveFormsModule } from '@angular/forms';
 import { MatButtonModule } from '@angular/material/button';
@@ -8,7 +8,10 @@ import { MatDatepickerModule } from '@angular/material/datepicker';
 import { MatFormFieldModule } from '@angular/material/form-field';
 import { MatIconModule } from '@angular/material/icon';
 import { MatInputModule } from '@angular/material/input';
+import { MatProgressSpinnerModule } from '@angular/material/progress-spinner';
+import { finalize } from 'rxjs';
 import { CategoriaPipe } from '../../shared/pipes/categoria.pipe';
+import { NotificationService } from '../../shared/services/notification/notification.service';
 import {
   EstatisticaCategoria,
   EstatisticaMensal,
@@ -26,6 +29,7 @@ import {
     MatFormFieldModule,
     MatIconModule,
     MatInputModule,
+    MatProgressSpinnerModule,
     CategoriaPipe
   ],
   providers: [provideNativeDateAdapter()],
@@ -35,6 +39,7 @@ import {
 export class EstatisticasComponent implements OnInit {
   private readonly estatisticasService = inject(EstatisticasService);
   private readonly destroyRef = inject(DestroyRef);
+  private readonly notify = inject(NotificationService);
 
   readonly periodoForm = new FormGroup({
     dataInicio: new FormControl<Date | null>(null),
@@ -43,8 +48,7 @@ export class EstatisticasComponent implements OnInit {
   readonly cores = ['#48A75A', '#2F80ED', '#F2994A', '#9B51E0', '#EB5757', '#56CCF2', '#F2C94C', '#27AE60'];
 
   resumo: EstatisticasResumo | null = null;
-  carregando = false;
-  erro = '';
+  loading = signal(false);
 
   ngOnInit(): void {
     this.carregarResumo();
@@ -84,22 +88,18 @@ export class EstatisticasComponent implements OnInit {
   carregarResumo(): void {
     const dataInicio = this.periodoForm.controls.dataInicio.value;
     const dataFim = this.periodoForm.controls.dataFim.value;
-
-    this.carregando = true;
-    this.erro = '';
-
+    this.loading.set(true);
     this.estatisticasService.buscarResumo({
       dataInicio: dataInicio ? this.formatarData(dataInicio) : undefined,
       dataFim: dataFim ? this.formatarData(dataFim) : undefined
-    }).pipe(takeUntilDestroyed(this.destroyRef)).subscribe({
-      next: resumo => {
-        this.resumo = resumo;
-        this.carregando = false;
-      },
+    }).pipe(
+      finalize(() => this.loading.set(false)),
+      takeUntilDestroyed(this.destroyRef)
+    ).subscribe({
+      next: resumo => { this.resumo = resumo; },
       error: () => {
-        this.erro = 'Nao foi possivel carregar as estatisticas.';
+        this.notify.error('Não foi possível carregar as estatísticas.');
         this.resumo = null;
-        this.carregando = false;
       }
     });
   }
