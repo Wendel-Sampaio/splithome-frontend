@@ -1,0 +1,176 @@
+.familia-page {
+  background: #f2f2f2;
+  box-sizing: border-box;
+  min-height: 100vh;
+  padding: 100px 24px 24px;
+}
+
+.familia-card {
+  border: none;
+  border-radius: 20px;
+  box-shadow: 0 2px 10px rgb(99 99 99 / 35%);
+  margin: 0 auto;
+  max-width: 920px;
+}
+
+.familia-card mat-card-content {
+  display: grid;
+  gap: 20px;
+  padding: 28px;
+}
+
+.header h1 {
+  color: #48a75a;
+  font-size: 32px;
+  margin: 0 0 8px;
+}
+
+.header p {
+  color: #767676;
+  margin: 0;
+}
+
+.benefits {
+  display: grid;
+  gap: 12px;
+}
+
+.benefit-item {
+  align-items: flex-start;
+  background: #f0fbf2;
+  border: 1px solid #d2ebd7;
+  border-radius: 12px;
+  display: flex;
+  gap: 12px;
+  padding: 14px;
+}
+
+.benefit-item mat-icon {
+  color: #48a75a;
+  margin-top: 2px;
+}
+
+.benefit-item div {
+  display: grid;
+  gap: 4px;
+}
+
+.benefit-item strong {
+  color: #2f7d3a;
+}
+
+.benefit-item span {
+  color: #666;
+  font-size: 14px;
+}
+
+.actions {
+  display: flex;
+}
+
+.join-box {
+  align-items: center;
+  display: flex;
+  gap: 12px;
+}
+
+.join-box mat-form-field {
+  flex: 1;
+}
+
+.family-code {
+  align-items: center;
+  background: #f8fcf8;
+  border: 1px solid #dbe8dd;
+  border-radius: 12px;
+  display: flex;
+  justify-content: space-between;
+  gap: 16px;
+  padding: 16px;
+}
+
+.label {
+  color: #808080;
+  display: block;
+  font-size: 13px;
+  margin-bottom: 4px;
+}
+
+.family-code strong {
+  color: #2f7d3a;
+  font-size: 24px;
+}
+
+.code-actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10px;
+}
+
+.code-actions button mat-icon {
+  margin-right: 4px;
+}
+
+.members h2 {
+  color: #2f7d3a;
+  margin: 0 0 12px;
+}
+
+.members ul {
+  display: grid;
+  gap: 10px;
+  list-style: none;
+  margin: 0;
+  padding: 0;
+}
+
+.members li {
+  background: #fff;
+  border: 1px solid #e7ece8;
+  border-radius: 10px;
+  display: grid;
+  padding: 12px;
+}
+
+.members li strong {
+  color: #2d2d2d;
+}
+
+.members li span {
+  color: #767676;
+}
+
+.status {
+  color: #7a7a7a;
+  margin: 0;
+}
+
+.erro {
+  color: #c44141;
+  font-weight: 600;
+  margin: 0;
+}
+
+@media (max-width: 768px) {
+  .familia-page {
+    padding: 88px 12px 16px;
+  }
+
+  .familia-card mat-card-content {
+    padding: 18px;
+  }
+
+  .header h1 {
+    font-size: 26px;
+  }
+
+  .join-box {
+    align-items: stretch;
+    flex-direction: column;
+  }
+
+  .family-code {
+    align-items: flex-start;
+    flex-direction: column;
+  }
+}

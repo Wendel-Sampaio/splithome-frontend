@@ -1,10 +1,22 @@
-import { HttpClient } from '@angular/common/http';
+import { HttpClient, HttpParams } from '@angular/common/http';
 import { inject, Injectable } from '@angular/core';
 import { Compra } from '../../../core/models/compra/compra';
 import { Observable } from 'rxjs';
 import { map } from 'rxjs/operators';
 import { environment } from '../../../../environments/environment';
 import { Despesa } from '../../../core/models/despesa/despesa';
+import { Page } from '../../../core/models/page/page';
+
+export interface CompraFilter {
+  title?: string;
+  category?: string;
+  purchaserId?: string;
+  startDate?: string;
+  endDate?: string;
+  page?: number;
+  size?: number;
+  sort?: string;
+}
 
 @Injectable({
   providedIn: 'root'
@@ -16,16 +28,23 @@ export class CompraService {
   http = inject(HttpClient)
 
   API = `${environment.apiUrl}/transactions`;
-  
-  listarCompras(): Observable<Compra[]> {
-    return this.http.get<unknown>(`${this.API}/purchases`).pipe(
-      map(response => this.extractList<Compra>(response, ['purchases', 'compras']))
-    );
+
+  listarCompras(filter: CompraFilter = {}): Observable<Page<Compra>> {
+    let params = new HttpParams();
+    if (filter.title) params = params.set('title', filter.title);
+    if (filter.category) params = params.set('category', filter.category);
+    if (filter.purchaserId) params = params.set('purchaserId', filter.purchaserId);
+    if (filter.startDate) params = params.set('startDate', filter.startDate);
+    if (filter.endDate) params = params.set('endDate', filter.endDate);
+    if (filter.page !== undefined) params = params.set('page', filter.page.toString());
+    if (filter.size !== undefined) params = params.set('size', filter.size.toString());
+    if (filter.sort) params = params.set('sort', filter.sort);
+    return this.http.get<Page<Compra>>(`${this.API}/purchases`, { params });
   }
 
   listarDespesas(): Observable<Despesa[]> {
-    return this.http.get<unknown>(`${this.API}/expenses`).pipe(
-      map(response => this.extractList<Despesa>(response, ['expenses', 'despesas']))
+    return this.http.get<Page<Despesa>>(`${this.API}/expenses`).pipe(
+      map(response => response.content)
     );
   }
 
@@ -53,27 +72,5 @@ export class CompraService {
 
   deleteDespesa(contaId: string): Observable<string> {
     return this.http.delete<string>(`${this.API}/delete/${contaId}`, { responseType: 'text' as 'json' });
-  }
-
-  private extractList<T>(response: unknown, specificKeys: string[]): T[] {
-    if (Array.isArray(response)) {
-      return response;
-    }
-
-    if (!response || typeof response !== 'object') {
-      console.warn('Resposta inesperada ao listar transações:', response);
-      return [];
-    }
-
-    const responseObject = response as Record<string, unknown>;
-    const possibleKeys = [...specificKeys, 'content', 'data', 'items', 'results'];
-    const listKey = possibleKeys.find(key => Array.isArray(responseObject[key]));
-
-    if (listKey) {
-      return responseObject[listKey] as T[];
-    }
-
-    console.warn('Resposta inesperada ao listar transações:', response);
-    return [];
   }
 }

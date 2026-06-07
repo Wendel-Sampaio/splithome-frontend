@@ -15,7 +15,7 @@
                 </div>
                 <img class="profile-photo" [src]="profilePhotoUrl" alt="Foto de perfil">
                 <mat-card-subtitle class="subtitulo-menu">
-                    Bem vindo
+                    Bem-vindo
                     <div class="user-plan">
                         <span class="username">{{ user.name }}</span>
                         <span class="plan-badge" [ngClass]="{'premium': isPremium, 'free': !isPremium}">
@@ -59,23 +59,26 @@
                     <span class="menu-label">Gr&aacute;ficos</span>
                 </button>
             </div>
+            <div>
+                <button (click)="abrirResumoFinanceiro()"
+                        class="botoes-menu-lateral"
+                        [ngClass]="{'selected': currentView === 'resumoFinanceiro'}">
+                    <mat-icon class="icones-botao" matSuffix>account_balance_wallet</mat-icon>
+                    <span class="menu-label">Resumo financeiro</span>
+                </button>
+            </div>
 
             <div>
                 <button (click)="abrirFamilia()"
-                        class="botoes-menu-lateral"
-                        [ngClass]="{'selected': currentView === 'familia', 'premium-locked': !isPremium}">
+                        class="botoes-menu-lateral">
                     <mat-icon class="icones-botao" matSuffix>groups</mat-icon>
                     <span class="menu-label">Fam&iacute;lia</span>
-                    <span *ngIf="!isPremium" class="premium-lock">
-                        <mat-icon class="lock-icon" aria-hidden="true">lock</mat-icon>
-                        Premium
-                    </span>
                 </button>
             </div>
             <div>
                 <button (click)="abrirRecados()"
                         class="botoes-menu-lateral"
-                        [ngClass]="{'selected': currentView === 'recados', 'premium-locked': !isPremium}">
+                        [ngClass]="{'premium-locked': !isPremium}">
                     <mat-icon class="icones-botao" matSuffix>forum</mat-icon>
                     <span class="menu-label">Recados</span>
                     <span *ngIf="!isPremium" class="premium-lock">
@@ -117,17 +120,8 @@
     <mat-card class="tabela-compras" appearance="outlined" *ngIf="currentView === 'graficos'">
         <mat-card-content><app-estatisticas></app-estatisticas></mat-card-content>
     </mat-card>
-    <mat-card class="tabela-compras tabela-boas-vindas" appearance="outlined" *ngIf="currentView === 'familia'">
-        <mat-card-content>
-            <h2>Fam&iacute;lia</h2>
-            <p>Gerencie seu grupo familiar e compartilhe a organiza&ccedil;&atilde;o da casa.</p>
-        </mat-card-content>
-    </mat-card>
-    <mat-card class="tabela-compras tabela-boas-vindas" appearance="outlined" *ngIf="currentView === 'recados'">
-        <mat-card-content>
-            <h2>Recados</h2>
-            <p>Centralize avisos importantes para todos da casa.</p>
-        </mat-card-content>
+    <mat-card class="tabela-compras" appearance="outlined" *ngIf="currentView === 'resumoFinanceiro'">
+        <mat-card-content><app-resumo-financeiro></app-resumo-financeiro></mat-card-content>
     </mat-card>
     <meu-perfil class="meu-perfil" *ngIf="currentView === 'meuPerfil'" (profilePhotoUpdated)="atualizarFotoPerfil($event)"></meu-perfil>
 </div>

@@ -1,4 +1,4 @@
-import { ChangeDetectionStrategy, Component, DestroyRef, Inject, inject, Optional } from '@angular/core';
+import { ChangeDetectionStrategy, Component, DestroyRef, Inject, inject, Optional, signal } from '@angular/core';
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { FormControl, FormGroup, FormsModule, ReactiveFormsModule, Validators } from '@angular/forms';
 import { MatButtonModule } from '@angular/material/button';
@@ -16,11 +16,13 @@ import { User } from '../../../core/models/user/user';
 import { UserService } from '../../../core/auth/user/user.service';
 import { format } from 'date-fns';
 import { CompraService } from '../../services/compra/compra.service';
-import { MatSnackBar } from '@angular/material/snack-bar';
+import { MatProgressSpinnerModule } from '@angular/material/progress-spinner';
 import { Compra } from '../../../core/models/compra/compra';
-import { map, of, shareReplay } from 'rxjs';
+import { finalize, map, of, shareReplay } from 'rxjs';
+import { NotificationService } from '../../services/notification/notification.service';
 import { CategoriaPipe } from '../../pipes/categoria.pipe';
 import { PlanService } from '../../../core/plan/plan.service';
+import { UserStateService } from '../../../core/auth/user/user-state.service';
 
 type FormTransacaoData = {
   tipo?: 'compra' | 'despesa';
@@ -44,6 +46,7 @@ type FormTransacaoData = {
     MatChipsModule,
     CommonModule,
     CategoriaPipe,
+    MatProgressSpinnerModule,
   ],
   providers: [provideNativeDateAdapter()],
   changeDetection: ChangeDetectionStrategy.OnPush,
@@ -55,23 +58,24 @@ export class FormTransacaoComponent {
   compraService = inject(CompraService)
   transacaoService = inject(TransacaoService)
   planService = inject(PlanService)
-  private _snackBar = inject(MatSnackBar);
+  userStateService = inject(UserStateService);
+  private notify = inject(NotificationService);
+  loading = signal(false);
   private dialogRef = inject(MatDialogRef<FormTransacaoComponent>, { optional: true });
   private destroyRef = inject(DestroyRef);
   readonly isPremium = this.planService.isPremium();
   readonly categorias$ = this.transacaoService.listarCategorias().pipe(
     shareReplay({ bufferSize: 1, refCount: true })
   );
-  readonly usuarios$ = this.isPremium ? this.userService.getAllUsers().pipe(
+  readonly usuarios$ = this.userStateService.getFamilyUsers().pipe(
     map((usuarios) => usuarios.filter((usuario) => this.usuarioPodeSerPagador(usuario))),
     shareReplay({ bufferSize: 1, refCount: true })
-  ) : of([]);
+  );
 
   pagadores: string[] = [];
   pagadoresRestantes: string[] = [];
   responsavel: string = this.userService.getUser().id
   tentouEnviar = false;
-  isSubmitting = false;
   formTransacao!: FormGroup;
 
   get isEdicaoCompra(): boolean {
@@ -170,16 +174,15 @@ export class FormTransacaoComponent {
 
     if (this.formTransacao.invalid) {
       this.formTransacao.markAllAsTouched();
-      this.openSnackBar('Preencha todos os campos obrigatórios antes de continuar.');
+      this.notify.warning('Preencha todos os campos obrigatórios antes de continuar.');
       return;
     }
 
     if (this.isPremium && !this.pagadores.length) {
-      this.openSnackBar('Selecione pelo menos um pagador.');
+      this.notify.warning('Selecione pelo menos um pagador.');
       return;
     }
 
-    this.isSubmitting = true;
     const categoriaSelecionada = this.formTransacao.value.categoria;
     const usuarioLogado = this.userService.getUser();
     const familyId = usuarioLogado.familyId ?? usuarioLogado.familyCode;
@@ -214,21 +217,19 @@ export class FormTransacaoComponent {
       ? this.compraService.cadastrarDespesa(formData)
       : this.compraService.cadastrarCompra(formData);
 
-    request.pipe(takeUntilDestroyed(this.destroyRef)).subscribe({
-      next: response => {
-        this.isSubmitting = false;
-        this.openSnackBar(this.getMensagemSucesso())
+    this.loading.set(true);
+    request.pipe(
+      finalize(() => this.loading.set(false)),
+      takeUntilDestroyed(this.destroyRef)
+    ).subscribe({
+      next: () => {
+        this.notify.success(this.getMensagemSucesso());
         this.dialogRef?.close(true);
       },
-      error: error => {
-        this.isSubmitting = false;
-        this.openSnackBar(this.getMensagemErro(error))
+      error: () => {
+        this.notify.error(this.getMensagemErro());
       }
     });
-  }
-
-  openSnackBar(message: string) {
-    this._snackBar.open(message, '', { duration: 5000 });
   }
 
   private preencherFormularioEdicao(): void {

@@ -7,35 +7,45 @@ import { MatIcon } from '@angular/material/icon';
 import { FormBuilder, FormGroup, FormsModule, ReactiveFormsModule, Validators } from '@angular/forms';
 import { MatFormFieldModule } from '@angular/material/form-field';
 import { MatInputModule } from '@angular/material/input';
+import { MatProgressSpinnerModule } from '@angular/material/progress-spinner';
+import { finalize } from 'rxjs';
 import { Login } from '../../core/auth/user/login';
 import { UserService } from '../../core/auth/user/user.service';
-import { MatSnackBar } from '@angular/material/snack-bar';
+import { NotificationService } from '../../shared/services/notification/notification.service';
 import { CommonModule } from '@angular/common';
+import { UserStateService } from '../../core/auth/user/user-state.service';
 
 @Component({
   selector: 'app-login',
-  imports: [MatCardModule, MatIcon, MatButtonModule, FormsModule, MatFormFieldModule, MatInputModule, CommonModule, ReactiveFormsModule],
+  imports: [
+    MatCardModule,
+    MatIcon,
+    MatButtonModule,
+    FormsModule,
+    MatFormFieldModule,
+    MatInputModule,
+    MatProgressSpinnerModule,
+    CommonModule,
+    ReactiveFormsModule
+  ],
   templateUrl: './login.component.html',
   styleUrl: './login.component.scss',
 })
 export class LoginComponent {
-
-
-  private _snackBar = inject(MatSnackBar);
+  private notify = inject(NotificationService);
   private destroyRef = inject(DestroyRef);
   router = inject(Router);
   userService = inject(UserService);
+  userStateService = inject(UserStateService);
   hide1 = signal(true);
+  loading = signal(false);
   loginForm: FormGroup;
 
-
   constructor(private fb: FormBuilder) {
-    this.loginForm = this.fb.group(
-      {
-        email: ['', [Validators.required, Validators.email]],
-        password: ['', [Validators.required]],
-      }
-    );
+    this.loginForm = this.fb.group({
+      email: ['', [Validators.required, Validators.email]],
+      password: ['', [Validators.required]],
+    });
   }
 
   clickEventPassword(event: MouseEvent) {
@@ -44,26 +54,26 @@ export class LoginComponent {
   }
 
   login() {
-    const { email, password } = this.loginForm.value;
-    const login: Login = new Login(email, password);
-
-    if (this.loginForm.invalid){
+    if (this.loginForm.invalid) {
       return;
     }
 
-    this.userService.logar(login).pipe(takeUntilDestroyed(this.destroyRef)).subscribe({
+    const { email, password } = this.loginForm.value;
+    const login: Login = new Login(email, password);
+    this.loading.set(true);
+
+    this.userService.logar(login).pipe(
+      finalize(() => this.loading.set(false)),
+      takeUntilDestroyed(this.destroyRef)
+    ).subscribe({
       next: token => {
+        this.userStateService.clearCache();
         this.userService.addToken(token);
-        this.router.navigate(["/home"]);
+        this.router.navigate(['/home']);
       },
-      error: erro => {
-        alert("Usuário ou senha incorreto!")
+      error: () => {
+        this.notify.error('Usuário ou senha incorreto!');
       }
-    })
+    });
   }
-
-  openSnackBar(message: string) {
-    this._snackBar.open(message, '', { duration: 5000 });
-  }
-
 }

@@ -67,8 +67,9 @@
     mat-button
     class="confirm-button"
     cdkFocusInitial
-    [disabled]="!isFormularioProntoParaEnvio || isSubmitting"
+    [disabled]="!isFormularioProntoParaEnvio || loading()"
     (click)="cadastrarTransacao()">
-    {{ textoBotaoConfirmacao }}
+    <mat-spinner *ngIf="loading()" diameter="20"></mat-spinner>
+    <span *ngIf="!loading()">{{ textoBotaoConfirmacao }}</span>
   </button>
 </mat-dialog-actions>

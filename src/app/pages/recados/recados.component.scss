@@ -1,0 +1,88 @@
+.recados-page {
+  box-sizing: border-box;
+  display: grid;
+  gap: 20px;
+  margin: 0 auto;
+  max-width: 920px;
+  padding: 32px 20px 40px;
+}
+
+.recados-header {
+  align-items: center;
+  display: flex;
+  gap: 16px;
+  justify-content: space-between;
+}
+
+.recados-header h1 {
+  color: #2f7d3a;
+  font-size: clamp(26px, 4vw, 34px);
+  line-height: 1.1;
+  margin: 0;
+}
+
+.recados-header p {
+  color: #5d6672;
+  margin: 6px 0 0;
+}
+
+.novo-recado-card,
+.recado-item {
+  border-radius: 14px;
+  border: 1px solid #deebdf;
+}
+
+.field-full {
+  width: 100%;
+}
+
+.form-actions {
+  display: flex;
+  justify-content: flex-end;
+}
+
+.recados-lista {
+  display: grid;
+  gap: 12px;
+}
+
+.recados-lista h2 {
+  color: #334055;
+  font-size: 20px;
+  margin: 0;
+}
+
+.lista-vazia {
+  background: #f3f7f4;
+  border: 1px dashed #c9dbcb;
+  border-radius: 12px;
+  color: #5d6672;
+  padding: 16px;
+}
+
+.recado-conteudo {
+  color: #1f2a37;
+  line-height: 1.5;
+  margin: 0;
+  white-space: pre-wrap;
+}
+
+.recado-meta {
+  align-items: center;
+  color: #697586;
+  display: flex;
+  font-size: 13px;
+  justify-content: space-between;
+  margin-top: 12px;
+}
+
+@media (max-width: 640px) {
+  .recados-page {
+    padding: 20px 14px 28px;
+  }
+
+  .recados-header {
+    align-items: flex-start;
+    flex-direction: column;
+  }
+}
