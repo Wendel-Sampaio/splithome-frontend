@@ -1,4 +1,4 @@
-import { Component, DestroyRef, inject, OnInit } from '@angular/core';
+import { Component, DestroyRef, inject, OnInit, signal } from '@angular/core';
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { MatTableModule } from '@angular/material/table';
 import { CompraService } from '../../services/compra/compra.service';
@@ -12,8 +12,10 @@ import { DialogPagamentoComponent } from '../dialog-pagamento/dialog-pagamento.c
 import { MatIconModule } from '@angular/material/icon';
 import { MatButtonModule } from '@angular/material/button';
 import { ConfirmDeleteComponent, ConfirmDeleteDialogData } from '../confirm-delete/confirm-delete.component';
-import { BehaviorSubject, catchError, forkJoin, map, Observable, of, switchMap, tap } from 'rxjs';
+import { BehaviorSubject, catchError, finalize, forkJoin, map, Observable, of, switchMap, tap } from 'rxjs';
 import { debounceTime } from 'rxjs/operators';
+import { MatProgressSpinnerModule } from '@angular/material/progress-spinner';
+import { NotificationService } from '../../services/notification/notification.service';
 import { PagadoresPipe } from '../../pipes/pagadores.pipe';
 import { CategoriaPipe } from '../../pipes/categoria.pipe';
 import { PlanService } from '../../../core/plan/plan.service';
@@ -53,6 +55,7 @@ interface Purchaser {
     MatDatepickerModule,
     MatNativeDateModule,
     ReactiveFormsModule,
+    MatProgressSpinnerModule
   ],
 })
 export class ComprasComponent implements OnInit {
@@ -63,6 +66,10 @@ export class ComprasComponent implements OnInit {
   userService = inject(UserService);
   planService = inject(PlanService);
   transacaoService = inject(TransacaoService);
+  private notify = inject(NotificationService);
+
+  loadingLista = signal(true);
+  loadingAcao = signal(false);
 
   pageSize = 10;
   pageIndex = 0;
@@ -84,6 +91,7 @@ export class ComprasComponent implements OnInit {
 
   readonly compras$: Observable<Compra[]> = this.recarregarComprasSubject.pipe(
     switchMap(() => {
+      this.loadingLista.set(true);
       const f = this.filterForm.value;
       return this.compraService.listarCompras({
         title: f.title || undefined,
@@ -101,9 +109,11 @@ export class ComprasComponent implements OnInit {
         }),
         tap(compras => {
           this.purchasers = this.extractUniquePurchasers(compras);
+          this.loadingLista.set(false);
         }),
         catchError(() => {
-          console.log("Erro ao carregar lista de compras!");
+          this.loadingLista.set(false);
+          this.notify.error('Não foi possível carregar as compras.');
           return of([]);
         })
       );
@@ -171,14 +181,21 @@ export class ComprasComponent implements OnInit {
       const userName = this.userService.getUser().name;
       element.remainingPayers.push(userName)
       element.isPaid = false;
+      this.loadingAcao.set(true);
       this.compraService.atualizarCompra({
         id: element.id,
         remainingPayers: element.remainingPayers
-      }).pipe(takeUntilDestroyed(this.destroyRef)).subscribe({
+      }).pipe(
+        finalize(() => this.loadingAcao.set(false)),
+        takeUntilDestroyed(this.destroyRef)
+      ).subscribe({
         next: () => {
+          this.notify.success('Pagamento registrado!');
           this.recarregarCompras();
         },
-        error: () => {}
+        error: () => {
+          this.notify.error('Não foi possível registrar o pagamento.');
+        }
       });
       return;
     }
@@ -275,12 +292,12 @@ export class ComprasComponent implements OnInit {
 
   private confirmDeleteCompra(contaId: string): void {
     this.compraService.deleteCompra(contaId).pipe(takeUntilDestroyed(this.destroyRef)).subscribe({
-      next: (response: string) => {
-        console.log('Compra deletada com sucesso:', response);
+      next: () => {
+        this.notify.success('Compra excluída!');
         this.recarregarCompras();
       },
-      error: (err) => {
-        console.error('Erro ao deletar compra', err);
+      error: () => {
+        this.notify.error('Não foi possível excluir a compra.');
       }
     });
   }

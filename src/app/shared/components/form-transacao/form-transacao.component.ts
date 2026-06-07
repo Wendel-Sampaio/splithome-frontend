@@ -1,4 +1,4 @@
-import { ChangeDetectionStrategy, Component, DestroyRef, Inject, inject, Optional } from '@angular/core';
+import { ChangeDetectionStrategy, Component, DestroyRef, Inject, inject, Optional, signal } from '@angular/core';
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { FormControl, FormGroup, FormsModule, ReactiveFormsModule } from '@angular/forms';
 import { MatButtonModule } from '@angular/material/button';
@@ -14,11 +14,12 @@ import { TransacaoService } from '../../services/transacao/transacao.service';
 import { CommonModule } from '@angular/common';
 import { User } from '../../../core/models/user/user';
 import { UserService } from '../../../core/auth/user/user.service';
-import moment from 'moment/moment';
+import { format } from 'date-fns';
 import { CompraService } from '../../services/compra/compra.service';
-import { MatSnackBar } from '@angular/material/snack-bar';
+import { MatProgressSpinnerModule } from '@angular/material/progress-spinner';
 import { Compra } from '../../../core/models/compra/compra';
-import { map, of, shareReplay } from 'rxjs';
+import { finalize, map, of, shareReplay } from 'rxjs';
+import { NotificationService } from '../../services/notification/notification.service';
 import { CategoriaPipe } from '../../pipes/categoria.pipe';
 import { PlanService } from '../../../core/plan/plan.service';
 
@@ -44,6 +45,7 @@ type FormTransacaoData = {
     MatChipsModule,
     CommonModule,
     CategoriaPipe,
+    MatProgressSpinnerModule,
   ],
   providers: [provideNativeDateAdapter()],
   changeDetection: ChangeDetectionStrategy.OnPush,
@@ -55,7 +57,8 @@ export class FormTransacaoComponent {
   compraService = inject(CompraService)
   transacaoService = inject(TransacaoService)
   planService = inject(PlanService)
-  private _snackBar = inject(MatSnackBar);
+  private notify = inject(NotificationService);
+  loading = signal(false);
   private dialogRef = inject(MatDialogRef<FormTransacaoComponent>, { optional: true });
   private destroyRef = inject(DestroyRef);
   readonly isPremium = this.planService.isPremium();
@@ -131,7 +134,7 @@ export class FormTransacaoComponent {
 
   cadastrarTransacao() {
     if (!this.pagadores.length) {
-      this.openSnackBar('Selecione pelo menos um pagador.');
+      this.notify.warning('Selecione pelo menos um pagador.');
       return;
     }
 
@@ -151,7 +154,7 @@ export class FormTransacaoComponent {
       category: categoriaSelecionada,
       value: Number(this.formTransacao.value.valor),
       payers: pagadores,
-      paymentDate: moment(this.formTransacao.value.dataPagamento).format('YYYY-MM-DDTHH:mm:ss'),
+      paymentDate: format(this.formTransacao.value.dataPagamento, "yyyy-MM-dd'T'HH:mm:ss"),
       remainingPayers: this.pagadoresRestantes,
       familyId,
       ...(this.isDespesa
@@ -159,8 +162,8 @@ export class FormTransacaoComponent {
         : {
           purchaserId: this.responsavel,
           purchaseDate: this.isEdicaoCompra && this.data?.compra?.purchaseDate
-            ? moment(this.data.compra.purchaseDate).format('YYYY-MM-DDTHH:mm:ss')
-            : moment(new Date()).format('YYYY-MM-DDTHH:mm:ss')
+            ? format(this.data.compra.purchaseDate, "yyyy-MM-dd'T'HH:mm:ss")
+            : format(new Date(), "yyyy-MM-dd'T'HH:mm:ss")
         })
     }
     const request = this.isEdicaoCompra
@@ -169,19 +172,19 @@ export class FormTransacaoComponent {
       ? this.compraService.cadastrarDespesa(formData)
       : this.compraService.cadastrarCompra(formData);
 
-    request.pipe(takeUntilDestroyed(this.destroyRef)).subscribe({
-      next: response => {
-        this.openSnackBar(this.getMensagemSucesso())
+    this.loading.set(true);
+    request.pipe(
+      finalize(() => this.loading.set(false)),
+      takeUntilDestroyed(this.destroyRef)
+    ).subscribe({
+      next: () => {
+        this.notify.success(this.getMensagemSucesso());
         this.dialogRef?.close(true);
       },
-      error: error => {
-        this.openSnackBar(this.getMensagemErro())
+      error: () => {
+        this.notify.error(this.getMensagemErro());
       }
     });
-  }
-
-  openSnackBar(message: string) {
-    this._snackBar.open(message, '', { duration: 5000 });
   }
 
   private preencherFormularioEdicao(): void {

@@ -72,14 +72,11 @@
         </form>
       </mat-card-content>
 
-      <div class="message-error" *ngIf="mensagemErro">
-        {{ mensagemErro }}
-      </div>
-      
-
       <mat-card-actions>
-        <button mat-raised-button id="register-button" (click)="registrar()" [disabled]="cadastroForm.invalid">
-          Cadastrar
+        <button mat-raised-button id="register-button" (click)="registrar()"
+                [disabled]="loading() || cadastroForm.invalid">
+          <mat-spinner *ngIf="loading()" diameter="20"></mat-spinner>
+          <span *ngIf="!loading()">Cadastrar</span>
         </button>
       </mat-card-actions>
       

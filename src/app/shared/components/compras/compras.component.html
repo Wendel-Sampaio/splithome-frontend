@@ -41,6 +41,9 @@
     </mat-form-field>
 </div>
 
+<div class="loading-overlay" *ngIf="loadingLista()">
+  <mat-spinner></mat-spinner>
+</div>
 <div class="table" *ngIf="compras$ | async as compras">
     <table mat-table [dataSource]="compras" matSort (matSortChange)="onSortChange($event)">
         <ng-container matColumnDef="title">

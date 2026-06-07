@@ -7,59 +7,55 @@ import { FormsModule, ReactiveFormsModule, FormBuilder, FormGroup, Validators } 
 import { MatFormFieldModule } from '@angular/material/form-field';
 import { MatInputModule } from '@angular/material/input';
 import { MatButtonModule } from '@angular/material/button';
+import { MatProgressSpinnerModule } from '@angular/material/progress-spinner';
+import { finalize } from 'rxjs';
 import { UserService } from '../../core/auth/user/user.service';
 import { Register } from '../../core/auth/user/register';
+import { NotificationService } from '../../shared/services/notification/notification.service';
 import { CommonModule } from '@angular/common';
-import { AbstractControl, ValidationErrors, ValidatorFn } from '@angular/forms';
+import { AbstractControl, ValidationErrors } from '@angular/forms';
 
 @Component({
   selector: 'app-cadastro',
   standalone: true,
   imports: [
-    MatCardModule, 
-    MatButtonModule, 
-    MatIconModule, 
-    FormsModule, 
-    ReactiveFormsModule, 
-    MatFormFieldModule, 
-    MatInputModule, 
+    MatCardModule,
+    MatButtonModule,
+    MatIconModule,
+    FormsModule,
+    ReactiveFormsModule,
+    MatFormFieldModule,
+    MatInputModule,
+    MatProgressSpinnerModule,
     CommonModule,
-
   ],
   templateUrl: './cadastro.component.html',
   styleUrls: ['./cadastro.component.scss']
 })
 export class CadastroComponent {
-
   cadastroForm: FormGroup;
   router = inject(Router);
   userService = inject(UserService);
+  private notify = inject(NotificationService);
   private destroyRef = inject(DestroyRef);
   hide1 = signal(true);
   hide2 = signal(true);
-  mensagemErro: string | null = null;
+  loading = signal(false);
 
   constructor(private fb: FormBuilder) {
-    this.cadastroForm = this.fb.group(
-      {
-        name: ['', [Validators.required, Validators.maxLength(20)]],
-        email: ['', [Validators.required, Validators.email]],
-        password: ['', [Validators.required, Validators.minLength(8), Validators.pattern(/[!@#$%^&*(),.?":{}|<>]/)]],
-        repeatPassword: ['', [Validators.required], [this.passwordMatchValidator.bind(this)]],
-      }
-    );
+    this.cadastroForm = this.fb.group({
+      name: ['', [Validators.required, Validators.maxLength(20)]],
+      email: ['', [Validators.required, Validators.email]],
+      password: ['', [Validators.required, Validators.minLength(8), Validators.pattern(/[!@#$%^&*(),.?":{}|<>]/)]],
+      repeatPassword: ['', [Validators.required], [this.passwordMatchValidator.bind(this)]],
+    });
   }
 
   passwordMatchValidator(control: AbstractControl): Promise<ValidationErrors | null> {
     return new Promise((resolve) => {
       const password = this.cadastroForm.get('password')?.value;
       const repeatPassword = control.value;
-
-      if (password !== repeatPassword) {
-        resolve({ passwordMismatch: true });
-      } else {
-        resolve(null);
-      }
+      resolve(password !== repeatPassword ? { passwordMismatch: true } : null);
     });
   }
 
@@ -80,21 +76,24 @@ export class CadastroComponent {
 
     const { name, email, password } = this.cadastroForm.value;
     const register: Register = new Register(name, email, password);
-    
-    this.userService.cadastrar(register).pipe(takeUntilDestroyed(this.destroyRef)).subscribe({
+    this.loading.set(true);
+
+    this.userService.cadastrar(register).pipe(
+      finalize(() => this.loading.set(false)),
+      takeUntilDestroyed(this.destroyRef)
+    ).subscribe({
       next: () => {
-        this.router.navigate(["/login"]);
+        this.notify.success('Cadastro realizado com sucesso!');
+        this.router.navigate(['/login']);
       },
       error: (error) => {
-        if (error.status === 409 || error.status === 404) {
-          const errorMessage = JSON.parse(error.error)?.message;
-          this.mensagemErro = errorMessage;
+        if (error?.status === 409 || error?.status === 404) {
+          const parsed = typeof error.error === 'string' ? JSON.parse(error.error) : error.error;
+          this.notify.error(parsed?.message ?? 'Não foi possível concluir o cadastro.');
         } else {
-          this.mensagemErro = "Tivemos um erro interno, lamentamos.";
-          console.error('Erro interno', error);
+          this.notify.error('Não foi possível concluir o cadastro.');
         }
       }
     });
   }
-
 }

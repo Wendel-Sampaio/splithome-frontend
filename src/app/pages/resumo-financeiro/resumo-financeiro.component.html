@@ -1,0 +1,91 @@
+<section class="resumo-financeiro">
+  <header class="resumo-header">
+    <div>
+      <h2>Resumo financeiro</h2>
+      <p>Veja quem deve para quem e a melhor sequ&ecirc;ncia para quitar os saldos.</p>
+    </div>
+
+    <form class="periodo-form" [formGroup]="periodoForm" (ngSubmit)="carregarResumo()">
+      <mat-form-field appearance="outline">
+        <mat-label>Per&iacute;odo</mat-label>
+        <mat-date-range-input [rangePicker]="picker">
+          <input matStartDate formControlName="dataInicio" placeholder="In&iacute;cio">
+          <input matEndDate formControlName="dataFim" placeholder="Fim">
+        </mat-date-range-input>
+        <mat-datepicker-toggle matIconSuffix [for]="picker"></mat-datepicker-toggle>
+        <mat-date-range-picker #picker></mat-date-range-picker>
+      </mat-form-field>
+
+      <div class="periodo-acoes">
+        <button mat-flat-button color="primary" type="submit">
+          <mat-icon>filter_alt</mat-icon>
+          Filtrar
+        </button>
+        <button mat-button type="button" (click)="limparFiltro()">
+          Limpar
+        </button>
+      </div>
+    </form>
+  </header>
+
+  <div class="mensagem-status" *ngIf="carregando">
+    Carregando resumo financeiro...
+  </div>
+
+  <div class="mensagem-status erro" *ngIf="erro">
+    {{ erro }}
+  </div>
+
+  <ng-container *ngIf="!carregando && !erro && resumo as dados">
+    <div class="cards-resumo">
+      <article class="resumo-card">
+        <span>Total em aberto</span>
+        <strong>{{ dados.totalOutstanding | currency:'BRL':'symbol':'1.2-2' }}</strong>
+      </article>
+
+      <article class="resumo-card">
+        <span>Pagamentos sugeridos</span>
+        <strong>{{ dados.settlements.length }}</strong>
+      </article>
+    </div>
+
+    <section class="bloco">
+      <h3>Saldos l&iacute;quidos</h3>
+      <div class="saldos-grid" *ngIf="dados.balances.length; else semSaldos">
+        <article class="saldo-item" [ngClass]="saldoClasse(saldo)" *ngFor="let saldo of dados.balances">
+          <span>{{ saldo.memberName }}</span>
+          <strong>{{ saldo.netBalance | currency:'BRL':'symbol':'1.2-2' }}</strong>
+        </article>
+      </div>
+      <ng-template #semSaldos>
+        <p class="vazio">Sem saldos para exibir.</p>
+      </ng-template>
+    </section>
+
+    <section class="bloco">
+      <h3>Quem deve para quem</h3>
+      <div class="lista" *ngIf="dados.debts.length; else semDividas">
+        <article class="linha" *ngFor="let debt of dados.debts">
+          <span>{{ debt.fromMemberName }} deve para {{ debt.toMemberName }}</span>
+          <strong>{{ debt.amount | currency:'BRL':'symbol':'1.2-2' }}</strong>
+        </article>
+      </div>
+      <ng-template #semDividas>
+        <p class="vazio">Nenhuma d&iacute;vida em aberto no per&iacute;odo.</p>
+      </ng-template>
+    </section>
+
+    <section class="bloco">
+      <h3>Sugest&atilde;o de liquida&ccedil;&atilde;o m&iacute;nima</h3>
+      <div class="lista" *ngIf="dados.settlements.length; else semLiquidacao">
+        <article class="linha" *ngFor="let settlement of dados.settlements">
+          <span>{{ settlement.fromMemberName }} paga para {{ settlement.toMemberName }}</span>
+          <strong>{{ settlement.amount | currency:'BRL':'symbol':'1.2-2' }}</strong>
+        </article>
+      </div>
+      <ng-template #semLiquidacao>
+        <p class="vazio">N&atilde;o h&aacute; pagamentos pendentes para liquidar.</p>
+      </ng-template>
+    </section>
+  </ng-container>
+</section>
