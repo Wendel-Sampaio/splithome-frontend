@@ -91,12 +91,7 @@ export class HomeComponent {
   }
 
   abrirFamilia(): void {
-    if (!this.canOpenPremiumFeature('family-sharing')) {
-      return;
-    }
-
-    this.currentView = 'familia';
-    this.currentViewTitle = 'Fam\u00edlia';
+    this.router.navigate(['/familia']);
   }
 
   abrirRecados(): void {

@@ -70,14 +70,9 @@
 
             <div>
                 <button (click)="abrirFamilia()"
-                        class="botoes-menu-lateral"
-                        [ngClass]="{'selected': currentView === 'familia', 'premium-locked': !isPremium}">
+                        class="botoes-menu-lateral">
                     <mat-icon class="icones-botao" matSuffix>groups</mat-icon>
                     <span class="menu-label">Fam&iacute;lia</span>
-                    <span *ngIf="!isPremium" class="premium-lock">
-                        <mat-icon class="lock-icon" aria-hidden="true">lock</mat-icon>
-                        Premium
-                    </span>
                 </button>
             </div>
             <div>
@@ -127,12 +122,6 @@
     </mat-card>
     <mat-card class="tabela-compras" appearance="outlined" *ngIf="currentView === 'resumoFinanceiro'">
         <mat-card-content><app-resumo-financeiro></app-resumo-financeiro></mat-card-content>
-    </mat-card>
-    <mat-card class="tabela-compras tabela-boas-vindas" appearance="outlined" *ngIf="currentView === 'familia'">
-        <mat-card-content>
-            <h2>Fam&iacute;lia</h2>
-            <p>Gerencie seu grupo familiar e compartilhe a organiza&ccedil;&atilde;o da casa.</p>
-        </mat-card-content>
     </mat-card>
     <mat-card class="tabela-compras tabela-boas-vindas" appearance="outlined" *ngIf="currentView === 'recados'">
         <mat-card-content>
