@@ -1,4 +1,4 @@
-import { Component, DestroyRef, inject } from '@angular/core';
+import { Component, DestroyRef, inject, signal } from '@angular/core';
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { MatTableModule } from '@angular/material/table';
 import { CompraService } from '../../services/compra/compra.service';
@@ -12,7 +12,9 @@ import { DialogPagamentoComponent } from '../dialog-pagamento/dialog-pagamento.c
 import { MatIconModule } from '@angular/material/icon';
 import { MatButtonModule } from '@angular/material/button';
 import { ConfirmDeleteComponent, ConfirmDeleteDialogData } from '../confirm-delete/confirm-delete.component';
-import { BehaviorSubject, catchError, forkJoin, map, Observable, of, switchMap } from 'rxjs';
+import { BehaviorSubject, catchError, finalize, forkJoin, map, Observable, of, switchMap, tap } from 'rxjs';
+import { MatProgressSpinnerModule } from '@angular/material/progress-spinner';
+import { NotificationService } from '../../services/notification/notification.service';
 import { PagadoresPipe } from '../../pipes/pagadores.pipe';
 import { CategoriaPipe } from '../../pipes/categoria.pipe';
 import { PlanService } from '../../../core/plan/plan.service';
@@ -29,7 +31,8 @@ import { PlanService } from '../../../core/plan/plan.service';
     MatIconModule,
     MatButtonModule,
     PagadoresPipe,
-    CategoriaPipe
+    CategoriaPipe,
+    MatProgressSpinnerModule
   ],
 })
 export class ComprasComponent {
@@ -38,15 +41,23 @@ export class ComprasComponent {
   compraService = inject(CompraService);
   userService = inject(UserService);
   planService = inject(PlanService);
+  private notify = inject(NotificationService);
+  loadingLista = signal(true);
+  loadingAcao = signal(false);
   private readonly recarregarComprasSubject = new BehaviorSubject<void>(undefined);
   readonly compras$ = this.recarregarComprasSubject.pipe(
-    switchMap(() => this.compraService.listarCompras().pipe(
-      switchMap(compras => this.tratamentoLista(compras)),
-      catchError(() => {
-        console.log("Erro ao carregar lista de compras!");
-        return of([]);
-      })
-    ))
+    switchMap(() => {
+      this.loadingLista.set(true);
+      return this.compraService.listarCompras().pipe(
+        switchMap(compras => this.tratamentoLista(compras)),
+        tap(() => this.loadingLista.set(false)),
+        catchError(() => {
+          this.loadingLista.set(false);
+          this.notify.error('Não foi possível carregar as compras.');
+          return of([]);
+        })
+      );
+    })
   );
 
   abrirFormCompra() {
@@ -83,14 +94,20 @@ export class ComprasComponent {
       const userName = this.userService.getUser().name;
       element.remainingPayers.push(userName)
       element.isPaid = false;
+      this.loadingAcao.set(true);
       this.compraService.atualizarCompra({
         id: element.id,
         remainingPayers: element.remainingPayers
-      }).pipe(takeUntilDestroyed(this.destroyRef)).subscribe({
-        next: (response) => {
+      }).pipe(
+        finalize(() => this.loadingAcao.set(false)),
+        takeUntilDestroyed(this.destroyRef)
+      ).subscribe({
+        next: () => {
+          this.notify.success('Pagamento registrado!');
           this.recarregarCompras();
         },
-        error: (error) => {
+        error: () => {
+          this.notify.error('Não foi possível registrar o pagamento.');
         }
       });
       return;
@@ -188,12 +205,12 @@ export class ComprasComponent {
 
   private confirmDeleteCompra(contaId: string): void {
     this.compraService.deleteCompra(contaId).pipe(takeUntilDestroyed(this.destroyRef)).subscribe({
-      next: (response: string) => {
-        console.log('Compra deletada com sucesso:', response);
+      next: () => {
+        this.notify.success('Compra excluída!');
         this.recarregarCompras();
       },
-      error: (err) => {
-        console.error('Erro ao deletar compra', err);
+      error: () => {
+        this.notify.error('Não foi possível excluir a compra.');
       }
     });
   }
