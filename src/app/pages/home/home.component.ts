@@ -15,10 +15,11 @@ import { DespesasComponent } from '../../shared/components/despesas/despesas.com
 import { LogoutComponent } from '../../shared/components/logout/logout.component';
 import { MeuPerfilComponent } from '../../shared/components/meu-perfil/meu-perfil.component';
 import { EstatisticasComponent } from '../estatisticas/estatisticas.component';
+import { ResumoFinanceiroComponent } from '../resumo-financeiro/resumo-financeiro.component';
 
 @Component({
   selector: 'app-home',
-  imports: [MatCardModule, MatIcon, MatButtonModule, ComprasComponent, DespesasComponent, MeuPerfilComponent, EstatisticasComponent, CommonModule, MatToolbarModule],
+  imports: [MatCardModule, MatIcon, MatButtonModule, ComprasComponent, DespesasComponent, MeuPerfilComponent, EstatisticasComponent, ResumoFinanceiroComponent, CommonModule, MatToolbarModule],
   templateUrl: './home.component.html',
   styleUrl: './home.component.scss'
 })
@@ -82,6 +83,11 @@ export class HomeComponent {
   abrirGraficos(): void {
     this.currentView = 'graficos';
     this.currentViewTitle = 'Gr\u00e1ficos';
+  }
+
+  abrirResumoFinanceiro(): void {
+    this.currentView = 'resumoFinanceiro';
+    this.currentViewTitle = 'Resumo financeiro';
   }
 
   abrirFamilia(): void {

@@ -55,10 +55,14 @@
     <div id="caixa-botao">
         <p class="family-code" (click)="copyToClipboard()">Código da família: {{userData.familyCode}} </p>
         <mat-card-actions>
-            <button id="botao-editar" mat-button (click)="atualizarUsuario()" (click)="toggleEditMode()">
-                {{ isEditable ? 'Salvar' : 'Editar informações' }} <mat-icon matSuffix>edit</mat-icon>
+            <button id="botao-editar" mat-button (click)="atualizarUsuario()" (click)="toggleEditMode()"
+                    [disabled]="loading()">
+                <mat-spinner *ngIf="loading()" diameter="20"></mat-spinner>
+                <ng-container *ngIf="!loading()">
+                    {{ isEditable ? 'Salvar' : 'Editar informações' }} <mat-icon matSuffix>edit</mat-icon>
+                </ng-container>
             </button>
-            <button *ngIf="isEditable" id="botao-cancelar" mat-button (click)="cancelEdit()">
+            <button *ngIf="isEditable" id="botao-cancelar" mat-button (click)="cancelEdit()" [disabled]="loading()">
                 Cancelar <mat-icon matSuffix>cancel</mat-icon>
             </button>
         </mat-card-actions>

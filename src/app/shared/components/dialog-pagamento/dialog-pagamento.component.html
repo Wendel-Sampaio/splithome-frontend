@@ -10,7 +10,10 @@
   </mat-dialog-content>
   <mat-dialog-actions>
     <button class="cancel-button" mat-button mat-dialog-close>Cancelar </button>
-    <button class="confirm-button" mat-button (click)="efetuarPagamento()" [mat-dialog-close]="true"
-      cdkFocusInitial>Pagar</button>
+    <button mat-raised-button color="primary" class="confirm-button" (click)="efetuarPagamento()"
+        [disabled]="loading()">
+      <mat-spinner *ngIf="loading()" diameter="20"></mat-spinner>
+      <span *ngIf="!loading()">Pagar</span>
+    </button>
   </mat-dialog-actions>
 </div>

@@ -15,7 +15,7 @@
                 </div>
                 <img class="profile-photo" [src]="profilePhotoUrl" alt="Foto de perfil">
                 <mat-card-subtitle class="subtitulo-menu">
-                    Bem vindo
+                    Bem-vindo
                     <div class="user-plan">
                         <span class="username">{{ user.name }}</span>
                         <span class="plan-badge" [ngClass]="{'premium': isPremium, 'free': !isPremium}">
@@ -57,6 +57,14 @@
                         [ngClass]="{'selected': currentView === 'graficos'}">
                     <mat-icon class="icones-botao" matSuffix>bar_chart</mat-icon>
                     <span class="menu-label">Gr&aacute;ficos</span>
+                </button>
+            </div>
+            <div>
+                <button (click)="abrirResumoFinanceiro()"
+                        class="botoes-menu-lateral"
+                        [ngClass]="{'selected': currentView === 'resumoFinanceiro'}">
+                    <mat-icon class="icones-botao" matSuffix>account_balance_wallet</mat-icon>
+                    <span class="menu-label">Resumo financeiro</span>
                 </button>
             </div>
 
@@ -111,6 +119,9 @@
     </mat-card>
     <mat-card class="tabela-compras" appearance="outlined" *ngIf="currentView === 'graficos'">
         <mat-card-content><app-estatisticas></app-estatisticas></mat-card-content>
+    </mat-card>
+    <mat-card class="tabela-compras" appearance="outlined" *ngIf="currentView === 'resumoFinanceiro'">
+        <mat-card-content><app-resumo-financeiro></app-resumo-financeiro></mat-card-content>
     </mat-card>
     <mat-card class="tabela-compras tabela-boas-vindas" appearance="outlined" *ngIf="currentView === 'recados'">
         <mat-card-content>
