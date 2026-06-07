@@ -1,0 +1,69 @@
+<section class="recados-page">
+  <header class="recados-header">
+    <div>
+      <h1>Recados da família</h1>
+      <p>Compartilhe avisos rápidos com todos da casa.</p>
+    </div>
+
+    <button mat-stroked-button type="button" (click)="voltarParaHome()">
+      <mat-icon>arrow_back</mat-icon>
+      Voltar
+    </button>
+  </header>
+
+  <mat-card class="novo-recado-card" appearance="outlined">
+    <mat-card-header>
+      <mat-card-title>Novo recado</mat-card-title>
+      <mat-card-subtitle>Até 280 caracteres</mat-card-subtitle>
+    </mat-card-header>
+
+    <mat-card-content>
+      <form class="recado-form" [formGroup]="recadoForm" (ngSubmit)="salvarRecado()">
+        <mat-form-field appearance="outline" class="field-full">
+          <mat-label>Digite o recado</mat-label>
+          <textarea
+            formControlName="content"
+            matInput
+            rows="4"
+            maxlength="280"
+            placeholder="Ex.: Comprar itens de limpeza para a semana">
+          </textarea>
+          <mat-hint align="end">{{ tamanhoAtual }}/280</mat-hint>
+          <mat-error *ngIf="recadoForm.controls.content.hasError('required')">
+            Escreva um recado para continuar.
+          </mat-error>
+          <mat-error *ngIf="recadoForm.controls.content.hasError('maxlength')">
+            O recado deve ter no máximo 280 caracteres.
+          </mat-error>
+        </mat-form-field>
+
+        <div class="form-actions">
+          <button mat-flat-button color="primary" type="submit">
+            <mat-icon>send</mat-icon>
+            Publicar recado
+          </button>
+        </div>
+      </form>
+    </mat-card-content>
+  </mat-card>
+
+  <section class="recados-lista">
+    <h2>Últimos recados</h2>
+
+    <div class="lista-vazia" *ngIf="!recados.length">
+      Nenhum recado ainda. Seja o primeiro a escrever.
+    </div>
+
+    <mat-card class="recado-item" appearance="outlined" *ngFor="let recado of recados">
+      <mat-card-content>
+        <p class="recado-conteudo">{{ recado.content }}</p>
+        <div class="recado-meta">
+          <span>{{ recado.authorName }}</span>
+          <time [attr.datetime]="recado.createdAt">
+            {{ recado.createdAt | date:'dd/MM/yyyy HH:mm' }}
+          </time>
+        </div>
+      </mat-card-content>
+    </mat-card>
+  </section>
+</section>
