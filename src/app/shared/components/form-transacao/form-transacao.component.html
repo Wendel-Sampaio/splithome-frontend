@@ -1,4 +1,4 @@
-<h2 class="title">{{ tituloDialog }}</h2>
+<h2 class="title" mat-dialog-title>{{ tituloDialog }}</h2>
 <mat-dialog-content class="form-body">
   <div>
     <form [formGroup]="formTransacao" (ngSubmit)="cadastrarTransacao()">
@@ -7,6 +7,7 @@
         <mat-form-field class="input-name" appearance="outline">
           <mat-label>Insira o título</mat-label>
           <input matInput formControlName="titulo">
+          <mat-error *ngIf="controlInvalido('titulo')">{{ getMensagemErroCampo('titulo') }}</mat-error>
         </mat-form-field>
       </div>
       
@@ -19,6 +20,7 @@
               {{ categoria | categoria }}
             </mat-option>
           </mat-select>
+          <mat-error *ngIf="controlInvalido('categoria')">{{ getMensagemErroCampo('categoria') }}</mat-error>
         </mat-form-field>
       </div>
 
@@ -27,6 +29,7 @@
           <mat-label>Valor</mat-label>
           <input matInput formControlName="valor" placeholder="0" /> 
           <span matTextPrefix>R$&nbsp;</span>
+          <mat-error *ngIf="controlInvalido('valor')">{{ getMensagemErroCampo('valor') }}</mat-error>
         </mat-form-field>
       </div>
 
@@ -36,6 +39,7 @@
           <input matInput formControlName="dataPagamento" [matDatepicker]="dp3" >
           <mat-datepicker-toggle matIconSuffix [for]="dp3"></mat-datepicker-toggle>
           <mat-datepicker #dp3 disabled="false"></mat-datepicker>
+          <mat-error *ngIf="controlInvalido('dataPagamento')">{{ getMensagemErroCampo('dataPagamento') }}</mat-error>
         </mat-form-field>
       </div>
   
@@ -51,6 +55,7 @@
             {{ usuario.name }}
           </mat-chip-option>
         </mat-chip-listbox>
+        <p class="field-error" *ngIf="tentouEnviar && !pagadores.length">Selecione pelo menos um pagador.</p>
       </div>
   
     </form>
@@ -58,8 +63,12 @@
 </mat-dialog-content>
 <mat-dialog-actions>
   <button mat-button class="cancel-button" mat-dialog-close>Cancelar</button>
-  <button mat-raised-button color="primary" class="confirm-button" cdkFocusInitial (click)="cadastrarTransacao()"
-          [disabled]="loading()">
+  <button
+    mat-button
+    class="confirm-button"
+    cdkFocusInitial
+    [disabled]="!isFormularioProntoParaEnvio || loading()"
+    (click)="cadastrarTransacao()">
     <mat-spinner *ngIf="loading()" diameter="20"></mat-spinner>
     <span *ngIf="!loading()">{{ textoBotaoConfirmacao }}</span>
   </button>

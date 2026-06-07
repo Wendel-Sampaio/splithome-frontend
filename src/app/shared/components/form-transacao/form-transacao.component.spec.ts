@@ -65,6 +65,7 @@ describe('FormTransacaoComponent', () => {
   });
 
   it('sem pagador notifica warning e não dispara request', () => {
+    preencher();
     component.pagadores = [];
     component.cadastrarTransacao();
     expect(notify.warning).toHaveBeenCalledWith('Selecione pelo menos um pagador.');
