@@ -65,11 +65,11 @@ export class ResumoFinanceiroService {
       ? response as Record<string, unknown>
       : {};
 
-    const balances = this.normalizarLista<SaldoMembro>(payload.balances);
-    const debts = this.normalizarLista<DividaMembro>(payload.debts);
-    const settlements = this.normalizarLista<SugestaoLiquidacao>(payload.settlements);
-    const totalOutstanding = typeof payload.totalOutstanding === 'number'
-      ? payload.totalOutstanding
+    const balances = this.normalizarLista<SaldoMembro>(payload['balances']);
+    const debts = this.normalizarLista<DividaMembro>(payload['debts']);
+    const settlements = this.normalizarLista<SugestaoLiquidacao>(payload['settlements']);
+    const totalOutstanding = typeof payload['totalOutstanding'] === 'number'
+      ? payload['totalOutstanding']
       : 0;
 
     return {
