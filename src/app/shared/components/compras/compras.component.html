@@ -2,13 +2,52 @@
     <mat-card-title class="titulo-menu-compras">Compras</mat-card-title>
     <button mat-button class="cadastrar-compra" mat-button (click)="abrirFormCompra()"><mat-icon>add_circle</mat-icon>Nova compra</button>
 </div>
+
+<div class="filter-bar" [formGroup]="filterForm">
+    <mat-form-field appearance="outline" class="filter-field">
+        <mat-label>Buscar título</mat-label>
+        <input matInput formControlName="title" placeholder="Ex: mercado" />
+        <mat-icon matSuffix>search</mat-icon>
+    </mat-form-field>
+
+    <mat-form-field appearance="outline" class="filter-field">
+        <mat-label>Categoria</mat-label>
+        <mat-select formControlName="category">
+            <mat-option [value]="null">Todas</mat-option>
+            <mat-option *ngFor="let cat of categories" [value]="cat">{{ cat | categoria }}</mat-option>
+        </mat-select>
+    </mat-form-field>
+
+    <mat-form-field appearance="outline" class="filter-field">
+        <mat-label>Data início</mat-label>
+        <input matInput [matDatepicker]="startPicker" formControlName="startDate" />
+        <mat-datepicker-toggle matIconSuffix [for]="startPicker"></mat-datepicker-toggle>
+        <mat-datepicker #startPicker></mat-datepicker>
+    </mat-form-field>
+
+    <mat-form-field appearance="outline" class="filter-field">
+        <mat-label>Data fim</mat-label>
+        <input matInput [matDatepicker]="endPicker" formControlName="endDate" />
+        <mat-datepicker-toggle matIconSuffix [for]="endPicker"></mat-datepicker-toggle>
+        <mat-datepicker #endPicker></mat-datepicker>
+    </mat-form-field>
+
+    <mat-form-field appearance="outline" class="filter-field" *ngIf="isPremium">
+        <mat-label>Comprador</mat-label>
+        <mat-select formControlName="purchaserId">
+            <mat-option [value]="null">Todos</mat-option>
+            <mat-option *ngFor="let p of purchasers" [value]="p.id">{{ p.name }}</mat-option>
+        </mat-select>
+    </mat-form-field>
+</div>
+
 <div class="loading-overlay" *ngIf="loadingLista()">
   <mat-spinner></mat-spinner>
 </div>
 <div class="table" *ngIf="compras$ | async as compras">
-    <table mat-table [dataSource]="compras">
+    <table mat-table [dataSource]="compras" matSort (matSortChange)="onSortChange($event)">
         <ng-container matColumnDef="title">
-            <th class="column-name" mat-header-cell *matHeaderCellDef> Título </th>
+            <th class="column-name" mat-header-cell *matHeaderCellDef mat-sort-header="title"> Título </th>
             <td [ngClass]="{
                 'payed-style': verificarPagamento(element),
                 'payed-style-last-left': isLastCompra(element, compras)
@@ -18,25 +57,25 @@
         </ng-container>
 
         <ng-container matColumnDef="category">
-            <th class="column-name" mat-header-cell *matHeaderCellDef> Categoria </th>
+            <th class="column-name" mat-header-cell *matHeaderCellDef mat-sort-header="category"> Categoria </th>
             <td [ngClass]="{'payed-style': verificarPagamento(element)}" mat-cell *matCellDef="let element">
                 {{ element.category | categoria }} </td>
         </ng-container>
 
         <ng-container matColumnDef="purchaseDate">
-            <th class="column-name" mat-header-cell *matHeaderCellDef> Data compra </th>
+            <th class="column-name" mat-header-cell *matHeaderCellDef mat-sort-header="purchaseDate"> Data compra </th>
             <td [ngClass]="{'payed-style': verificarPagamento(element)}" mat-cell *matCellDef="let element">
                 {{element.purchaseDate | date: "dd/MM/yyyy"}}</td>
         </ng-container>
 
         <ng-container matColumnDef="paymentDate">
-            <th class="column-name" mat-header-cell *matHeaderCellDef> Data Pagamento </th>
+            <th class="column-name" mat-header-cell *matHeaderCellDef mat-sort-header="paymentDate"> Data Pagamento </th>
             <td [ngClass]="{'payed-style': verificarPagamento(element)}" mat-cell *matCellDef="let element">
                 {{element.paymentDate | date: "dd/MM/yyyy"}} </td>
         </ng-container>
 
         <ng-container matColumnDef="value">
-            <th class="column-name" mat-header-cell *matHeaderCellDef> Valor </th>
+            <th class="column-name" mat-header-cell *matHeaderCellDef mat-sort-header="value"> Valor </th>
             <td [ngClass]="{'payed-style': verificarPagamento(element)}" mat-cell *matCellDef="let element"> R${{
                 element.value }} </td>
         </ng-container>
@@ -93,4 +132,13 @@
         <tr mat-header-row *matHeaderRowDef="displayedColumns"></tr>
         <tr mat-row *matRowDef="let row; columns: displayedColumns;"></tr>
     </table>
+
+    <mat-paginator
+        [length]="totalElements"
+        [pageSize]="pageSize"
+        [pageIndex]="pageIndex"
+        [pageSizeOptions]="[5, 10, 20, 50]"
+        showFirstLastButtons
+        (page)="onPageChange($event)">
+    </mat-paginator>
 </div>
