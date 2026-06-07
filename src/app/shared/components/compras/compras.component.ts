@@ -12,13 +12,14 @@ import { DialogPagamentoComponent } from '../dialog-pagamento/dialog-pagamento.c
 import { MatIconModule } from '@angular/material/icon';
 import { MatButtonModule } from '@angular/material/button';
 import { ConfirmDeleteComponent, ConfirmDeleteDialogData } from '../confirm-delete/confirm-delete.component';
-import { BehaviorSubject, catchError, finalize, forkJoin, map, Observable, of, switchMap, tap } from 'rxjs';
+import { BehaviorSubject, catchError, finalize, map, Observable, of, switchMap, tap } from 'rxjs';
 import { debounceTime } from 'rxjs/operators';
 import { MatProgressSpinnerModule } from '@angular/material/progress-spinner';
 import { NotificationService } from '../../services/notification/notification.service';
 import { PagadoresPipe } from '../../pipes/pagadores.pipe';
 import { CategoriaPipe } from '../../pipes/categoria.pipe';
 import { PlanService } from '../../../core/plan/plan.service';
+import { UserStateService } from '../../../core/auth/user/user-state.service';
 import { MatPaginatorModule, PageEvent } from '@angular/material/paginator';
 import { MatSortModule, Sort } from '@angular/material/sort';
 import { MatFormFieldModule } from '@angular/material/form-field';
@@ -65,6 +66,7 @@ export class ComprasComponent implements OnInit {
   compraService = inject(CompraService);
   userService = inject(UserService);
   planService = inject(PlanService);
+  userStateService = inject(UserStateService);
   transacaoService = inject(TransacaoService);
   private notify = inject(NotificationService);
 
@@ -249,7 +251,22 @@ export class ComprasComponent implements OnInit {
       return of([]);
     }
 
-    return forkJoin(compras.map(compra => this.prepararCompra(compra)));
+    if (!this.isPremium) {
+      const usersById = new Map<string, string>();
+      return of(compras.map((compra) => this.prepararCompra(compra, usersById)));
+    }
+
+    return this.userStateService.getFamilyUsers().pipe(
+      map((users) => {
+        const usersById = new Map<string, string>(users.map((user) => [user.id, user.name]));
+        const currentUser = this.userService.getUser();
+        if (currentUser.id) {
+          usersById.set(currentUser.id, currentUser.name);
+        }
+
+        return compras.map((compra) => this.prepararCompra(compra, usersById));
+      })
+    );
   }
 
   isLastCompra(compra: Compra, compras: Compra[]): boolean {
@@ -328,7 +345,7 @@ export class ComprasComponent implements OnInit {
     return result;
   }
 
-  private prepararCompra(compra: Compra): Observable<Compra> {
+  private prepararCompra(compra: Compra, usersById: Map<string, string>): Compra {
     const currentUser = this.userService.getUser();
     const userName = currentUser.name;
     const isNotPurchaser = compra.purchaserId !== currentUser.id;
@@ -336,22 +353,14 @@ export class ComprasComponent implements OnInit {
     const remainingPayers = compra.remainingPayers ?? [];
     const unitValue = payers.length ? compra.value / payers.length : 0;
     const compraNormalizada = { ...compra, payers, remainingPayers };
+    const purchaserName = usersById.get(compra.purchaserId) ?? (compra.purchaserId === currentUser.id ? currentUser.name : '');
 
-    return this.userService.getUserById(compra.purchaserId).pipe(
-      map(user => ({
-        ...compraNormalizada,
-        unitValue,
-        purchaserName: user.name,
-        showPaymentButton: isNotPurchaser && payers.includes(userName),
-        isPaid: !this.verificaUserRemainingPayers(compraNormalizada)
-      })),
-      catchError(() => of({
-        ...compraNormalizada,
-        unitValue,
-        purchaserName: '',
-        showPaymentButton: isNotPurchaser && payers.includes(userName),
-        isPaid: !this.verificaUserRemainingPayers(compraNormalizada)
-      }))
-    );
+    return {
+      ...compraNormalizada,
+      unitValue,
+      purchaserName,
+      showPaymentButton: isNotPurchaser && payers.includes(userName),
+      isPaid: !this.verificaUserRemainingPayers(compraNormalizada)
+    };
   }
 }

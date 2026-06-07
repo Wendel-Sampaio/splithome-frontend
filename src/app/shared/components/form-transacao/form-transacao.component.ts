@@ -22,6 +22,7 @@ import { finalize, map, of, shareReplay } from 'rxjs';
 import { NotificationService } from '../../services/notification/notification.service';
 import { CategoriaPipe } from '../../pipes/categoria.pipe';
 import { PlanService } from '../../../core/plan/plan.service';
+import { UserStateService } from '../../../core/auth/user/user-state.service';
 
 type FormTransacaoData = {
   tipo?: 'compra' | 'despesa';
@@ -57,6 +58,7 @@ export class FormTransacaoComponent {
   compraService = inject(CompraService)
   transacaoService = inject(TransacaoService)
   planService = inject(PlanService)
+  userStateService = inject(UserStateService);
   private notify = inject(NotificationService);
   loading = signal(false);
   private dialogRef = inject(MatDialogRef<FormTransacaoComponent>, { optional: true });
@@ -65,10 +67,10 @@ export class FormTransacaoComponent {
   readonly categorias$ = this.transacaoService.listarCategorias().pipe(
     shareReplay({ bufferSize: 1, refCount: true })
   );
-  readonly usuarios$ = this.isPremium ? this.userService.getAllUsers().pipe(
+  readonly usuarios$ = this.userStateService.getFamilyUsers().pipe(
     map((usuarios) => usuarios.filter((usuario) => this.usuarioPodeSerPagador(usuario))),
     shareReplay({ bufferSize: 1, refCount: true })
-  ) : of([]);
+  );
 
   pagadores: string[] = [];
   pagadoresRestantes: string[] = [];

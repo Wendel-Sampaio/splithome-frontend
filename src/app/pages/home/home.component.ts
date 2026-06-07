@@ -15,6 +15,7 @@ import { DespesasComponent } from '../../shared/components/despesas/despesas.com
 import { LogoutComponent } from '../../shared/components/logout/logout.component';
 import { MeuPerfilComponent } from '../../shared/components/meu-perfil/meu-perfil.component';
 import { EstatisticasComponent } from '../estatisticas/estatisticas.component';
+import { UserStateService } from '../../core/auth/user/user-state.service';
 import { ResumoFinanceiroComponent } from '../resumo-financeiro/resumo-financeiro.component';
 
 @Component({
@@ -27,6 +28,7 @@ export class HomeComponent {
   loginService = inject(UserService);
   router = inject(Router);
   planService = inject(PlanService);
+  userStateService = inject(UserStateService);
   private cdr = inject(ChangeDetectorRef);
   private destroyRef = inject(DestroyRef);
   readonly dialog = inject(MatDialog);
@@ -44,6 +46,10 @@ export class HomeComponent {
       };
       this.cdr.markForCheck();
     });
+
+    if (this.isPremium) {
+      this.userStateService.getFamilyUsers().pipe(takeUntilDestroyed(this.destroyRef)).subscribe();
+    }
   }
 
   get isPremium(): boolean {

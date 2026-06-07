@@ -13,6 +13,7 @@ import { Login } from '../../core/auth/user/login';
 import { UserService } from '../../core/auth/user/user.service';
 import { NotificationService } from '../../shared/services/notification/notification.service';
 import { CommonModule } from '@angular/common';
+import { UserStateService } from '../../core/auth/user/user-state.service';
 
 @Component({
   selector: 'app-login',
@@ -35,6 +36,7 @@ export class LoginComponent {
   private destroyRef = inject(DestroyRef);
   router = inject(Router);
   userService = inject(UserService);
+  userStateService = inject(UserStateService);
   hide1 = signal(true);
   loading = signal(false);
   loginForm: FormGroup;
@@ -65,6 +67,7 @@ export class LoginComponent {
       takeUntilDestroyed(this.destroyRef)
     ).subscribe({
       next: token => {
+        this.userStateService.clearCache();
         this.userService.addToken(token);
         this.router.navigate(['/home']);
       },
