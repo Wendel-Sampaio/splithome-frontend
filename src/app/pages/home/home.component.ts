@@ -16,10 +16,11 @@ import { LogoutComponent } from '../../shared/components/logout/logout.component
 import { MeuPerfilComponent } from '../../shared/components/meu-perfil/meu-perfil.component';
 import { EstatisticasComponent } from '../estatisticas/estatisticas.component';
 import { UserStateService } from '../../core/auth/user/user-state.service';
+import { ResumoFinanceiroComponent } from '../resumo-financeiro/resumo-financeiro.component';
 
 @Component({
   selector: 'app-home',
-  imports: [MatCardModule, MatIcon, MatButtonModule, ComprasComponent, DespesasComponent, MeuPerfilComponent, EstatisticasComponent, CommonModule, MatToolbarModule],
+  imports: [MatCardModule, MatIcon, MatButtonModule, ComprasComponent, DespesasComponent, MeuPerfilComponent, EstatisticasComponent, ResumoFinanceiroComponent, CommonModule, MatToolbarModule],
   templateUrl: './home.component.html',
   styleUrl: './home.component.scss'
 })
@@ -90,13 +91,13 @@ export class HomeComponent {
     this.currentViewTitle = 'Gr\u00e1ficos';
   }
 
-  abrirFamilia(): void {
-    if (!this.canOpenPremiumFeature('family-sharing')) {
-      return;
-    }
+  abrirResumoFinanceiro(): void {
+    this.currentView = 'resumoFinanceiro';
+    this.currentViewTitle = 'Resumo financeiro';
+  }
 
-    this.currentView = 'familia';
-    this.currentViewTitle = 'Fam\u00edlia';
+  abrirFamilia(): void {
+    this.router.navigate(['/familia']);
   }
 
   abrirRecados(): void {
@@ -104,8 +105,7 @@ export class HomeComponent {
       return;
     }
 
-    this.currentView = 'recados';
-    this.currentViewTitle = 'Recados';
+    this.router.navigate(['/recados']);
   }
 
   abrirMeuPerfil(): void {

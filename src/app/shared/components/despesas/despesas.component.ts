@@ -1,12 +1,14 @@
 import { CommonModule } from "@angular/common";
-import { Component, DestroyRef, inject } from "@angular/core";
+import { Component, DestroyRef, inject, signal } from "@angular/core";
 import { takeUntilDestroyed } from "@angular/core/rxjs-interop";
 import { MatButtonModule } from "@angular/material/button";
 import { MatCardTitle } from "@angular/material/card";
 import { MatDialog, MatDialogModule } from "@angular/material/dialog";
 import { MatIconModule } from "@angular/material/icon";
+import { MatProgressSpinnerModule } from "@angular/material/progress-spinner";
 import { MatTableModule } from "@angular/material/table";
-import { BehaviorSubject, catchError, forkJoin, map, Observable, of, switchMap } from "rxjs";
+import { BehaviorSubject, catchError, finalize, forkJoin, map, Observable, of, switchMap, tap } from "rxjs";
+import { NotificationService } from "../../services/notification/notification.service";
 import { UserService } from "../../../core/auth/user/user.service";
 import { Despesa } from "../../../core/models/despesa/despesa";
 import { CompraService } from "../../services/compra/compra.service";
@@ -25,6 +27,7 @@ import { FormTransacaoComponent } from "../form-transacao/form-transacao.compone
     MatIconModule,
     MatDialogModule,
     MatCardTitle,
+    MatProgressSpinnerModule,
     CategoriaPipe,
     PagadoresPipe
   ],
@@ -34,17 +37,25 @@ import { FormTransacaoComponent } from "../form-transacao/form-transacao.compone
 export class DespesasComponent {
   readonly dialog = inject(MatDialog);
   private destroyRef = inject(DestroyRef);
+  private notify = inject(NotificationService);
   despesaService = inject(CompraService);
   userService = inject(UserService);
+  loadingLista = signal(true);
+  loadingAcao = signal(false);
   private readonly recarregarDespesasSubject = new BehaviorSubject<void>(undefined);
   readonly despesas$ = this.recarregarDespesasSubject.pipe(
-    switchMap(() => this.despesaService.listarDespesas().pipe(
-      switchMap(despesas => this.tratamentoLista(despesas)),
-      catchError(() => {
-        console.log("Erro ao carregar lista de despesas!");
-        return of([]);
-      })
-    ))
+    switchMap(() => {
+      this.loadingLista.set(true);
+      return this.despesaService.listarDespesas().pipe(
+        switchMap(despesas => this.tratamentoLista(despesas)),
+        tap(() => this.loadingLista.set(false)),
+        catchError(() => {
+          this.loadingLista.set(false);
+          this.notify.error('Não foi possível carregar as despesas.');
+          return of([]);
+        })
+      );
+    })
   );
 
   displayedColumns: string[] = [
@@ -76,11 +87,21 @@ export class DespesasComponent {
       const userName = this.userService.getUser().name;
       element.remainingPayers.push(userName);
       element.isPaid = false;
+      this.loadingAcao.set(true);
       this.despesaService.atualizarDespesa({
         id: element.id,
         remainingPayers: element.remainingPayers
-      }).pipe(takeUntilDestroyed(this.destroyRef)).subscribe({
-        next: () => this.recarregarDespesas(),
+      }).pipe(
+        finalize(() => this.loadingAcao.set(false)),
+        takeUntilDestroyed(this.destroyRef)
+      ).subscribe({
+        next: () => {
+          this.notify.success('Pagamento registrado!');
+          this.recarregarDespesas();
+        },
+        error: () => {
+          this.notify.error('Não foi possível registrar o pagamento.');
+        }
       });
       return;
     }
@@ -144,12 +165,12 @@ export class DespesasComponent {
 
   private confirmDeleteDespesa(contaId: string): void {
     this.despesaService.deleteDespesa(contaId).pipe(takeUntilDestroyed(this.destroyRef)).subscribe({
-      next: (response: string) => {
-        console.log('Despesa deletada com sucesso:', response);
+      next: () => {
+        this.notify.success('Despesa excluída!');
         this.recarregarDespesas();
       },
-      error: (err) => {
-        console.error('Erro ao deletar despesa', err);
+      error: () => {
+        this.notify.error('Não foi possível excluir a despesa.');
       }
     });
   }

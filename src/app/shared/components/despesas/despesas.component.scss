@@ -11,6 +11,12 @@ $header-text-color: #777777;
 $error-text-color: #f44336;
 $white-color: #ffffff;
 
+.loading-overlay {
+  display: flex;
+  justify-content: center;
+  padding: 2rem 0;
+}
+
 .card-body {
     display: flex;
 

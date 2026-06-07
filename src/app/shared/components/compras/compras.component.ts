@@ -1,4 +1,4 @@
-import { Component, DestroyRef, inject } from '@angular/core';
+import { Component, DestroyRef, inject, OnInit, signal } from '@angular/core';
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { MatTableModule } from '@angular/material/table';
 import { CompraService } from '../../services/compra/compra.service';
@@ -12,11 +12,28 @@ import { DialogPagamentoComponent } from '../dialog-pagamento/dialog-pagamento.c
 import { MatIconModule } from '@angular/material/icon';
 import { MatButtonModule } from '@angular/material/button';
 import { ConfirmDeleteComponent, ConfirmDeleteDialogData } from '../confirm-delete/confirm-delete.component';
-import { BehaviorSubject, catchError, map, Observable, of, switchMap } from 'rxjs';
+import { BehaviorSubject, catchError, finalize, map, Observable, of, switchMap, tap } from 'rxjs';
+import { debounceTime } from 'rxjs/operators';
+import { MatProgressSpinnerModule } from '@angular/material/progress-spinner';
+import { NotificationService } from '../../services/notification/notification.service';
 import { PagadoresPipe } from '../../pipes/pagadores.pipe';
 import { CategoriaPipe } from '../../pipes/categoria.pipe';
 import { PlanService } from '../../../core/plan/plan.service';
 import { UserStateService } from '../../../core/auth/user/user-state.service';
+import { MatPaginatorModule, PageEvent } from '@angular/material/paginator';
+import { MatSortModule, Sort } from '@angular/material/sort';
+import { MatFormFieldModule } from '@angular/material/form-field';
+import { MatInputModule } from '@angular/material/input';
+import { MatSelectModule } from '@angular/material/select';
+import { MatDatepickerModule } from '@angular/material/datepicker';
+import { MatNativeDateModule } from '@angular/material/core';
+import { ReactiveFormsModule, FormBuilder } from '@angular/forms';
+import { TransacaoService } from '../../services/transacao/transacao.service';
+
+interface Purchaser {
+  id: string;
+  name: string;
+}
 
 @Component({
   selector: 'tabela-compras',
@@ -30,26 +47,107 @@ import { UserStateService } from '../../../core/auth/user/user-state.service';
     MatIconModule,
     MatButtonModule,
     PagadoresPipe,
-    CategoriaPipe
+    CategoriaPipe,
+    MatPaginatorModule,
+    MatSortModule,
+    MatFormFieldModule,
+    MatInputModule,
+    MatSelectModule,
+    MatDatepickerModule,
+    MatNativeDateModule,
+    ReactiveFormsModule,
+    MatProgressSpinnerModule
   ],
 })
-export class ComprasComponent {
+export class ComprasComponent implements OnInit {
   private destroyRef = inject(DestroyRef);
+  private fb = inject(FormBuilder);
   readonly dialog = inject(MatDialog);
   compraService = inject(CompraService);
   userService = inject(UserService);
   planService = inject(PlanService);
   userStateService = inject(UserStateService);
+  transacaoService = inject(TransacaoService);
+  private notify = inject(NotificationService);
+
+  loadingLista = signal(true);
+  loadingAcao = signal(false);
+
+  pageSize = 10;
+  pageIndex = 0;
+  totalElements = 0;
+  sortField = 'purchaseDate';
+  sortDirection = 'desc';
+  categories: string[] = [];
+  purchasers: Purchaser[] = [];
+
+  filterForm = this.fb.group({
+    title: [''],
+    category: [null as string | null],
+    purchaserId: [null as string | null],
+    startDate: [null as Date | null],
+    endDate: [null as Date | null],
+  });
+
   private readonly recarregarComprasSubject = new BehaviorSubject<void>(undefined);
-  readonly compras$ = this.recarregarComprasSubject.pipe(
-    switchMap(() => this.compraService.listarCompras().pipe(
-      switchMap(compras => this.tratamentoLista(compras)),
-      catchError(() => {
-        console.log("Erro ao carregar lista de compras!");
-        return of([]);
-      })
-    ))
+
+  readonly compras$: Observable<Compra[]> = this.recarregarComprasSubject.pipe(
+    switchMap(() => {
+      this.loadingLista.set(true);
+      const f = this.filterForm.value;
+      return this.compraService.listarCompras({
+        title: f.title || undefined,
+        category: f.category || undefined,
+        purchaserId: f.purchaserId || undefined,
+        startDate: f.startDate ? this.formatDate(f.startDate) : undefined,
+        endDate: f.endDate ? this.formatDate(f.endDate) : undefined,
+        page: this.pageIndex,
+        size: this.pageSize,
+        sort: `${this.sortField},${this.sortDirection}`,
+      }).pipe(
+        switchMap(page => {
+          this.totalElements = page.totalElements;
+          return this.tratamentoLista(page.content);
+        }),
+        tap(compras => {
+          this.purchasers = this.extractUniquePurchasers(compras);
+          this.loadingLista.set(false);
+        }),
+        catchError(() => {
+          this.loadingLista.set(false);
+          this.notify.error('Não foi possível carregar as compras.');
+          return of([]);
+        })
+      );
+    })
   );
+
+  ngOnInit(): void {
+    this.transacaoService.listarCategorias().pipe(
+      takeUntilDestroyed(this.destroyRef)
+    ).subscribe(cats => this.categories = cats);
+
+    this.filterForm.valueChanges.pipe(
+      debounceTime(300),
+      takeUntilDestroyed(this.destroyRef)
+    ).subscribe(() => {
+      this.pageIndex = 0;
+      this.recarregarCompras();
+    });
+  }
+
+  onPageChange(event: PageEvent): void {
+    this.pageIndex = event.pageIndex;
+    this.pageSize = event.pageSize;
+    this.recarregarCompras();
+  }
+
+  onSortChange(sort: Sort): void {
+    this.sortField = sort.active || 'purchaseDate';
+    this.sortDirection = sort.direction || 'desc';
+    this.pageIndex = 0;
+    this.recarregarCompras();
+  }
 
   abrirFormCompra() {
     const formRef = this.dialog.open(FormTransacaoComponent, {
@@ -80,19 +178,25 @@ export class ComprasComponent {
     });
   }
 
-  efetuarPagamento(element: any) {
+  efetuarPagamento(element: Compra) {
     if (!this.verificaUserRemainingPayers(element)) {
       const userName = this.userService.getUser().name;
       element.remainingPayers.push(userName)
       element.isPaid = false;
+      this.loadingAcao.set(true);
       this.compraService.atualizarCompra({
         id: element.id,
         remainingPayers: element.remainingPayers
-      }).pipe(takeUntilDestroyed(this.destroyRef)).subscribe({
-        next: (response) => {
+      }).pipe(
+        finalize(() => this.loadingAcao.set(false)),
+        takeUntilDestroyed(this.destroyRef)
+      ).subscribe({
+        next: () => {
+          this.notify.success('Pagamento registrado!');
           this.recarregarCompras();
         },
-        error: (error) => {
+        error: () => {
+          this.notify.error('Não foi possível registrar o pagamento.');
         }
       });
       return;
@@ -205,12 +309,12 @@ export class ComprasComponent {
 
   private confirmDeleteCompra(contaId: string): void {
     this.compraService.deleteCompra(contaId).pipe(takeUntilDestroyed(this.destroyRef)).subscribe({
-      next: (response: string) => {
-        console.log('Compra deletada com sucesso:', response);
+      next: () => {
+        this.notify.success('Compra excluída!');
         this.recarregarCompras();
       },
-      error: (err) => {
-        console.error('Erro ao deletar compra', err);
+      error: () => {
+        this.notify.error('Não foi possível excluir a compra.');
       }
     });
   }
@@ -220,6 +324,25 @@ export class ComprasComponent {
       style: 'currency',
       currency: 'BRL'
     }).format(value);
+  }
+
+  private formatDate(date: Date): string {
+    const y = date.getFullYear();
+    const m = String(date.getMonth() + 1).padStart(2, '0');
+    const d = String(date.getDate()).padStart(2, '0');
+    return `${y}-${m}-${d}`;
+  }
+
+  private extractUniquePurchasers(compras: Compra[]): Purchaser[] {
+    const seen = new Set<string>();
+    const result: Purchaser[] = [];
+    for (const c of compras) {
+      if (c.purchaserId && c.purchaserName && !seen.has(c.purchaserId)) {
+        seen.add(c.purchaserId);
+        result.push({ id: c.purchaserId, name: c.purchaserName });
+      }
+    }
+    return result;
   }
 
   private prepararCompra(compra: Compra, usersById: Map<string, string>): Compra {
@@ -240,5 +363,4 @@ export class ComprasComponent {
       isPaid: !this.verificaUserRemainingPayers(compraNormalizada)
     };
   }
-
 }
