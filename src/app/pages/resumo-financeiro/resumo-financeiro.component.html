@@ -1,55 +1,57 @@
-<section class="resumo-financeiro">
-  <header class="resumo-header">
+<section class="resumo-financeiro sh-page">
+  <header class="sh-page-header">
     <div>
-      <h2>Resumo financeiro</h2>
-      <p>Veja quem deve para quem e a melhor sequ&ecirc;ncia para quitar os saldos.</p>
+      <h2 class="sh-page-title">Resumo financeiro</h2>
+      <p class="sh-page-subtitle">Veja quem deve para quem e a melhor sequ&ecirc;ncia para quitar os saldos.</p>
     </div>
 
-    <form class="periodo-form" [formGroup]="periodoForm" (ngSubmit)="carregarResumo()">
-      <mat-form-field appearance="outline">
-        <mat-label>Per&iacute;odo</mat-label>
-        <mat-date-range-input [rangePicker]="picker">
-          <input matStartDate formControlName="dataInicio" placeholder="In&iacute;cio">
-          <input matEndDate formControlName="dataFim" placeholder="Fim">
-        </mat-date-range-input>
-        <mat-datepicker-toggle matIconSuffix [for]="picker"></mat-datepicker-toggle>
-        <mat-date-range-picker #picker></mat-date-range-picker>
-      </mat-form-field>
+    <div class="sh-page-actions">
+      <form class="periodo-form" [formGroup]="periodoForm" (ngSubmit)="carregarResumo()">
+        <mat-form-field appearance="outline">
+          <mat-label>Per&iacute;odo</mat-label>
+          <mat-date-range-input [rangePicker]="picker">
+            <input matStartDate formControlName="dataInicio" placeholder="In&iacute;cio">
+            <input matEndDate formControlName="dataFim" placeholder="Fim">
+          </mat-date-range-input>
+          <mat-datepicker-toggle matIconSuffix [for]="picker"></mat-datepicker-toggle>
+          <mat-date-range-picker #picker></mat-date-range-picker>
+        </mat-form-field>
 
-      <div class="periodo-acoes">
-        <button mat-flat-button color="primary" type="submit">
-          <mat-icon>filter_alt</mat-icon>
-          Filtrar
-        </button>
-        <button mat-button type="button" (click)="limparFiltro()">
-          Limpar
-        </button>
-      </div>
-    </form>
+        <div class="periodo-acoes">
+          <button mat-flat-button color="primary" type="submit">
+            <mat-icon>filter_alt</mat-icon>
+            Filtrar
+          </button>
+          <button mat-button type="button" (click)="limparFiltro()">
+            Limpar
+          </button>
+        </div>
+      </form>
+    </div>
   </header>
 
-  <div class="mensagem-status" *ngIf="carregando">
+  <div class="sh-status" *ngIf="carregando">
     Carregando resumo financeiro...
   </div>
 
-  <div class="mensagem-status erro" *ngIf="erro">
+  <div class="sh-status-error" *ngIf="erro">
     {{ erro }}
   </div>
 
   <ng-container *ngIf="!carregando && !erro && resumo as dados">
     <div class="cards-resumo">
-      <article class="resumo-card">
+      <article class="resumo-card sh-stat-card">
         <span>Total em aberto</span>
         <strong>{{ dados.totalOutstanding | currency:'BRL':'symbol':'1.2-2' }}</strong>
       </article>
 
-      <article class="resumo-card">
+      <article class="resumo-card sh-stat-card">
         <span>Pagamentos sugeridos</span>
         <strong>{{ dados.settlements.length }}</strong>
       </article>
     </div>
 
-    <section class="bloco">
+    <section class="bloco sh-panel">
       <h3>Saldos l&iacute;quidos</h3>
       <div class="saldos-grid" *ngIf="dados.balances.length; else semSaldos">
         <article class="saldo-item" [ngClass]="saldoClasse(saldo)" *ngFor="let saldo of dados.balances">
@@ -58,11 +60,11 @@
         </article>
       </div>
       <ng-template #semSaldos>
-        <p class="vazio">Sem saldos para exibir.</p>
+        <p class="sh-empty-state">Sem saldos para exibir.</p>
       </ng-template>
     </section>
 
-    <section class="bloco">
+    <section class="bloco sh-panel">
       <h3>Quem deve para quem</h3>
       <div class="lista" *ngIf="dados.debts.length; else semDividas">
         <article class="linha" *ngFor="let debt of dados.debts">
@@ -71,11 +73,11 @@
         </article>
       </div>
       <ng-template #semDividas>
-        <p class="vazio">Nenhuma d&iacute;vida em aberto no per&iacute;odo.</p>
+        <p class="sh-empty-state">Nenhuma d&iacute;vida em aberto no per&iacute;odo.</p>
       </ng-template>
     </section>
 
-    <section class="bloco">
+    <section class="bloco sh-panel">
       <h3>Sugest&atilde;o de liquida&ccedil;&atilde;o m&iacute;nima</h3>
       <div class="lista" *ngIf="dados.settlements.length; else semLiquidacao">
         <article class="linha" *ngFor="let settlement of dados.settlements">
@@ -84,7 +86,7 @@
         </article>
       </div>
       <ng-template #semLiquidacao>
-        <p class="vazio">N&atilde;o h&aacute; pagamentos pendentes para liquidar.</p>
+        <p class="sh-empty-state">N&atilde;o h&aacute; pagamentos pendentes para liquidar.</p>
       </ng-template>
     </section>
   </ng-container>
