@@ -46,6 +46,8 @@
       @if (carregandoFamilia) {
         <p class="sh-status">Carregando dados da família...</p>
       } @else {
+        <h2 class="familia-nome">{{ family?.name || 'Minha família' }}</h2>
+
         <div class="family-code sh-panel">
           <div>
             <span class="label">Código da família</span>
