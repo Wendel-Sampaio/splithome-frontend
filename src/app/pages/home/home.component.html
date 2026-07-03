@@ -5,14 +5,20 @@
         </div>
     </mat-toolbar>
 </div>
-<div class="body">
+<div class="body" [ngClass]="{'menu-minimizado': isMenuCollapsed}">
     <mat-card class="menu-lateral" appearance="outlined">
         <mat-card-header class="header-menu-lateral">
             <div class="title">
                 <div class="splithome">
-                    <img class="icon-title" src="../../../assets/icon.png" alt="">
+                    <img class="icon-title" src="../../../assets/icon.png" alt="Logo SplitHome">
                     <mat-card-title class="titulo-menu-lateral">SplitHome</mat-card-title>
                 </div>
+                <button class="botao-minimizar-menu"
+                        type="button"
+                        (click)="alternarMenu()"
+                        [attr.aria-label]="isMenuCollapsed ? 'Expandir menu lateral' : 'Minimizar menu lateral'">
+                    <mat-icon>{{ isMenuCollapsed ? 'chevron_right' : 'chevron_left' }}</mat-icon>
+                </button>
                 <img class="profile-photo" [src]="profilePhotoUrl" alt="Foto de perfil">
                 <mat-card-subtitle class="subtitulo-menu">
                     Bem-vindo

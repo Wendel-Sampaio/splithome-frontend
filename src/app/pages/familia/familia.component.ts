@@ -82,6 +82,10 @@ export class FamiliaComponent implements OnInit {
     return !this.criandoFamilia && !this.entrandoFamilia;
   }
 
+  voltarParaHome(): void {
+    this.router.navigate(['/home']);
+  }
+
   criarMinhaFamilia(): void {
     if (!this.podeCriarFamilia) {
       return;

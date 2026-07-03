@@ -37,4 +37,14 @@ describe('HomeComponent', () => {
     expect(component.currentView).toBe('compras');
     expect(component.currentViewTitle).toBe('Compras');
   });
+
+  it('alternarMenu() deve minimizar e expandir o menu lateral', () => {
+    expect(component.isMenuCollapsed).toBeFalse();
+
+    component.alternarMenu();
+    expect(component.isMenuCollapsed).toBeTrue();
+
+    component.alternarMenu();
+    expect(component.isMenuCollapsed).toBeFalse();
+  });
 });

@@ -19,6 +19,14 @@
   padding: 28px;
 }
 
+.top-actions {
+  display: flex;
+}
+
+.top-actions button mat-icon {
+  margin-right: 4px;
+}
+
 .header h1 {
   color: #48a75a;
   font-size: 32px;

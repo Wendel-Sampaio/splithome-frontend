@@ -36,6 +36,7 @@ export class HomeComponent {
   user!: User;
   currentView = 'inicio';
   currentViewTitle = 'In\u00edcio';
+  isMenuCollapsed = false;
 
   constructor() {
     this.user = this.loginService.getUser();
@@ -69,6 +70,10 @@ export class HomeComponent {
       ...this.user,
       profilePhoto
     };
+  }
+
+  alternarMenu(): void {
+    this.isMenuCollapsed = !this.isMenuCollapsed;
   }
 
   abrirInicio(): void {
