@@ -1,45 +1,47 @@
-<section class="estatisticas">
-  <header class="estatisticas-header">
+<section class="estatisticas sh-page">
+  <header class="sh-page-header">
     <div>
-      <h2>Estat&iacute;sticas</h2>
-      <p>Resumo dos seus gastos por categoria e por m&ecirc;s.</p>
+      <h2 class="sh-page-title">Estat&iacute;sticas</h2>
+      <p class="sh-page-subtitle">Resumo dos seus gastos por categoria e por m&ecirc;s.</p>
     </div>
 
-    <form class="periodo-form" [formGroup]="periodoForm" (ngSubmit)="carregarResumo()">
-      <mat-form-field appearance="outline">
-        <mat-label>Per&iacute;odo</mat-label>
-        <mat-date-range-input [rangePicker]="picker">
-          <input matStartDate formControlName="dataInicio" placeholder="In&iacute;cio">
-          <input matEndDate formControlName="dataFim" placeholder="Fim">
-        </mat-date-range-input>
-        <mat-datepicker-toggle matIconSuffix [for]="picker"></mat-datepicker-toggle>
-        <mat-date-range-picker #picker></mat-date-range-picker>
-      </mat-form-field>
+    <div class="sh-page-actions">
+      <form class="periodo-form" [formGroup]="periodoForm" (ngSubmit)="carregarResumo()">
+        <mat-form-field appearance="outline">
+          <mat-label>Per&iacute;odo</mat-label>
+          <mat-date-range-input [rangePicker]="picker">
+            <input matStartDate formControlName="dataInicio" placeholder="In&iacute;cio">
+            <input matEndDate formControlName="dataFim" placeholder="Fim">
+          </mat-date-range-input>
+          <mat-datepicker-toggle matIconSuffix [for]="picker"></mat-datepicker-toggle>
+          <mat-date-range-picker #picker></mat-date-range-picker>
+        </mat-form-field>
 
-      <div class="periodo-acoes">
-        <button mat-flat-button color="primary" type="submit">
-          <mat-icon>filter_alt</mat-icon>
-          Filtrar
-        </button>
-        <button mat-button type="button" (click)="limparFiltro()">
-          Limpar
-        </button>
-      </div>
-    </form>
+        <div class="periodo-acoes">
+          <button mat-flat-button color="primary" type="submit">
+            <mat-icon>filter_alt</mat-icon>
+            Filtrar
+          </button>
+          <button mat-button type="button" (click)="limparFiltro()">
+            Limpar
+          </button>
+        </div>
+      </form>
+    </div>
   </header>
 
-  <div class="mensagem-status" *ngIf="loading()">
+  <div class="sh-status" *ngIf="loading()">
     Carregando estat&iacute;sticas...
   </div>
 
   <ng-container *ngIf="!loading() && resumo as dados">
     <div class="resumo-grid">
-      <article class="resumo-card">
+      <article class="resumo-card sh-stat-card">
         <span>Gasto no m&ecirc;s atual</span>
         <strong>{{ dados.totalMesAtual | currency:'BRL':'symbol':'1.2-2' }}</strong>
       </article>
 
-      <article class="resumo-card">
+      <article class="resumo-card sh-stat-card">
         <span>Maior categoria</span>
         <strong>{{ dados.maiorCategoria?.categoria | categoria }}</strong>
         <small *ngIf="dados.maiorCategoria">
@@ -49,7 +51,7 @@
     </div>
 
     <div class="graficos-grid">
-      <section class="grafico-card">
+      <section class="grafico-card sh-panel">
         <div class="grafico-titulo">
           <h3>Total por categoria</h3>
           <span>{{ totalCategorias | currency:'BRL':'symbol':'1.2-2' }}</span>
@@ -67,11 +69,11 @@
         </div>
 
         <ng-template #semCategorias>
-          <p class="vazio">Nenhum gasto por categoria encontrado.</p>
+          <p class="sh-empty">Nenhum gasto por categoria encontrado.</p>
         </ng-template>
       </section>
 
-      <section class="grafico-card">
+      <section class="grafico-card sh-panel">
         <div class="grafico-titulo">
           <h3>Total por m&ecirc;s</h3>
           <span>&Uacute;ltimos 6 meses</span>
@@ -88,7 +90,7 @@
         </div>
 
         <ng-template #semMeses>
-          <p class="vazio">Nenhum gasto mensal encontrado.</p>
+          <p class="sh-empty">Nenhum gasto mensal encontrado.</p>
         </ng-template>
       </section>
     </div>
