@@ -5,39 +5,10 @@
   padding: clamp(24px, 5vw, 64px) clamp(16px, 4vw, 32px);
 }
 
-.familia-card {
-  border: 1px solid var(--sh-color-border);
-  border-radius: var(--sh-radius-lg);
-  box-shadow: var(--sh-shadow-md);
-  margin: 0 auto;
-  max-width: 920px;
-}
-
-.familia-card mat-card-content {
-  display: grid;
-  gap: 20px;
-  padding: 28px;
-}
-
-.top-actions {
+.familia-conteudo {
   display: flex;
-}
-
-.top-actions button mat-icon {
-  margin-right: 4px;
-}
-
-.header h1 {
-  color: var(--sh-color-text);
-  font-size: 32px;
-  font-weight: 800;
-  letter-spacing: -0.02em;
-  margin: 0 0 8px;
-}
-
-.header p {
-  color: var(--sh-color-text-muted);
-  margin: 0;
+  flex-direction: column;
+  gap: var(--sh-space-6);
 }
 
 .benefits {
@@ -90,13 +61,9 @@
 
 .family-code {
   align-items: center;
-  background: #f8fcf8;
-  border: 1px solid #dbe8dd;
-  border-radius: 12px;
   display: flex;
   justify-content: space-between;
   gap: 16px;
-  padding: 16px;
 }
 
 .label {
@@ -150,28 +117,9 @@
   color: #767676;
 }
 
-.status {
-  color: #7a7a7a;
-  margin: 0;
-}
-
-.erro {
-  color: #c44141;
-  font-weight: 600;
-  margin: 0;
-}
-
 @media (max-width: 768px) {
   .familia-page {
     padding: 88px 12px 16px;
-  }
-
-  .familia-card mat-card-content {
-    padding: 18px;
-  }
-
-  .header h1 {
-    font-size: 26px;
   }
 
   .join-box {
