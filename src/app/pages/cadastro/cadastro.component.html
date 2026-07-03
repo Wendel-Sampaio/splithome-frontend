@@ -1,92 +1,76 @@
-<div class="body">
-  <div class="main-card">
-    <mat-card class="body-card-register" appearance="outlined">
-      <mat-card-header class="card-header">
-        <mat-card-title id="welcome">
-          Bem-vindo ao <b id="splithome">SplitHome</b>
-        </mat-card-title>
-      </mat-card-header>
-      
-      <mat-card-content class="content-card">
-        <form [formGroup]="cadastroForm">
-          
-          <!-- Nome -->
-          <mat-form-field class="input-name" appearance="outline">
-            <mat-label>Insira seu nome</mat-label>
-            <mat-icon matSuffix>person</mat-icon>
-            <input matInput formControlName="name" required>
-            <mat-error *ngIf="cadastroForm.get('name')?.hasError('required')">
-              O nome é obrigatório.
-            </mat-error>
-            <mat-error *ngIf="cadastroForm.get('name')?.hasError('maxlength')">
-              O nome não deve ter mais do que 20 caracteres.
-            </mat-error>
-          </mat-form-field>
-  
-          <!-- E-mail -->
-          <mat-form-field class="input-email" appearance="outline">
-            <mat-label>Insira seu email</mat-label>
-            <mat-icon matSuffix>email</mat-icon>
-            <input matInput formControlName="email" required>
-            <mat-error *ngIf="cadastroForm.get('email')?.hasError('required')">
-              O e-mail é obrigatório.
-            </mat-error>
-            <mat-error *ngIf="cadastroForm.get('email')?.hasError('email')">
-              Por favor insira um e-mail válido.
-            </mat-error>
-          </mat-form-field>
-  
-          <!-- Senha -->
-          <mat-form-field class="password-input" appearance="outline">
-            <mat-label>Insira sua senha</mat-label>
-            <input matInput formControlName="password" [type]="hide1() ? 'password' : 'text'" required />
-            <button mat-icon-button matSuffix (click)="clickEventPassword($event)" [attr.aria-label]="'Hide password'" [attr.aria-pressed]="hide1()">
-              <mat-icon>{{ hide1() ? 'visibility_off' : 'visibility' }}</mat-icon>
-            </button>
-            <mat-error *ngIf="cadastroForm.get('password')?.hasError('required')">
-              A senha é obrigatória.
-            </mat-error>
-            <mat-error *ngIf="cadastroForm.get('password')?.hasError('minlength')">
-              Deve conter no mínimo 8 caracteres.
-            </mat-error>
-            <mat-error *ngIf="cadastroForm.get('password')?.hasError('pattern')">
-              Deve conter pelo menos um caractere especial.
-            </mat-error>
-          </mat-form-field>
-  
-          <!-- Repita a Senha -->
-          <mat-form-field class="repeat-password-input" appearance="outline">
-            <mat-label>Repita sua senha</mat-label>
-            <input matInput formControlName="repeatPassword" [type]="hide2() ? 'password' : 'text'" required />
-            <button mat-icon-button matSuffix (click)="clickEventRepeatPassword($event)" [attr.aria-label]="'Hide password'" [attr.aria-pressed]="hide2()">
-              <mat-icon>{{ hide2() ? 'visibility_off' : 'visibility' }}</mat-icon>
-            </button>
-            <mat-error *ngIf="cadastroForm.get('repeatPassword')?.hasError('required')">
-              Por favor repita a sua senha.
-            </mat-error>
-            <mat-error *ngIf="cadastroForm.get('repeatPassword')?.hasError('passwordMismatch')">
-              As senhas devem ser iguais.
-            </mat-error>
-          </mat-form-field>
-          
-        </form>
-      </mat-card-content>
+<main class="auth-page">
+  <!-- Fundo com ondas verdes -->
+  <svg class="auth-bg" viewBox="0 0 1440 820" preserveAspectRatio="xMidYMid slice" aria-hidden="true">
+    <path class="wave-light"
+      d="M0,430 C 260,520 380,360 620,350 C 900,340 1080,140 1440,150 L1440,820 L0,820 Z" />
+    <path class="wave-dark"
+      d="M0,520 C 260,600 400,470 640,460 C 920,450 1120,240 1440,250 L1440,820 L0,820 Z" />
+  </svg>
 
-      <mat-card-actions>
-        <button mat-raised-button id="register-button" (click)="registrar()"
-                [disabled]="loading() || cadastroForm.invalid">
-          <mat-spinner *ngIf="loading()" diameter="20"></mat-spinner>
-          <span *ngIf="!loading()">Cadastrar</span>
-        </button>
-      </mat-card-actions>
-      
-      <mat-card-subtitle id="subtitle">
-        Já tem uma conta? Faça o login <a id="aqui" href="#">aqui.</a>
-      </mat-card-subtitle>
-    </mat-card>
-    
-    <div class="slogan">
-      <img src="../../../assets/imagem1.png" alt="Slogan Image">
+  <section class="auth-card" aria-label="Cadastro no SplitHome">
+    <!-- Marca / chamada -->
+    <div class="brand-side">
+      <div class="brand">
+        <img class="brand-logo" src="../../../assets/logo-splithome.png" alt="SplitHome">
+      </div>
+      <p class="tagline-lead">Controle a grana, sozinho</p>
+      <p class="tagline-title">Ou com a galera <span class="tagline-arrows">&#8250;&#8250;&#8250;</span></p>
     </div>
-  </div>
-</div>
+
+    <!-- Formulário -->
+    <div class="form-side">
+      <form class="auth-form" [formGroup]="cadastroForm" (ngSubmit)="registrar()">
+        <div class="field" [class.field--invalid]="isInvalid('name')">
+          <input formControlName="name" type="text" placeholder="Nome" autocomplete="name" aria-label="Nome">
+          <mat-icon>person</mat-icon>
+        </div>
+
+        <div class="field" [class.field--invalid]="isInvalid('email')">
+          <input formControlName="email" type="email" placeholder="E-mail" autocomplete="email" aria-label="E-mail">
+          <mat-icon>mail</mat-icon>
+        </div>
+
+        <div class="field" [class.field--invalid]="isInvalid('password')">
+          <input formControlName="password" [type]="hide1() ? 'password' : 'text'" placeholder="Criar senha"
+            autocomplete="new-password" aria-label="Criar senha">
+          <button type="button" class="field-toggle" (click)="clickEventPassword($event)"
+            [attr.aria-label]="hide1() ? 'Mostrar senha' : 'Ocultar senha'" [attr.aria-pressed]="!hide1()">
+            <mat-icon>{{ hide1() ? 'visibility' : 'visibility_off' }}</mat-icon>
+          </button>
+        </div>
+
+        <div class="field" [class.field--invalid]="isInvalid('repeatPassword')">
+          <input formControlName="repeatPassword" [type]="hide2() ? 'password' : 'text'" placeholder="Confirmar senha"
+            autocomplete="new-password" aria-label="Confirmar senha">
+          <button type="button" class="field-toggle" (click)="clickEventRepeatPassword($event)"
+            [attr.aria-label]="hide2() ? 'Mostrar senha' : 'Ocultar senha'" [attr.aria-pressed]="!hide2()">
+            <mat-icon>{{ hide2() ? 'visibility' : 'visibility_off' }}</mat-icon>
+          </button>
+        </div>
+
+        <div class="social" aria-label="Cadastrar com redes sociais">
+          <button type="button" class="social-btn social-btn--google" aria-label="Cadastrar com Google">
+            <svg viewBox="0 0 48 48" aria-hidden="true">
+              <path fill="#EA4335" d="M24 9.5c3.54 0 6.71 1.22 9.21 3.6l6.85-6.85C35.9 2.38 30.47 0 24 0 14.62 0 6.51 5.38 2.56 13.22l7.98 6.19C12.43 13.72 17.74 9.5 24 9.5z"/>
+              <path fill="#4285F4" d="M46.98 24.55c0-1.57-.15-3.09-.38-4.55H24v9.02h12.94c-.58 2.96-2.26 5.48-4.78 7.18l7.73 6c4.51-4.18 7.09-10.36 7.09-17.65z"/>
+              <path fill="#FBBC05" d="M10.53 28.59c-.48-1.45-.76-2.99-.76-4.59s.27-3.14.76-4.59l-7.98-6.19C.92 16.46 0 20.12 0 24c0 3.88.92 7.54 2.56 10.78l7.97-6.19z"/>
+              <path fill="#34A853" d="M24 48c6.48 0 11.93-2.13 15.89-5.81l-7.73-6c-2.15 1.45-4.92 2.3-8.16 2.3-6.26 0-11.57-4.22-13.47-9.91l-7.98 6.19C6.51 42.62 14.62 48 24 48z"/>
+            </svg>
+          </button>
+          <button type="button" class="social-btn social-btn--facebook" aria-label="Cadastrar com Facebook">
+            <svg viewBox="0 0 24 24" aria-hidden="true">
+              <path fill="#ffffff" d="M15.12 12.75h2.36l.37-2.87h-2.73V8.03c0-.83.23-1.4 1.42-1.4h1.52V4.06a20.3 20.3 0 0 0-2.21-.11c-2.19 0-3.69 1.34-3.69 3.79v2.14H10.2v2.87h2.36V20h2.56v-7.25z"/>
+            </svg>
+          </button>
+        </div>
+
+        <button type="submit" class="auth-submit" [disabled]="loading() || cadastroForm.invalid">
+          <mat-spinner *ngIf="loading()" diameter="20"></mat-spinner>
+          <span *ngIf="!loading()">Cadastrar-se</span>
+        </button>
+
+        <p class="form-bottom">Já tem uma conta? <a href="/login">Faça o login.</a></p>
+      </form>
+    </div>
+  </section>
+</main>

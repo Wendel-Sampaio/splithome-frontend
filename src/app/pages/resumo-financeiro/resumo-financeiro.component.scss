@@ -1,28 +1,3 @@
-.resumo-financeiro {
-  display: flex;
-  flex-direction: column;
-  gap: 20px;
-  padding: 24px;
-}
-
-.resumo-header {
-  align-items: flex-start;
-  display: flex;
-  flex-wrap: wrap;
-  gap: 16px;
-  justify-content: space-between;
-}
-
-.resumo-header h2 {
-  color: #2f7d3a;
-  margin: 0;
-}
-
-.resumo-header p {
-  color: #6c7480;
-  margin: 4px 0 0;
-}
-
 .periodo-form {
   align-items: center;
   display: flex;
@@ -36,47 +11,10 @@
   gap: 8px;
 }
 
-.mensagem-status {
-  color: #6c7480;
-  font-weight: 500;
-}
-
-.mensagem-status.erro {
-  color: #c62828;
-}
-
 .cards-resumo {
   display: grid;
   gap: 12px;
   grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
-}
-
-.resumo-card {
-  background-color: #f0fbf2;
-  border: 1px solid #d4f0d9;
-  border-radius: 14px;
-  display: flex;
-  flex-direction: column;
-  gap: 4px;
-  padding: 16px;
-}
-
-.resumo-card span {
-  color: #4f6b53;
-  font-size: 13px;
-  font-weight: 600;
-}
-
-.resumo-card strong {
-  color: #1f4f27;
-  font-size: 24px;
-}
-
-.bloco {
-  background-color: #ffffff;
-  border: 1px solid #ebeff2;
-  border-radius: 14px;
-  padding: 16px;
 }
 
 .bloco h3 {
@@ -136,16 +74,7 @@
   color: #1f2937;
 }
 
-.vazio {
-  color: #6c7480;
-  margin: 0;
-}
-
 @media (max-width: 768px) {
-  .resumo-financeiro {
-    padding: 16px;
-  }
-
   .linha {
     align-items: flex-start;
     flex-direction: column;

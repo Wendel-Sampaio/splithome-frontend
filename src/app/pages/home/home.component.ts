@@ -6,7 +6,9 @@ import { MatButtonModule } from '@angular/material/button';
 import { MatCardModule } from '@angular/material/card';
 import { MatDialog } from '@angular/material/dialog';
 import { MatIcon } from '@angular/material/icon';
+import { MatMenuModule } from '@angular/material/menu';
 import { MatToolbarModule } from '@angular/material/toolbar';
+import { DashboardInicioComponent, DashboardView } from '../../shared/components/dashboard-inicio/dashboard-inicio.component';
 import { UserService } from '../../core/auth/user/user.service';
 import { User } from '../../core/models/user/user';
 import { PlanFeature, PlanService } from '../../core/plan/plan.service';
@@ -20,7 +22,7 @@ import { ResumoFinanceiroComponent } from '../resumo-financeiro/resumo-financeir
 
 @Component({
   selector: 'app-home',
-  imports: [MatCardModule, MatIcon, MatButtonModule, ComprasComponent, DespesasComponent, MeuPerfilComponent, EstatisticasComponent, ResumoFinanceiroComponent, CommonModule, MatToolbarModule],
+  imports: [MatCardModule, MatIcon, MatButtonModule, MatMenuModule, ComprasComponent, DespesasComponent, MeuPerfilComponent, EstatisticasComponent, ResumoFinanceiroComponent, DashboardInicioComponent, CommonModule, MatToolbarModule],
   templateUrl: './home.component.html',
   styleUrl: './home.component.scss'
 })
@@ -99,6 +101,23 @@ export class HomeComponent {
   abrirResumoFinanceiro(): void {
     this.currentView = 'resumoFinanceiro';
     this.currentViewTitle = 'Resumo financeiro';
+  }
+
+  abrirDashboardView(view: DashboardView): void {
+    switch (view) {
+      case 'compras':
+        this.abrirCompras();
+        break;
+      case 'despesas':
+        this.abrirDespesas();
+        break;
+      case 'graficos':
+        this.abrirGraficos();
+        break;
+      case 'resumoFinanceiro':
+        this.abrirResumoFinanceiro();
+        break;
+    }
   }
 
   abrirFamilia(): void {

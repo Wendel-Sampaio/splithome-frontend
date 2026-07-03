@@ -1,116 +1,288 @@
-@use '@angular/material' as mat;
-@use '../../../assets/theme-colors.scss' as my-theme;
+$green: #3ece52;
+$green-strong: #2bb843;
+$green-dark: #1fae3a;
+$green-light: #63dd74;
+$grey-title: #6b7280;
+$grey-text: #9aa3ab;
 
-.body {
-    background-image: url('/assets/background.png');
-    background-size: cover; /* Faz a imagem cobrir todo o fundo */
-    background-position: center; /* Centraliza a imagem */
-    background-repeat: no-repeat; /* Garante que a imagem não se repita */
-    position: relative;
-    min-height: 100vh;
-    display: flex;
-    justify-content: center;
-    align-items: center; 
+:host {
+  display: block;
 }
 
-.main-card {
-    display: flex;
-    justify-items: center;
-    gap: 400px;
+.auth-page {
+  align-items: center;
+  background: #ffffff;
+  display: flex;
+  min-height: 100vh;
+  overflow: hidden;
+  position: relative;
+  width: 100%;
 }
 
-.body-card-login {
-    width: 550px;
-    min-height: max-content;
-    padding-bottom: 10%;
-    background-color: white;
-    box-shadow: 5px 5px 10px rgb(170, 170, 170);
-    display: flex;
+.auth-bg {
+  height: 100%;
+  left: 0;
+  position: absolute;
+  top: 0;
+  width: 100%;
+  z-index: 0;
+
+  .wave-light {
+    fill: $green-light;
+  }
+
+  .wave-dark {
+    fill: $green;
+  }
+}
+
+.auth-content {
+  align-items: center;
+  display: grid;
+  gap: clamp(24px, 5vw, 80px);
+  grid-template-columns: minmax(320px, 400px) 1fr;
+  margin: 0 auto;
+  max-width: 1240px;
+  padding: clamp(24px, 5vw, 64px);
+  position: relative;
+  width: 100%;
+  z-index: 1;
+}
+
+/* ---------- Card ---------- */
+.auth-card {
+  background: #fdfdfb;
+  border-radius: 26px;
+  box-shadow: 0 30px 60px rgba(20, 60, 30, 0.18);
+  display: flex;
+  flex-direction: column;
+  padding: clamp(28px, 4vw, 40px) clamp(24px, 3vw, 34px);
+}
+
+.welcome {
+  color: $grey-title;
+  font-size: 20px;
+  font-weight: 700;
+  letter-spacing: 0.01em;
+  margin: 0;
+  text-align: center;
+}
+
+.brand {
+  align-items: center;
+  display: flex;
+  justify-content: center;
+  margin: 6px 0 26px;
+}
+
+.brand-logo {
+  border-radius: 22px;
+  height: auto;
+  width: clamp(120px, 40%, 150px);
+}
+
+/* ---------- Formulário ---------- */
+.auth-form {
+  display: flex;
+  flex-direction: column;
+  gap: 26px;
+}
+
+.field {
+  align-items: center;
+  border-bottom: 1px solid #cfd4d8;
+  display: flex;
+  gap: 8px;
+  transition: border-color 0.2s ease;
+
+  &:focus-within {
+    border-bottom-color: $green;
+  }
+
+  input {
+    background: transparent;
+    border: none;
+    color: #3a4149;
+    flex: 1;
+    font-size: 16px;
+    outline: none;
+    padding: 8px 2px;
+    width: 100%;
+
+    &::placeholder {
+      color: $grey-text;
+    }
+  }
+
+  mat-icon {
+    color: #9aa3ab;
+    flex-shrink: 0;
+  }
+
+  .field-toggle {
     align-items: center;
-    border-radius: 25px;
+    background: none;
     border: none;
-    margin-left: -100px;
-}
-
-.card-header {
+    color: #9aa3ab;
+    cursor: pointer;
     display: flex;
-    justify-content: center;
-    margin-top: 30px;
-    min-width: 500px;
+    padding: 0;
+  }
+
+  &.field--invalid {
+    border-bottom-color: var(--sh-color-danger, #c62828);
+  }
 }
 
-.slogan {
-    margin-top: 20px;
+.auth-submit {
+  align-items: center;
+  background: $green;
+  border: none;
+  border-radius: 999px;
+  color: #ffffff;
+  cursor: pointer;
+  display: flex;
+  font-size: 16px;
+  font-weight: 700;
+  height: 46px;
+  justify-content: center;
+  margin-top: 8px;
+  transition: background 0.2s ease, transform 0.1s ease;
+  width: 100%;
+
+  &:hover:not(:disabled) {
+    background: $green-strong;
+  }
+
+  &:active:not(:disabled) {
+    transform: translateY(1px);
+  }
+
+  &:disabled {
+    cursor: not-allowed;
+    opacity: 0.6;
+  }
+
+  mat-spinner {
+    margin: 0 auto;
+
+    ::ng-deep circle {
+      stroke: #ffffff;
+    }
+  }
 }
 
-#welcome {
-    font-family: "Inter", serif;
-    font-weight: 700;
-    font-style: normal;
-    font-size: 33px;
-    color: #9F9D9D;
-    word-wrap: normal;
+/* ---------- Redes sociais ---------- */
+.social {
+  align-items: center;
+  display: flex;
+  gap: 16px;
+  justify-content: center;
+  margin: 20px 0 6px;
 }
 
-#splithome {
-    font-family: "Tilt Warp", serif;
-    font-weight: 500;
-    font-size: 33px;
-    font-style: normal;
-    font-variation-settings:
-      "XROT" 0,
-      "YROT" 0;
-    color: #48A75A;
+.social-btn {
+  align-items: center;
+  background: #ffffff;
+  border: none;
+  border-radius: 50%;
+  box-shadow: 0 3px 8px rgba(0, 0, 0, 0.14);
+  cursor: pointer;
+  display: flex;
+  height: 42px;
+  justify-content: center;
+  padding: 0;
+  transition: transform 0.15s ease, box-shadow 0.15s ease;
+  width: 42px;
+
+  &:hover {
+    box-shadow: 0 5px 12px rgba(0, 0, 0, 0.2);
+    transform: translateY(-1px);
+  }
+
+  svg {
+    height: 22px;
+    width: 22px;
+  }
+
+  &--facebook {
+    background: #1877f2;
+  }
 }
 
-#aqui {
-    color: #48A75A;
+/* ---------- Rodapé ---------- */
+.auth-footer {
+  color: $grey-text;
+  font-size: 13px;
+  margin: 8px 0 0;
+  text-align: center;
+
+  a {
+    color: $green;
+    font-weight: 600;
     text-decoration: none;
+
+    &:hover {
+      text-decoration: underline;
+    }
+  }
 }
 
-#subtitle {
-    font-family: "Zain", serif;
-    font-weight: normal;
-    font-style: 100;
+/* ---------- Hero (lado direito) ---------- */
+.auth-hero {
+  color: #ffffff;
+  padding-left: clamp(8px, 3vw, 40px);
+
+  .hero-lead {
+    font-size: clamp(24px, 3.4vw, 46px);
+    font-weight: 400;
+    letter-spacing: -0.01em;
+    line-height: 1.1;
+    margin: 0;
+  }
+
+  .hero-title {
+    align-items: center;
+    display: flex;
+    font-size: clamp(40px, 6vw, 84px);
+    font-weight: 800;
+    gap: 0.15em;
+    letter-spacing: -0.02em;
+    line-height: 1;
+    margin: 4px 0 0;
+  }
+
+  .hero-arrows {
+    font-weight: 800;
+    letter-spacing: -0.12em;
+  }
+}
+
+/* ---------- Responsivo ---------- */
+@media (max-width: 900px) {
+  .auth-content {
+    grid-template-columns: 1fr;
+    justify-items: center;
+  }
+
+  .auth-card {
+    max-width: 420px;
+    width: 100%;
+  }
+
+  .auth-hero {
+    order: -1;
+    padding-left: 0;
     text-align: center;
-    font-size: 23px;
-    color: #9F9D9D;
-    margin-top: 15px;
+
+    .hero-title {
+      justify-content: center;
+    }
+  }
 }
 
-.input-email,
-.password-input {
-    min-width: 350px;
-    margin-top: 10px;
-}
-
-.input-email {
-    margin-top: 30px;
-}
-
-.input-email,
-.password-input {
-    margin-bottom: 2%;
-    @include mat.theme((
-    color: (
-      primary: my-theme.$primary-palette,
-      tertiary: my-theme.$tertiary-palette,
-    ),
-  ));
-}
-
-#register-button {
-    font-family: "Itim", serif;
-    font-weight: 300;
-    font-style: normal;
-    font-size: 20px;
-    color: white;
-    background-color: #48A75A;
-    border: none;
-    border-radius: 8px;
-    margin-top: 2%;
-    min-width: 350px;
-    min-height: 50px;
-
-
+@media (max-width: 520px) {
+  .auth-hero {
+    display: none;
+  }
 }

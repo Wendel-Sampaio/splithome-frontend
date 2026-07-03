@@ -1,5 +1,4 @@
 $primary-color: #4caf50;
-$primary-hover: #45a049;
 $secondary-color: #4caf50;
 $secondary-hover: #21f321;
 $paid-background: #e8f5e9;
@@ -7,7 +6,6 @@ $paid-border-color: #66bb6a;
 $remove-button-color: #f443369f;
 $remove-button-hover: #f44336;
 $header-background: #f4f4f4;
-$header-text-color: #777777;
 $error-text-color: #f44336;
 $white-color: #ffffff;
 
@@ -15,40 +13,6 @@ $white-color: #ffffff;
   display: flex;
   justify-content: center;
   padding: 2rem 0;
-}
-
-.card-body {
-    display: flex;
-
-  .titulo-menu-despesas {
-    margin: 2.4%;
-    font-size: 34px;
-    font-weight: bold;
-    margin-bottom: 20px;
-    color: $header-text-color;
-  }
-
-  .importar-ofx,
-  .cadastrar-despesa {
-    margin-top: 2%;
-    background-color: $primary-color;
-    color: $white-color;
-    font-weight: bold;
-    font-size: 18px;
-
-    &:hover {
-      background-color: $primary-hover;
-    }
-  }
-
-  .importar-ofx {
-    margin-left: auto;
-    margin-right: 1%;
-  }
-
-  .cadastrar-despesa {
-    margin-right: 3%;
-  }
 }
 
 .table {

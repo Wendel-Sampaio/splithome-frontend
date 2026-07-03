@@ -1,41 +1,14 @@
 .familia-page {
-  background: #f2f2f2;
+  background: var(--sh-color-bg);
   box-sizing: border-box;
   min-height: 100vh;
-  padding: 100px 24px 24px;
+  padding: clamp(24px, 5vw, 64px) clamp(16px, 4vw, 32px);
 }
 
-.familia-card {
-  border: none;
-  border-radius: 20px;
-  box-shadow: 0 2px 10px rgb(99 99 99 / 35%);
-  margin: 0 auto;
-  max-width: 920px;
-}
-
-.familia-card mat-card-content {
-  display: grid;
-  gap: 20px;
-  padding: 28px;
-}
-
-.top-actions {
+.familia-conteudo {
   display: flex;
-}
-
-.top-actions button mat-icon {
-  margin-right: 4px;
-}
-
-.header h1 {
-  color: #48a75a;
-  font-size: 32px;
-  margin: 0 0 8px;
-}
-
-.header p {
-  color: #767676;
-  margin: 0;
+  flex-direction: column;
+  gap: var(--sh-space-6);
 }
 
 .benefits {
@@ -88,13 +61,9 @@
 
 .family-code {
   align-items: center;
-  background: #f8fcf8;
-  border: 1px solid #dbe8dd;
-  border-radius: 12px;
   display: flex;
   justify-content: space-between;
   gap: 16px;
-  padding: 16px;
 }
 
 .label {
@@ -124,6 +93,13 @@
   margin: 0 0 12px;
 }
 
+.familia-nome {
+  color: var(--sh-color-text);
+  font-size: 20px;
+  font-weight: 700;
+  margin: 0;
+}
+
 .members ul {
   display: grid;
   gap: 10px;
@@ -148,28 +124,9 @@
   color: #767676;
 }
 
-.status {
-  color: #7a7a7a;
-  margin: 0;
-}
-
-.erro {
-  color: #c44141;
-  font-weight: 600;
-  margin: 0;
-}
-
 @media (max-width: 768px) {
   .familia-page {
     padding: 88px 12px 16px;
-  }
-
-  .familia-card mat-card-content {
-    padding: 18px;
-  }
-
-  .header h1 {
-    font-size: 26px;
   }
 
   .join-box {

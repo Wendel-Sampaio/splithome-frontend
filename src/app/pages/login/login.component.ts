@@ -1,12 +1,8 @@
 import { Component, DestroyRef, inject, signal } from '@angular/core';
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
-import { MatCardModule } from '@angular/material/card';
 import { Router } from '@angular/router';
-import { MatButtonModule } from '@angular/material/button';
 import { MatIcon } from '@angular/material/icon';
-import { FormBuilder, FormGroup, FormsModule, ReactiveFormsModule, Validators } from '@angular/forms';
-import { MatFormFieldModule } from '@angular/material/form-field';
-import { MatInputModule } from '@angular/material/input';
+import { FormBuilder, FormGroup, ReactiveFormsModule, Validators } from '@angular/forms';
 import { MatProgressSpinnerModule } from '@angular/material/progress-spinner';
 import { finalize } from 'rxjs';
 import { Login } from '../../core/auth/user/login';
@@ -18,12 +14,7 @@ import { UserStateService } from '../../core/auth/user/user-state.service';
 @Component({
   selector: 'app-login',
   imports: [
-    MatCardModule,
     MatIcon,
-    MatButtonModule,
-    FormsModule,
-    MatFormFieldModule,
-    MatInputModule,
     MatProgressSpinnerModule,
     CommonModule,
     ReactiveFormsModule
@@ -51,6 +42,11 @@ export class LoginComponent {
   clickEventPassword(event: MouseEvent) {
     this.hide1.set(!this.hide1());
     event.stopPropagation();
+  }
+
+  isInvalid(control: string): boolean {
+    const field = this.loginForm.get(control);
+    return !!field && field.invalid && (field.dirty || field.touched);
   }
 
   login() {
