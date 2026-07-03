@@ -186,20 +186,6 @@ a:hover {
   width: 64px;
 }
 
-.sh-page-title {
-  color: var(--sh-color-text);
-  font-size: 1.5rem;
-  font-weight: 700;
-  line-height: 1.2;
-  margin: 0;
-}
-
-.sh-page-subtitle {
-  color: var(--sh-color-text-muted);
-  font-size: 0.95rem;
-  margin: 4px 0 0;
-}
-
 .sh-page-actions {
   align-items: center;
   display: flex;
@@ -235,22 +221,6 @@ a:hover {
     color: var(--sh-color-text);
     font-size: 1.5rem;
     font-weight: 700;
-  }
-}
-
-.sh-empty {
-  color: var(--sh-color-text-subtle);
-  padding: var(--sh-space-8) var(--sh-space-4);
-  text-align: center;
-}
-
-.sh-status {
-  color: var(--sh-color-text-muted);
-  padding: var(--sh-space-6) 0;
-  text-align: center;
-
-  &.is-error {
-    color: var(--sh-color-danger);
   }
 }
 
