@@ -7,7 +7,6 @@ import { CommonModule } from '@angular/common';
 import { MatDialog, MatDialogModule } from '@angular/material/dialog';
 import { FormTransacaoComponent } from '../form-transacao/form-transacao.component';
 import { UserService } from '../../../core/auth/user/user.service';
-import { MatCardTitle } from '@angular/material/card';
 import { DialogPagamentoComponent } from '../dialog-pagamento/dialog-pagamento.component';
 import { MatIconModule } from '@angular/material/icon';
 import { MatButtonModule } from '@angular/material/button';
@@ -43,7 +42,6 @@ interface Purchaser {
     MatTableModule,
     CommonModule,
     MatDialogModule,
-    MatCardTitle,
     MatIconModule,
     MatButtonModule,
     PagadoresPipe,
