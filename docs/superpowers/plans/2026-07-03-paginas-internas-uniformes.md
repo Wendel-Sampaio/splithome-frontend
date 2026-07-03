@@ -6,6 +6,8 @@
 
 **Architecture:** Adicionar um conjunto de classes utilitárias globais em `src/styles.scss` (cabeçalho de página, painéis, cards de KPI, estados, tabela de dados) e refatorar cada tela para consumi-las, removendo o SCSS duplicado. Cor verde a partir dos tokens `--sh-color-primary*` já existentes. Nenhuma mudança em back-end, dados ou nos valores dos tokens globais.
 
+> **Correção pós-Task 4 (design system pré-existente):** `src/styles.scss` já continha classes `.sh-page-title`, `.sh-page-subtitle`, `.sh-card`, `.sh-empty-state`, `.sh-status`, `.sh-status-error` (sem consumidores ainda). Reutilizamos essas classes existentes em vez de duplicá-las. Convenções canônicas: estado vazio = `.sh-empty-state`; estado de erro = `.sh-status-error` (não `.sh-status is-error`); loading = `.sh-status`. As classes **novas** que Task 1 realmente adiciona são só as estruturais: `.sh-page`, `.sh-page-header` (+`::after`), `.sh-page-actions`, `.sh-panel`, `.sh-stat-card`, `.sh-btn-primary`, `.sh-data-table`.
+
 **Tech Stack:** Angular 19 (Standalone), Angular Material 19, SCSS, Jasmine/Karma.
 
 ## Global Constraints
@@ -371,7 +373,7 @@ git commit -m "style: padronizar cabeçalho e tabela da tela Despesas"
 - Trocar `<article class="resumo-card">` por `<article class="resumo-card sh-stat-card">` (2 ocorrências).
 - Trocar `<section class="grafico-card">` por `<section class="grafico-card sh-panel">` (2 ocorrências).
 - Trocar `<div class="mensagem-status" *ngIf="loading()">` por `<div class="sh-status" *ngIf="loading()">`.
-- Trocar `<p class="vazio">…</p>` por `<p class="sh-empty">…</p>` (2 ocorrências).
+- Trocar `<p class="vazio">…</p>` por `<p class="sh-empty-state">…</p>` (2 ocorrências).
 
 - [ ] **Step 2: Limpar SCSS redundante**
 
@@ -423,8 +425,8 @@ git commit -m "style: padronizar tela Gráficos com o layout de página comparti
 - Trocar `<article class="resumo-card">` por `<article class="resumo-card sh-stat-card">` (2 ocorrências).
 - Trocar `<section class="bloco">` por `<section class="bloco sh-panel">` (3 ocorrências).
 - Trocar `<div class="mensagem-status" *ngIf="carregando">` por `<div class="sh-status" *ngIf="carregando">`.
-- Trocar `<div class="mensagem-status erro" *ngIf="erro">` por `<div class="sh-status is-error" *ngIf="erro">`.
-- Trocar `<p class="vazio">…</p>` por `<p class="sh-empty">…</p>` (3 ocorrências).
+- Trocar `<div class="mensagem-status erro" *ngIf="erro">` por `<div class="sh-status-error" *ngIf="erro">`.
+- Trocar `<p class="vazio">…</p>` por `<p class="sh-empty-state">…</p>` (3 ocorrências).
 
 - [ ] **Step 2: Limpar SCSS redundante**
 
@@ -511,7 +513,7 @@ por:
 
 ```html
       @if (mensagemErro) {
-        <p class="sh-status is-error">{{ mensagemErro }}</p>
+        <p class="sh-status-error">{{ mensagemErro }}</p>
       }
   </div>
 </section>
@@ -593,7 +595,7 @@ por:
 
 - Trocar `<mat-card class="novo-recado-card" appearance="outlined">` por `<mat-card class="novo-recado-card sh-panel" appearance="outlined">`.
 - Trocar `<mat-card class="recado-item" appearance="outlined" *ngFor="let recado of recados">` por `<mat-card class="recado-item sh-panel" appearance="outlined" *ngFor="let recado of recados">`.
-- Trocar `<div class="lista-vazia" *ngIf="!recados.length">` por `<div class="sh-empty" *ngIf="!recados.length">`.
+- Trocar `<div class="lista-vazia" *ngIf="!recados.length">` por `<div class="sh-empty-state" *ngIf="!recados.length">`.
 - No título da lista, trocar `<h2>Últimos recados</h2>` por `<h2 class="sh-page-title">Últimos recados</h2>`.
 
 - [ ] **Step 3: Limpar SCSS**

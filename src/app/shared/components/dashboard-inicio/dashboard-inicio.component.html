@@ -1,0 +1,148 @@
+<section class="dashboard">
+    <!-- Banner de boas-vindas compacto -->
+    <section class="hero">
+        <div class="hero-text">
+            <span class="hero-eyebrow">Vis&atilde;o geral</span>
+            <h2>Ol&aacute;, {{ primeiroNome }}. Bora organizar a casa?</h2>
+            <p>Registre gastos, acompanhe saldos e mantenha tudo alinhado em um s&oacute; lugar.</p>
+            <div class="hero-actions">
+                <button mat-flat-button class="btn-primary" type="button" (click)="novaCompra()">
+                    <mat-icon>add_shopping_cart</mat-icon>
+                    Nova compra
+                </button>
+                <button mat-stroked-button class="btn-secondary" type="button" (click)="novaDespesa()">
+                    <mat-icon>add_card</mat-icon>
+                    Adicionar despesa
+                </button>
+            </div>
+        </div>
+        <div class="hero-art" aria-hidden="true">
+            <svg viewBox="0 0 120 120" fill="none" xmlns="http://www.w3.org/2000/svg">
+                <circle cx="60" cy="60" r="58" fill="currentColor" opacity="0.12" />
+                <path d="M28 62 L60 34 L92 62 V92 H28 Z" fill="currentColor" opacity="0.28" />
+                <path d="M28 62 L60 34 L92 62" stroke="currentColor" stroke-width="4" stroke-linejoin="round" opacity="0.6" />
+                <rect x="52" y="70" width="16" height="22" rx="2" fill="currentColor" opacity="0.55" />
+                <circle cx="60" cy="20" r="6" fill="currentColor" opacity="0.5" />
+            </svg>
+        </div>
+    </section>
+
+    <!-- KPIs -->
+    <section class="kpi-row">
+        <ng-container *ngIf="carregando(); else kpisProntos">
+            <div class="kpi-card skeleton" *ngFor="let i of [1,2,3,4]"></div>
+        </ng-container>
+        <ng-template #kpisProntos>
+            <div class="kpi-card">
+                <div class="kpi-icon amber"><mat-icon>account_balance_wallet</mat-icon></div>
+                <span class="kpi-label">Em aberto</span>
+                <strong class="kpi-value">{{ moeda(totalEmAberto()) }}</strong>
+            </div>
+            <div class="kpi-card">
+                <div class="kpi-icon green"><mat-icon>payments</mat-icon></div>
+                <span class="kpi-label">Despesas do m&ecirc;s</span>
+                <strong class="kpi-value">{{ moeda(totalDespesasMes()) }}</strong>
+            </div>
+            <div class="kpi-card">
+                <div class="kpi-icon blue"><mat-icon>shopping_cart</mat-icon></div>
+                <span class="kpi-label">Compras</span>
+                <strong class="kpi-value">{{ totalCompras() }}</strong>
+            </div>
+            <div class="kpi-card">
+                <div class="kpi-icon violet"><mat-icon>category</mat-icon></div>
+                <span class="kpi-label">Maior categoria</span>
+                <strong class="kpi-value texto">{{ maiorCategoria() }}</strong>
+            </div>
+        </ng-template>
+    </section>
+
+    <!-- Gr&aacute;fico + atividades -->
+    <section class="resumo-grid">
+        <article class="panel grafico-panel">
+            <header class="panel-head">
+                <div>
+                    <h3>Gastos por m&ecirc;s</h3>
+                    <span class="panel-sub">&Uacute;ltimos meses</span>
+                </div>
+                <button class="panel-link" type="button" (click)="ir('graficos')">
+                    Ver gr&aacute;ficos <mat-icon>chevron_right</mat-icon>
+                </button>
+            </header>
+
+            <div class="grafico-body" *ngIf="carregando(); else graficoPronto">
+                <div class="skeleton bar-skel" *ngFor="let i of [1,2,3,4,5,6]"></div>
+            </div>
+            <ng-template #graficoPronto>
+                <div class="grafico-body" *ngIf="barrasMes().length; else vazioGrafico">
+                    <div class="barra-col" *ngFor="let b of barrasMes()">
+                        <div class="barra" [style.height.%]="b.altura" [attr.title]="moeda(b.total)"></div>
+                        <span class="barra-label">{{ b.label }}</span>
+                    </div>
+                </div>
+                <ng-template #vazioGrafico>
+                    <div class="estado-vazio">
+                        <mat-icon>bar_chart</mat-icon>
+                        <span>Sem dados de gastos ainda.</span>
+                    </div>
+                </ng-template>
+            </ng-template>
+        </article>
+
+        <article class="panel atividades-panel">
+            <header class="panel-head">
+                <div>
+                    <h3>&Uacute;ltimas atividades</h3>
+                    <span class="panel-sub">Compras e despesas recentes</span>
+                </div>
+            </header>
+
+            <div class="atividades-body" *ngIf="carregando(); else atividadesProntas">
+                <div class="skeleton row-skel" *ngFor="let i of [1,2,3,4]"></div>
+            </div>
+            <ng-template #atividadesProntas>
+                <ul class="atividades-lista" *ngIf="atividades().length; else vazioAtividades">
+                    <li *ngFor="let a of atividades()">
+                        <span class="ativ-icone" [ngClass]="a.tipo">
+                            <mat-icon>{{ iconeAtividade(a.tipo) }}</mat-icon>
+                        </span>
+                        <div class="ativ-info">
+                            <strong>{{ a.title }}</strong>
+                            <span class="ativ-meta">{{ a.category }} &middot; {{ a.autor }}</span>
+                        </div>
+                        <span class="ativ-valor">{{ moeda(a.value) }}</span>
+                    </li>
+                </ul>
+                <ng-template #vazioAtividades>
+                    <div class="estado-vazio">
+                        <mat-icon>inbox</mat-icon>
+                        <span>Nenhuma atividade ainda.</span>
+                    </div>
+                </ng-template>
+            </ng-template>
+        </article>
+    </section>
+
+    <!-- Atalhos -->
+    <section class="shortcut-grid">
+        <button class="shortcut-card" type="button" (click)="ir('compras')">
+            <span class="shortcut-icon"><mat-icon>shopping_cart</mat-icon></span>
+            <strong>Compras</strong>
+            <span class="shortcut-metric">{{ totalCompras() }} registradas</span>
+        </button>
+        <button class="shortcut-card" type="button" (click)="ir('despesas')">
+            <span class="shortcut-icon"><mat-icon>payments</mat-icon></span>
+            <strong>Despesas</strong>
+            <span class="shortcut-metric">{{ moeda(totalDespesasMes()) }} no m&ecirc;s</span>
+        </button>
+        <button class="shortcut-card" type="button" (click)="ir('resumoFinanceiro')">
+            <span class="shortcut-icon"><mat-icon>account_balance_wallet</mat-icon></span>
+            <strong>Resumo financeiro</strong>
+            <span class="shortcut-metric">{{ moeda(totalEmAberto()) }} em aberto</span>
+        </button>
+        <button class="shortcut-card" type="button" (click)="ir('graficos')">
+            <span class="shortcut-icon"><mat-icon>bar_chart</mat-icon></span>
+            <strong>Gr&aacute;ficos</strong>
+            <span class="shortcut-metric">Maior: {{ maiorCategoria() }}</span>
+        </button>
+    </section>
+</section>

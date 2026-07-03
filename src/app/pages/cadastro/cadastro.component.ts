@@ -1,12 +1,8 @@
 import { Component, DestroyRef, inject, signal } from '@angular/core';
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
-import { MatCardModule } from '@angular/material/card';
 import { Router } from '@angular/router';
 import { MatIconModule } from '@angular/material/icon';
-import { FormsModule, ReactiveFormsModule, FormBuilder, FormGroup, Validators } from '@angular/forms';
-import { MatFormFieldModule } from '@angular/material/form-field';
-import { MatInputModule } from '@angular/material/input';
-import { MatButtonModule } from '@angular/material/button';
+import { ReactiveFormsModule, FormBuilder, FormGroup, Validators } from '@angular/forms';
 import { MatProgressSpinnerModule } from '@angular/material/progress-spinner';
 import { finalize } from 'rxjs';
 import { UserService } from '../../core/auth/user/user.service';
@@ -19,13 +15,8 @@ import { AbstractControl, ValidationErrors } from '@angular/forms';
   selector: 'app-cadastro',
   standalone: true,
   imports: [
-    MatCardModule,
-    MatButtonModule,
     MatIconModule,
-    FormsModule,
     ReactiveFormsModule,
-    MatFormFieldModule,
-    MatInputModule,
     MatProgressSpinnerModule,
     CommonModule,
   ],
@@ -67,6 +58,11 @@ export class CadastroComponent {
   clickEventRepeatPassword(event: MouseEvent) {
     this.hide2.set(!this.hide2());
     event.stopPropagation();
+  }
+
+  isInvalid(control: string): boolean {
+    const field = this.cadastroForm.get(control);
+    return !!field && field.invalid && (field.dirty || field.touched);
   }
 
   registrar() {
