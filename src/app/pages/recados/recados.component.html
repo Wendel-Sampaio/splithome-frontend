@@ -1,17 +1,18 @@
-<section class="recados-page">
-  <header class="recados-header">
+<section class="recados-page sh-page">
+  <header class="sh-page-header">
     <div>
-      <h1>Recados da família</h1>
-      <p>Compartilhe avisos rápidos com todos da casa.</p>
+      <h1 class="sh-page-title">Recados</h1>
+      <p class="sh-page-subtitle">Compartilhe avisos rápidos com todos da casa.</p>
     </div>
-
-    <button mat-stroked-button type="button" (click)="voltarParaHome()">
-      <mat-icon>arrow_back</mat-icon>
-      Voltar
-    </button>
+    <div class="sh-page-actions">
+      <button mat-stroked-button color="primary" type="button" (click)="voltarParaHome()">
+        <mat-icon>arrow_back</mat-icon>
+        Voltar
+      </button>
+    </div>
   </header>
 
-  <mat-card class="novo-recado-card" appearance="outlined">
+  <mat-card class="novo-recado-card sh-panel" appearance="outlined">
     <mat-card-header>
       <mat-card-title>Novo recado</mat-card-title>
       <mat-card-subtitle>Até 280 caracteres</mat-card-subtitle>
@@ -48,13 +49,13 @@
   </mat-card>
 
   <section class="recados-lista">
-    <h2>Últimos recados</h2>
+    <h2 class="sh-page-title">Últimos recados</h2>
 
-    <div class="lista-vazia" *ngIf="!recados.length">
+    <div class="sh-empty-state" *ngIf="!recados.length">
       Nenhum recado ainda. Seja o primeiro a escrever.
     </div>
 
-    <mat-card class="recado-item" appearance="outlined" *ngFor="let recado of recados">
+    <mat-card class="recado-item sh-panel" appearance="outlined" *ngFor="let recado of recados">
       <mat-card-content>
         <p class="recado-conteudo">{{ recado.content }}</p>
         <div class="recado-meta">
