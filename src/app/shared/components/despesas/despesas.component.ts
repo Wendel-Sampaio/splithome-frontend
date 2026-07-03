@@ -2,7 +2,6 @@ import { CommonModule } from "@angular/common";
 import { Component, DestroyRef, inject, signal } from "@angular/core";
 import { takeUntilDestroyed } from "@angular/core/rxjs-interop";
 import { MatButtonModule } from "@angular/material/button";
-import { MatCardTitle } from "@angular/material/card";
 import { MatDialog, MatDialogModule } from "@angular/material/dialog";
 import { MatIconModule } from "@angular/material/icon";
 import { MatProgressSpinnerModule } from "@angular/material/progress-spinner";
@@ -27,7 +26,6 @@ import { parseOfxExpenses } from "../../services/ofx/ofx-parser";
     MatButtonModule,
     MatIconModule,
     MatDialogModule,
-    MatCardTitle,
     MatProgressSpinnerModule,
     CategoriaPipe,
     PagadoresPipe

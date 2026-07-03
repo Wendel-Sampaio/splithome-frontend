@@ -17,40 +17,6 @@ $white-color: #ffffff;
   padding: 2rem 0;
 }
 
-.card-body {
-    display: flex;
-
-  .titulo-menu-despesas {
-    margin: 2.4%;
-    font-size: 34px;
-    font-weight: bold;
-    margin-bottom: 20px;
-    color: $header-text-color;
-  }
-
-  .importar-ofx,
-  .cadastrar-despesa {
-    margin-top: 2%;
-    background-color: $primary-color;
-    color: $white-color;
-    font-weight: bold;
-    font-size: 18px;
-
-    &:hover {
-      background-color: $primary-hover;
-    }
-  }
-
-  .importar-ofx {
-    margin-left: auto;
-    margin-right: 1%;
-  }
-
-  .cadastrar-despesa {
-    margin-right: 3%;
-  }
-}
-
 .table {
   margin-top: 20px;
 
