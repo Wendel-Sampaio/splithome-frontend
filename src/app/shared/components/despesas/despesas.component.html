@@ -1,5 +1,9 @@
 <div class="card-body">
     <mat-card-title class="titulo-menu-despesas">Despesas</mat-card-title>
+    <button mat-button class="importar-ofx" (click)="ofxInput.click()" [disabled]="loadingAcao()">
+        <mat-icon>upload_file</mat-icon>Importar OFX
+    </button>
+    <input #ofxInput type="file" accept=".ofx" hidden (change)="importarOfx($event)">
     <button mat-button class="cadastrar-despesa" (click)="abrirFormDespesa()">
         <mat-icon>add_circle</mat-icon>Nova despesa
     </button>

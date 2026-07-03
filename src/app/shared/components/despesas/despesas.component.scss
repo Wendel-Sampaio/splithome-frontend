@@ -28,10 +28,9 @@ $white-color: #ffffff;
     color: $header-text-color;
   }
 
+  .importar-ofx,
   .cadastrar-despesa {
     margin-top: 2%;
-    margin-left: auto;
-    margin-right: 3%;
     background-color: $primary-color;
     color: $white-color;
     font-weight: bold;
@@ -40,6 +39,15 @@ $white-color: #ffffff;
     &:hover {
       background-color: $primary-hover;
     }
+  }
+
+  .importar-ofx {
+    margin-left: auto;
+    margin-right: 1%;
+  }
+
+  .cadastrar-despesa {
+    margin-right: 3%;
   }
 }
 

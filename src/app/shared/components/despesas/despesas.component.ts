@@ -17,6 +17,7 @@ import { PagadoresPipe } from "../../pipes/pagadores.pipe";
 import { ConfirmDeleteComponent, ConfirmDeleteDialogData } from "../confirm-delete/confirm-delete.component";
 import { DialogPagamentoComponent } from "../dialog-pagamento/dialog-pagamento.component";
 import { FormTransacaoComponent } from "../form-transacao/form-transacao.component";
+import { parseOfxExpenses } from "../../services/ofx/ofx-parser";
 
 @Component({
   selector: 'tabela-despesas',
@@ -79,6 +80,75 @@ export class DespesasComponent {
     formRef.afterClosed().pipe(takeUntilDestroyed(this.destroyRef)).subscribe(result => {
       console.log(`Dialog result: ${result}`);
       this.recarregarDespesas();
+    });
+  }
+
+  importarOfx(event: Event): void {
+    const input = event.target as HTMLInputElement;
+    const file = input.files?.[0];
+    input.value = '';
+
+    if (!file) {
+      return;
+    }
+
+    if (!file.name.toLowerCase().endsWith('.ofx')) {
+      this.notify.error('Selecione um arquivo OFX válido.');
+      return;
+    }
+
+    this.loadingAcao.set(true);
+
+    this.lerArquivo(file).pipe(
+      map(content => parseOfxExpenses(content)),
+      switchMap(despesas => {
+        if (!despesas.length) {
+          this.notify.info('Nenhuma despesa encontrada no arquivo OFX.');
+          return of([]);
+        }
+
+        return forkJoin(despesas.map(despesa => this.despesaService.cadastrarDespesa(this.criarPayloadOfx(despesa))));
+      }),
+      finalize(() => this.loadingAcao.set(false)),
+      takeUntilDestroyed(this.destroyRef)
+    ).subscribe({
+      next: despesasImportadas => {
+        if (!despesasImportadas.length) {
+          return;
+        }
+
+        this.notify.success(`${despesasImportadas.length} despesa(s) importada(s) com sucesso!`);
+        this.recarregarDespesas();
+      },
+      error: () => {
+        this.notify.error('Não foi possível importar o arquivo OFX.');
+      }
+    });
+  }
+
+  private criarPayloadOfx(despesa: { title: string; value: number; paymentDate: string }): Record<string, unknown> {
+    const user = this.userService.getUser();
+
+    return {
+      title: despesa.title,
+      category: 'OTHERS',
+      value: despesa.value,
+      paymentDate: despesa.paymentDate,
+      responsibleId: user.id,
+      payers: [user.name],
+      remainingPayers: [user.name]
+    };
+  }
+
+  private lerArquivo(file: File): Observable<string> {
+    return new Observable(observer => {
+      const reader = new FileReader();
+      reader.onload = () => {
+        observer.next(String(reader.result ?? ''));
+        observer.complete();
+      };
+      reader.onerror = () => observer.error(reader.error);
+      reader.readAsText(file);
     });
   }
 

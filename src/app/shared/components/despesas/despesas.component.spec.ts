@@ -14,7 +14,7 @@ describe('DespesasComponent', () => {
 
   beforeEach(async () => {
     despesaService = jasmine.createSpyObj<CompraService>('CompraService',
-      ['listarDespesas', 'atualizarDespesa', 'deleteDespesa']);
+      ['listarDespesas', 'atualizarDespesa', 'deleteDespesa', 'cadastrarDespesa']);
     despesaService.listarDespesas.and.returnValue(of([]));
     const userService = jasmine.createSpyObj<UserService>('UserService', ['getUser', 'getUserById']);
     userService.getUser.and.returnValue({ id: 'u1', name: 'Eu' } as any);
@@ -63,5 +63,41 @@ describe('DespesasComponent', () => {
     despesaService.deleteDespesa.and.returnValue(throwError(() => ({ status: 400 })));
     (component as any).confirmDeleteDespesa('d1');
     expect(notify.error).toHaveBeenCalledWith('Não foi possível excluir a despesa.');
+  });
+
+  it('importa despesas de arquivo OFX', () => {
+    despesaService.cadastrarDespesa.and.returnValue(of({}));
+    const file = new File(['conteudo'], 'extrato.ofx');
+    const input = { files: [file], value: 'extrato.ofx' } as unknown as HTMLInputElement;
+    spyOn(component as any, 'lerArquivo').and.returnValue(of(`
+      <STMTTRN>
+        <DTPOSTED>20260701
+        <TRNAMT>-25.90
+        <NAME>Padaria
+      </STMTTRN>
+    `));
+
+    component.importarOfx({ target: input } as unknown as Event);
+
+    expect(despesaService.cadastrarDespesa).toHaveBeenCalledOnceWith({
+      title: 'Padaria',
+      category: 'OTHERS',
+      value: 25.9,
+      paymentDate: '2026-07-01',
+      responsibleId: 'u1',
+      payers: ['Eu'],
+      remainingPayers: ['Eu']
+    });
+    expect(notify.success).toHaveBeenCalledWith('1 despesa(s) importada(s) com sucesso!');
+  });
+
+  it('não importa arquivo que não seja OFX', () => {
+    const file = new File(['conteudo'], 'extrato.txt');
+    const input = { files: [file], value: 'extrato.txt' } as unknown as HTMLInputElement;
+
+    component.importarOfx({ target: input } as unknown as Event);
+
+    expect(despesaService.cadastrarDespesa).not.toHaveBeenCalled();
+    expect(notify.error).toHaveBeenCalledWith('Selecione um arquivo OFX válido.');
   });
 });
