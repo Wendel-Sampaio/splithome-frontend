@@ -1,53 +1,61 @@
-<div class="body">
-  <div class="main-card">
-    <div>
-      <form [formGroup]="loginForm">
-        <mat-card class="body-card-login" appearance="outlined">
-          <mat-card-header class="card-header">
-            <mat-card-title id="welcome">Bem-vindo ao <b id="splithome">SplitHome</b></mat-card-title>
-          </mat-card-header>
-          <mat-card-content class="content-card">
-            <div>
-              <mat-form-field class="input-email" appearance="outline">
-                <mat-label>Insira seu email</mat-label>
-                <input matInput formControlName="email" required>
-                <mat-error *ngIf="loginForm.get('email')?.hasError('required')">
-                  Por favor insira o Email.
-                </mat-error>  
-                <mat-error *ngIf="loginForm.get('email')?.hasError('email')">
-                  Por favor insira um email válido.
-                </mat-error>               
-                <mat-icon matSuffix>person</mat-icon>
-              </mat-form-field>
-            </div>
-            <div>
-              <mat-form-field class="password-input" appearance="outline">
-                <mat-label>Insira sua senha</mat-label>
-                <input matInput formControlName="password" [type]="hide1() ? 'password' : 'text'" />
-                <mat-error *ngIf="loginForm.get('password')?.hasError('required')">
-                  Por favor insira a senha.
-                </mat-error> 
-                <button mat-icon-button matSuffix (click)="clickEventPassword($event)"
-                  [attr.aria-label]="'Hide password'" [attr.aria-pressed]="hide1()">
-                  <mat-icon>{{hide1() ? 'visibility_off' : 'visibility'}}</mat-icon>
-                </button>
-              </mat-form-field>
-            </div>
-          </mat-card-content>
-          <mat-card-actions>
-            <button mat-raised-button id="register-button" (click)="login()"
-                    [disabled]="loading() || loginForm.invalid">
-              <mat-spinner *ngIf="loading()" diameter="20"></mat-spinner>
-              <span *ngIf="!loading()">Entrar</span>
+<main class="auth-page">
+  <section class="auth-shell" aria-label="Login no SplitHome">
+    <mat-card class="auth-card" appearance="outlined">
+      <mat-card-header class="auth-header">
+        <div class="brand-pill">
+          <img src="../../../assets/logo-splithome.png" alt="" aria-hidden="true">
+          <span>SplitHome</span>
+        </div>
+        <mat-card-title>Bem-vindo de volta</mat-card-title>
+        <mat-card-subtitle>Entre para acompanhar compras, despesas e combinações da sua casa.</mat-card-subtitle>
+      </mat-card-header>
+
+      <mat-card-content>
+        <form class="auth-form" [formGroup]="loginForm" (ngSubmit)="login()">
+          <mat-form-field appearance="outline">
+            <mat-label>E-mail</mat-label>
+            <input matInput formControlName="email" autocomplete="email" required>
+            <mat-icon matSuffix>mail</mat-icon>
+            <mat-error *ngIf="loginForm.get('email')?.hasError('required')">
+              Informe seu e-mail.
+            </mat-error>
+            <mat-error *ngIf="loginForm.get('email')?.hasError('email')">
+              Informe um e-mail válido.
+            </mat-error>
+          </mat-form-field>
+
+          <mat-form-field appearance="outline">
+            <mat-label>Senha</mat-label>
+            <input matInput formControlName="password" [type]="hide1() ? 'password' : 'text'" autocomplete="current-password" required>
+            <button mat-icon-button matSuffix type="button" (click)="clickEventPassword($event)"
+              [attr.aria-label]="hide1() ? 'Mostrar senha' : 'Ocultar senha'" [attr.aria-pressed]="!hide1()">
+              <mat-icon>{{ hide1() ? 'visibility_off' : 'visibility' }}</mat-icon>
             </button>
-          </mat-card-actions>
-          <mat-card-subtitle id="subtitle">Não tem uma conta? cadastre-se <a id="aqui"
-            href="/cadastro">aqui.</a></mat-card-subtitle>
-        </mat-card>
-      </form>
-    </div>
-    <div class="slogan">
-      <img src="../../../assets/imagem1.png" alt="">
-    </div>
-  </div>
-</div>
+            <mat-error *ngIf="loginForm.get('password')?.hasError('required')">
+              Informe sua senha.
+            </mat-error>
+          </mat-form-field>
+
+          <button mat-flat-button color="primary" class="auth-submit" type="submit" [disabled]="loading() || loginForm.invalid">
+            <mat-spinner *ngIf="loading()" diameter="20"></mat-spinner>
+            <span *ngIf="!loading()">Entrar</span>
+          </button>
+        </form>
+      </mat-card-content>
+
+      <mat-card-actions class="auth-footer">
+        <span>Não tem uma conta?</span>
+        <a href="/cadastro">Criar conta</a>
+      </mat-card-actions>
+    </mat-card>
+
+    <aside class="auth-hero" aria-label="Benefícios do SplitHome">
+      <div class="hero-copy">
+        <span class="eyebrow">Organização doméstica</span>
+        <h1>Divida gastos sem perder o controle da rotina.</h1>
+        <p>Centralize compras, despesas e recados em uma experiência simples para todos da família.</p>
+      </div>
+      <img src="../../../assets/imagem1.png" alt="Família organizando despesas no SplitHome">
+    </aside>
+  </section>
+</main>

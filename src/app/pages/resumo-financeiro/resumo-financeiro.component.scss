@@ -2,7 +2,8 @@
   display: flex;
   flex-direction: column;
   gap: 20px;
-  padding: 24px;
+  padding: 4px;
+  width: 100%;
 }
 
 .resumo-header {
@@ -14,12 +15,15 @@
 }
 
 .resumo-header h2 {
-  color: #2f7d3a;
+  color: var(--sh-color-text);
+  font-size: 26px;
+  font-weight: 800;
+  letter-spacing: -0.02em;
   margin: 0;
 }
 
 .resumo-header p {
-  color: #6c7480;
+  color: var(--sh-color-text-muted);
   margin: 4px 0 0;
 }
 

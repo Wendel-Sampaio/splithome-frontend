@@ -1,16 +1,9 @@
-<div id="navbar">
-    <mat-toolbar class="toolbar">
-        <div id="titulo-nav">
-            <span>{{ currentViewTitle }}</span>
-        </div>
-    </mat-toolbar>
-</div>
-<div class="body" [ngClass]="{'menu-minimizado': isMenuCollapsed}">
-    <mat-card class="menu-lateral" appearance="outlined">
+<div class="app-shell" [ngClass]="{'menu-minimizado': isMenuCollapsed}">
+    <mat-card class="menu-lateral" appearance="outlined" aria-label="Menu principal">
         <mat-card-header class="header-menu-lateral">
             <div class="title">
                 <div class="splithome">
-                    <img class="icon-title" src="../../../assets/icon.png" alt="Logo SplitHome">
+                    <img class="icon-title" src="../../../assets/logo-splithome.png" alt="Logo SplitHome">
                     <mat-card-title class="titulo-menu-lateral">SplitHome</mat-card-title>
                 </div>
                 <button class="botao-minimizar-menu"
@@ -21,7 +14,7 @@
                 </button>
                 <img class="profile-photo" [src]="profilePhotoUrl" alt="Foto de perfil">
                 <mat-card-subtitle class="subtitulo-menu">
-                    Bem-vindo
+                    <span>Bem-vindo</span>
                     <div class="user-plan">
                         <span class="username">{{ user.name }}</span>
                         <span class="plan-badge" [ngClass]="{'premium': isPremium, 'free': !isPremium}">
@@ -31,103 +24,147 @@
                 </mat-card-subtitle>
             </div>
         </mat-card-header>
+
         <mat-card-content class="conteudo-card">
-            <div>
-                <button (click)="abrirInicio()"
-                        class="botoes-menu-lateral"
-                        [ngClass]="{'selected': currentView === 'inicio'}">
-                    <mat-icon class="icones-botao">view_list</mat-icon>
-                    <span class="menu-label">In&iacute;cio</span>
-                </button>
-            </div>
+            <button (click)="abrirInicio()"
+                    class="botoes-menu-lateral"
+                    [ngClass]="{'selected': currentView === 'inicio'}">
+                <mat-icon class="icones-botao">dashboard</mat-icon>
+                <span class="menu-label">In&iacute;cio</span>
+            </button>
 
-            <div>
-                <button (click)="abrirCompras()"
-                        class="botoes-menu-lateral"
-                        [ngClass]="{'selected': currentView === 'compras'}">
-                    <mat-icon class="icones-botao" matSuffix>shopping_cart</mat-icon>
-                    <span class="menu-label">Compras</span>
-                </button>
-            </div>
-            <div>
-                <button (click)="abrirDespesas()"
-                        class="botoes-menu-lateral"
-                        [ngClass]="{'selected': currentView === 'despesas'}">
-                    <mat-icon class="icones-botao" matSuffix>payments</mat-icon>
-                    <span class="menu-label">Despesas</span>
-                </button>
-            </div>
-            <div>
-                <button (click)="abrirGraficos()"
-                        class="botoes-menu-lateral"
-                        [ngClass]="{'selected': currentView === 'graficos'}">
-                    <mat-icon class="icones-botao" matSuffix>bar_chart</mat-icon>
-                    <span class="menu-label">Gr&aacute;ficos</span>
-                </button>
-            </div>
-            <div>
-                <button (click)="abrirResumoFinanceiro()"
-                        class="botoes-menu-lateral"
-                        [ngClass]="{'selected': currentView === 'resumoFinanceiro'}">
-                    <mat-icon class="icones-botao" matSuffix>account_balance_wallet</mat-icon>
-                    <span class="menu-label">Resumo financeiro</span>
-                </button>
-            </div>
+            <button (click)="abrirCompras()"
+                    class="botoes-menu-lateral"
+                    [ngClass]="{'selected': currentView === 'compras'}">
+                <mat-icon class="icones-botao" matSuffix>shopping_cart</mat-icon>
+                <span class="menu-label">Compras</span>
+            </button>
 
-            <div>
-                <button (click)="abrirFamilia()"
-                        class="botoes-menu-lateral">
-                    <mat-icon class="icones-botao" matSuffix>groups</mat-icon>
-                    <span class="menu-label">Fam&iacute;lia</span>
-                </button>
-            </div>
-            <div>
-                <button (click)="abrirRecados()"
-                        class="botoes-menu-lateral"
-                        [ngClass]="{'premium-locked': !isPremium}">
-                    <mat-icon class="icones-botao" matSuffix>forum</mat-icon>
-                    <span class="menu-label">Recados</span>
-                    <span *ngIf="!isPremium" class="premium-lock">
-                        <mat-icon class="lock-icon" aria-hidden="true">lock</mat-icon>
-                        Premium
-                    </span>
-                </button>
-            </div>
+            <button (click)="abrirDespesas()"
+                    class="botoes-menu-lateral"
+                    [ngClass]="{'selected': currentView === 'despesas'}">
+                <mat-icon class="icones-botao" matSuffix>payments</mat-icon>
+                <span class="menu-label">Despesas</span>
+            </button>
 
-            <div>
-                <button (click)="abrirMeuPerfil()"
-                        class="botoes-menu-lateral"
-                        [ngClass]="{'selected': currentView === 'meuPerfil'}">
-                    <mat-icon class="icones-botao" matSuffix>perm_identity</mat-icon>
-                    <span class="menu-label">Meu perfil</span>
-                </button>
-            </div>
-            <div>
-                <button (click)="openDialog('200ms', '200ms')"
-                        class="botoes-menu-lateral">
-                    <mat-icon class="icones-botao" matSuffix>logout</mat-icon>
-                    <span class="menu-label">Sair</span>
-                </button>
-            </div>
+            <button (click)="abrirGraficos()"
+                    class="botoes-menu-lateral"
+                    [ngClass]="{'selected': currentView === 'graficos'}">
+                <mat-icon class="icones-botao" matSuffix>bar_chart</mat-icon>
+                <span class="menu-label">Gr&aacute;ficos</span>
+            </button>
+
+            <button (click)="abrirResumoFinanceiro()"
+                    class="botoes-menu-lateral"
+                    [ngClass]="{'selected': currentView === 'resumoFinanceiro'}">
+                <mat-icon class="icones-botao" matSuffix>account_balance_wallet</mat-icon>
+                <span class="menu-label">Resumo financeiro</span>
+            </button>
+
+            <button (click)="abrirFamilia()"
+                    class="botoes-menu-lateral">
+                <mat-icon class="icones-botao" matSuffix>groups</mat-icon>
+                <span class="menu-label">Fam&iacute;lia</span>
+            </button>
+
+            <button (click)="abrirRecados()"
+                    class="botoes-menu-lateral"
+                    [ngClass]="{'premium-locked': !isPremium}">
+                <mat-icon class="icones-botao" matSuffix>forum</mat-icon>
+                <span class="menu-label">Recados</span>
+                <span *ngIf="!isPremium" class="premium-lock">
+                    <mat-icon class="lock-icon" aria-hidden="true">lock</mat-icon>
+                    Premium
+                </span>
+            </button>
+
+            <button (click)="abrirMeuPerfil()"
+                    class="botoes-menu-lateral"
+                    [ngClass]="{'selected': currentView === 'meuPerfil'}">
+                <mat-icon class="icones-botao" matSuffix>perm_identity</mat-icon>
+                <span class="menu-label">Meu perfil</span>
+            </button>
+
+            <button (click)="openDialog('200ms', '200ms')"
+                    class="botoes-menu-lateral logout-action">
+                <mat-icon class="icones-botao" matSuffix>logout</mat-icon>
+                <span class="menu-label">Sair</span>
+            </button>
         </mat-card-content>
     </mat-card>
-    <mat-card class="tabela-compras tabela-boas-vindas" appearance="outlined" *ngIf="currentView === 'inicio'">
-        <mat-card-content>
-            <h2>Bem-vindo ao SplitHome</h2>
-            <p>Selecione uma op&ccedil;&atilde;o no menu lateral para acessar compras, despesas, gr&aacute;ficos, recados ou o seu perfil.</p>
-        </mat-card-content>
-    </mat-card>
-    <mat-card class="tabela-compras" appearance="outlined" *ngIf="currentView === 'compras'">
-        <mat-card-content><tabela-compras></tabela-compras></mat-card-content>
-    </mat-card>
-    <mat-card class="tabela-despesas" appearance="outlined" *ngIf="currentView === 'despesas'">
-        <mat-card-content><tabela-despesas></tabela-despesas></mat-card-content>
-    </mat-card>
-    <mat-card class="tabela-compras" appearance="outlined" *ngIf="currentView === 'graficos'">
-        <mat-card-content><app-estatisticas></app-estatisticas></mat-card-content>
-    </mat-card>
-    <mat-card class="tabela-compras" appearance="outlined" *ngIf="currentView === 'resumoFinanceiro'">
-        <mat-card-content><app-resumo-financeiro></app-resumo-financeiro></mat-card-content>
-    </mat-card>
-    <meu-perfil class="meu-perfil" *ngIf="currentView === 'meuPerfil'" (profilePhotoUpdated)="atualizarFotoPerfil($event)"></meu-perfil>
+
+    <main class="main-area">
+        <mat-toolbar class="topbar">
+            <div>
+                <span class="topbar-kicker">SplitHome</span>
+                <h1>{{ currentViewTitle }}</h1>
+            </div>
+        </mat-toolbar>
+
+        <section class="content-area">
+            <section class="dashboard" *ngIf="currentView === 'inicio'">
+                <mat-card class="hero-card" appearance="outlined">
+                    <mat-card-content>
+                        <span class="eyebrow">Visão geral</span>
+                        <h2>Olá, {{ user.name }}. O que vamos organizar hoje?</h2>
+                        <p>Acesse rapidamente as principais áreas para registrar gastos, revisar saldos e manter a casa alinhada.</p>
+                        <div class="hero-actions">
+                            <button mat-flat-button color="primary" type="button" (click)="abrirCompras()">
+                                <mat-icon>add_shopping_cart</mat-icon>
+                                Ver compras
+                            </button>
+                            <button mat-stroked-button color="primary" type="button" (click)="abrirDespesas()">
+                                <mat-icon>add_card</mat-icon>
+                                Ver despesas
+                            </button>
+                        </div>
+                    </mat-card-content>
+                </mat-card>
+
+                <div class="shortcut-grid">
+                    <button class="shortcut-card" type="button" (click)="abrirCompras()">
+                        <mat-icon>shopping_cart</mat-icon>
+                        <strong>Compras</strong>
+                        <span>Registre e acompanhe compras compartilhadas.</span>
+                    </button>
+
+                    <button class="shortcut-card" type="button" (click)="abrirDespesas()">
+                        <mat-icon>payments</mat-icon>
+                        <strong>Despesas</strong>
+                        <span>Controle pagamentos recorrentes e avulsos.</span>
+                    </button>
+
+                    <button class="shortcut-card" type="button" (click)="abrirResumoFinanceiro()">
+                        <mat-icon>account_balance_wallet</mat-icon>
+                        <strong>Resumo financeiro</strong>
+                        <span>Veja saldos, dívidas e sugestões de quitação.</span>
+                    </button>
+
+                    <button class="shortcut-card" type="button" (click)="abrirGraficos()">
+                        <mat-icon>bar_chart</mat-icon>
+                        <strong>Gráficos</strong>
+                        <span>Entenda seus gastos por período e categoria.</span>
+                    </button>
+                </div>
+            </section>
+
+            <mat-card class="content-card" appearance="outlined" *ngIf="currentView === 'compras'">
+                <mat-card-content><tabela-compras></tabela-compras></mat-card-content>
+            </mat-card>
+
+            <mat-card class="content-card" appearance="outlined" *ngIf="currentView === 'despesas'">
+                <mat-card-content><tabela-despesas></tabela-despesas></mat-card-content>
+            </mat-card>
+
+            <mat-card class="content-card" appearance="outlined" *ngIf="currentView === 'graficos'">
+                <mat-card-content><app-estatisticas></app-estatisticas></mat-card-content>
+            </mat-card>
+
+            <mat-card class="content-card" appearance="outlined" *ngIf="currentView === 'resumoFinanceiro'">
+                <mat-card-content><app-resumo-financeiro></app-resumo-financeiro></mat-card-content>
+            </mat-card>
+
+            <meu-perfil class="meu-perfil" *ngIf="currentView === 'meuPerfil'" (profilePhotoUpdated)="atualizarFotoPerfil($event)"></meu-perfil>
+        </section>
+    </main>
 </div>

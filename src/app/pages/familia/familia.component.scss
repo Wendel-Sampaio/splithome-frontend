@@ -1,14 +1,14 @@
 .familia-page {
-  background: #f2f2f2;
+  background: var(--sh-color-bg);
   box-sizing: border-box;
   min-height: 100vh;
-  padding: 100px 24px 24px;
+  padding: clamp(24px, 5vw, 64px) clamp(16px, 4vw, 32px);
 }
 
 .familia-card {
-  border: none;
-  border-radius: 20px;
-  box-shadow: 0 2px 10px rgb(99 99 99 / 35%);
+  border: 1px solid var(--sh-color-border);
+  border-radius: var(--sh-radius-lg);
+  box-shadow: var(--sh-shadow-md);
   margin: 0 auto;
   max-width: 920px;
 }
@@ -28,13 +28,15 @@
 }
 
 .header h1 {
-  color: #48a75a;
+  color: var(--sh-color-text);
   font-size: 32px;
+  font-weight: 800;
+  letter-spacing: -0.02em;
   margin: 0 0 8px;
 }
 
 .header p {
-  color: #767676;
+  color: var(--sh-color-text-muted);
   margin: 0;
 }
 
