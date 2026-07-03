@@ -9,7 +9,6 @@ import { FormTransacaoComponent } from '../form-transacao/form-transacao.compone
 import { UserService } from '../../../core/auth/user/user.service';
 import { DialogPagamentoComponent } from '../dialog-pagamento/dialog-pagamento.component';
 import { MatIconModule } from '@angular/material/icon';
-import { MatButtonModule } from '@angular/material/button';
 import { ConfirmDeleteComponent, ConfirmDeleteDialogData } from '../confirm-delete/confirm-delete.component';
 import { BehaviorSubject, catchError, finalize, map, Observable, of, switchMap, tap } from 'rxjs';
 import { debounceTime } from 'rxjs/operators';
@@ -43,7 +42,6 @@ interface Purchaser {
     CommonModule,
     MatDialogModule,
     MatIconModule,
-    MatButtonModule,
     PagadoresPipe,
     CategoriaPipe,
     MatPaginatorModule,
