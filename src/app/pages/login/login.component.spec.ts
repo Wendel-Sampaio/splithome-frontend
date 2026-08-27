@@ -2,10 +2,13 @@ import { ComponentFixture, TestBed } from '@angular/core/testing';
 import { provideHttpClient } from '@angular/common/http';
 import { provideRouter, Router } from '@angular/router';
 import { ReactiveFormsModule } from '@angular/forms';
+import { MatDialog } from '@angular/material/dialog';
 import { of, throwError } from 'rxjs';
 import { LoginComponent } from './login.component';
 import { UserService } from '../../core/auth/user/user.service';
 import { NotificationService } from '../../shared/services/notification/notification.service';
+import { UserStateService } from '../../core/auth/user/user-state.service';
+import { SocialUnavailableComponent } from '../../shared/components/social-unavailable/social-unavailable.component';
 
 describe('LoginComponent', () => {
   let component: LoginComponent;
@@ -13,11 +16,15 @@ describe('LoginComponent', () => {
   let userService: jasmine.SpyObj<UserService>;
   let notify: jasmine.SpyObj<NotificationService>;
   let router: jasmine.SpyObj<Router>;
+  let dialog: jasmine.SpyObj<MatDialog>;
+  let userState: jasmine.SpyObj<UserStateService>;
 
   beforeEach(async () => {
     userService = jasmine.createSpyObj<UserService>('UserService', ['logar', 'addToken']);
     notify = jasmine.createSpyObj<NotificationService>('NotificationService', ['success', 'error', 'info', 'warning']);
     router = jasmine.createSpyObj<Router>('Router', ['navigate']);
+    dialog = jasmine.createSpyObj<MatDialog>('MatDialog', ['open']);
+    userState = jasmine.createSpyObj<UserStateService>('UserStateService', ['clearCache']);
 
     await TestBed.configureTestingModule({
       imports: [LoginComponent, ReactiveFormsModule],
@@ -26,7 +33,9 @@ describe('LoginComponent', () => {
         provideRouter([]),
         { provide: UserService, useValue: userService },
         { provide: NotificationService, useValue: notify },
-        { provide: Router, useValue: router }
+        { provide: Router, useValue: router },
+        { provide: MatDialog, useValue: dialog },
+        { provide: UserStateService, useValue: userState }
       ]
     }).compileComponents();
 
@@ -46,6 +55,7 @@ describe('LoginComponent', () => {
     component.login();
 
     expect(userService.logar).toHaveBeenCalled();
+    expect(userState.clearCache).toHaveBeenCalled();
     expect(userService.addToken).toHaveBeenCalledWith('jwt-token');
     expect(router.navigate).toHaveBeenCalledWith(['/home']);
     expect(component.loading()).toBe(false);
@@ -65,5 +75,37 @@ describe('LoginComponent', () => {
     component.loginForm.setValue({ email: '', password: '' });
     component.login();
     expect(userService.logar).not.toHaveBeenCalled();
+  });
+
+  it('abre diálogo de indisponibilidade ao clicar no botão do Google', () => {
+    component.openSocialUnavailable('google');
+
+    expect(dialog.open).toHaveBeenCalledWith(
+      SocialUnavailableComponent,
+      jasmine.objectContaining({ data: { provider: 'google' } })
+    );
+  });
+
+  it('abre diálogo de indisponibilidade ao clicar no botão do Facebook', () => {
+    component.openSocialUnavailable('facebook');
+
+    expect(dialog.open).toHaveBeenCalledWith(
+      SocialUnavailableComponent,
+      jasmine.objectContaining({ data: { provider: 'facebook' } })
+    );
+  });
+
+  it('clicar nos botões sociais no template dispara o diálogo correto', () => {
+    const buttons: HTMLButtonElement[] = Array.from(
+      fixture.nativeElement.querySelectorAll('.social-btn')
+    );
+
+    expect(buttons.length).toBe(2);
+    buttons[0].click();
+    buttons[1].click();
+
+    expect(dialog.open).toHaveBeenCalledTimes(2);
+    expect(dialog.open.calls.first().args[1]?.['data']).toEqual({ provider: 'google' });
+    expect(dialog.open.calls.mostRecent().args[1]?.['data']).toEqual({ provider: 'facebook' });
   });
 });

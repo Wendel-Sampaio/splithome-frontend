@@ -1,0 +1,27 @@
+<h2 class="social-unavailable-title" mat-dialog-title>
+  <mat-icon class="title-icon" aria-hidden="true">schedule</mat-icon>
+  <span>Login com {{ providerName }} em breve</span>
+</h2>
+
+<mat-dialog-content class="social-unavailable-content">
+  <p class="lead-message">
+    O acesso via <strong>{{ providerName }}</strong> ainda não está disponível,
+    mas estamos preparando essa novidade para você.
+  </p>
+
+  <div class="info-card" role="note">
+    <mat-icon aria-hidden="true">auto_awesome</mat-icon>
+    <span>
+      Por enquanto, crie sua conta manualmente em poucos segundos e comece a
+      controlar os gastos da sua casa agora mesmo.
+    </span>
+  </div>
+</mat-dialog-content>
+
+<mat-dialog-actions class="social-unavailable-actions" align="end">
+  <button mat-button mat-dialog-close>Agora não</button>
+  <button mat-flat-button color="primary" class="register-cta" (click)="goToRegister()">
+    <mat-icon aria-hidden="true">person_add</mat-icon>
+    <span>Criar minha conta</span>
+  </button>
+</mat-dialog-actions>

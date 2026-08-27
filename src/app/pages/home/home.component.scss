@@ -21,7 +21,7 @@
 .menu-lateral {
     background: linear-gradient(180deg, var(--home-sidebar-top) 0%, var(--home-sidebar-bottom) 100%);
     border: none;
-    border-radius: 0;
+    border-radius: 0 !important;
     box-shadow: 2px 0 18px rgba(14, 51, 32, 0.18);
     color: var(--home-on-dark);
     display: flex;
