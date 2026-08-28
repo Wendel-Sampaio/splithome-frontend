@@ -2,75 +2,82 @@
     <header class="sh-page-header">
         <div>
             <h1 class="sh-page-title">Meu perfil</h1>
-            <p class="sh-page-subtitle">Suas informações pessoais e dados de pagamento.</p>
+            <p class="sh-page-subtitle">Suas informações pessoais, dados de pagamento e cartões.</p>
         </div>
     </header>
 
-    <mat-card id="meu-perfil-card" class="sh-panel" appearance="outlined">
-        <mat-card-content>
-        <div id="conteudo-card">
-            <div id="inputs-container">
-                <div class="input-name">
-                    <mat-form-field appearance="outline">
-                        <mat-label>Seu nome</mat-label>
-                        <mat-icon matSuffix>person</mat-icon>
-                        <input [(ngModel)]="userData.name" [disabled]="!isEditable" matInput>
-                    </mat-form-field>
-                </div>
-                <div class="input-email">
-                    <mat-form-field appearance="outline">
-                        <mat-label>Insira seu email</mat-label>
-                        <input [(ngModel)]="userData.email" [disabled]="!isEditable" matInput>
-                        <mat-icon matSuffix>email</mat-icon>
-                    </mat-form-field>
-                </div>
-                <div id="input-linha-dois">
-                    <div class="input-phonenumber-div">
-                        <mat-form-field id="input-phonenumber" appearance="outline">
-                            <mat-label>Seu telefone</mat-label>
-                            <mat-icon matSuffix>phone</mat-icon>
-                            <input [(ngModel)]="userData.phoneNumber" [disabled]="!isEditable" matInput>
-                        </mat-form-field>
+    <mat-tab-group class="meu-perfil-tabs" mat-stretch-tabs="false">
+        <mat-tab label="Perfil">
+            <mat-card id="meu-perfil-card" class="sh-panel" appearance="outlined">
+                <mat-card-content>
+                    <div id="conteudo-card">
+                        <div id="inputs-container">
+                            <div class="input-name">
+                                <mat-form-field appearance="outline">
+                                    <mat-label>Seu nome</mat-label>
+                                    <mat-icon matSuffix>person</mat-icon>
+                                    <input [(ngModel)]="userData.name" [disabled]="!isEditable" matInput>
+                                </mat-form-field>
+                            </div>
+                            <div class="input-email">
+                                <mat-form-field appearance="outline">
+                                    <mat-label>Insira seu email</mat-label>
+                                    <input [(ngModel)]="userData.email" [disabled]="!isEditable" matInput>
+                                    <mat-icon matSuffix>email</mat-icon>
+                                </mat-form-field>
+                            </div>
+                            <div id="input-linha-dois">
+                                <div class="input-phonenumber-div">
+                                    <mat-form-field id="input-phonenumber" appearance="outline">
+                                        <mat-label>Seu telefone</mat-label>
+                                        <mat-icon matSuffix>phone</mat-icon>
+                                        <input [(ngModel)]="userData.phoneNumber" [disabled]="!isEditable" matInput>
+                                    </mat-form-field>
+                                </div>
+                                <div class="input-chavepix-div">
+                                    <mat-form-field id="input-chavepix" appearance="outline">
+                                        <mat-label>Sua chave Pix</mat-label>
+                                        <mat-icon matSuffix>pix</mat-icon>
+                                        <input [(ngModel)]="userData.pixKey" [disabled]="!isEditable" matInput>
+                                    </mat-form-field>
+                                </div>
+                            </div>
+                        </div>
+                        <div id="foto-container">
+                            <label id="foto-upload" for="profile-photo-input" aria-label="Alterar foto de perfil">
+                                <img id="foto-perfil" [src]="profilePhotoUrl" alt="Foto de perfil">
+                                <span id="foto-upload-icon">
+                                    <mat-icon>photo_camera</mat-icon>
+                                </span>
+                            </label>
+                            <input
+                                id="profile-photo-input"
+                                type="file"
+                                [accept]="acceptProfilePhoto"
+                                (change)="onProfilePhotoSelected($event)">
+                        </div>
                     </div>
-                    <div class="input-chavepix-div">
-                        <mat-form-field id="input-chavepix" appearance="outline">
-                            <mat-label>Sua chave Pix</mat-label>
-                            <mat-icon matSuffix>pix</mat-icon>
-                            <input [(ngModel)]="userData.pixKey" [disabled]="!isEditable" matInput>
-                        </mat-form-field>
-                    </div>
+                </mat-card-content>
+                <div id="caixa-botao">
+                    <p class="family-code" (click)="copyToClipboard()">Código da família: {{userData.familyCode}}</p>
+                    <mat-card-actions>
+                        <button id="botao-editar" mat-button (click)="atualizarUsuario()" (click)="toggleEditMode()"
+                                [disabled]="loading()">
+                            <mat-spinner *ngIf="loading()" diameter="20"></mat-spinner>
+                            <ng-container *ngIf="!loading()">
+                                {{ isEditable ? 'Salvar' : 'Editar informações' }} <mat-icon matSuffix>edit</mat-icon>
+                            </ng-container>
+                        </button>
+                        <button *ngIf="isEditable" id="botao-cancelar" mat-button (click)="cancelEdit()" [disabled]="loading()">
+                            Cancelar <mat-icon matSuffix>cancel</mat-icon>
+                        </button>
+                    </mat-card-actions>
                 </div>
-                
-            </div>
-            <div id="foto-container">
-                <label id="foto-upload" for="profile-photo-input" aria-label="Alterar foto de perfil">
-                    <img id="foto-perfil" [src]="profilePhotoUrl" alt="Foto de perfil">
-                    <span id="foto-upload-icon">
-                        <mat-icon>photo_camera</mat-icon>
-                    </span>
-                </label>
-                <input
-                    id="profile-photo-input"
-                    type="file"
-                    [accept]="acceptProfilePhoto"
-                    (change)="onProfilePhotoSelected($event)">
-            </div>
-        </div>
-    </mat-card-content>
-    <div id="caixa-botao">
-        <p class="family-code" (click)="copyToClipboard()">Código da família: {{userData.familyCode}} </p>
-        <mat-card-actions>
-            <button id="botao-editar" mat-button (click)="atualizarUsuario()" (click)="toggleEditMode()"
-                    [disabled]="loading()">
-                <mat-spinner *ngIf="loading()" diameter="20"></mat-spinner>
-                <ng-container *ngIf="!loading()">
-                    {{ isEditable ? 'Salvar' : 'Editar informações' }} <mat-icon matSuffix>edit</mat-icon>
-                </ng-container>
-            </button>
-            <button *ngIf="isEditable" id="botao-cancelar" mat-button (click)="cancelEdit()" [disabled]="loading()">
-                Cancelar <mat-icon matSuffix>cancel</mat-icon>
-            </button>
-        </mat-card-actions>
-    </div>
-</mat-card>
+            </mat-card>
+        </mat-tab>
+
+        <mat-tab label="Cartões">
+            <tabela-cartoes></tabela-cartoes>
+        </mat-tab>
+    </mat-tab-group>
 </section>

@@ -1,0 +1,33 @@
+.cartoes-container {
+  padding: 16px;
+
+  h2 {
+    margin-bottom: 16px;
+  }
+
+  .form-cartao {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+    gap: 8px;
+    margin-bottom: 16px;
+  }
+
+  .form-actions {
+    grid-column: 1 / -1;
+    display: flex;
+    justify-content: flex-end;
+    gap: 8px;
+  }
+
+  .loading {
+    display: flex;
+    justify-content: center;
+    padding: 32px;
+  }
+
+  .empty {
+    text-align: center;
+    color: #777;
+    padding: 32px;
+  }
+}

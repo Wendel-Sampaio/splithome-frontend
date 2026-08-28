@@ -2,6 +2,7 @@ import { Component, DestroyRef, inject, signal } from '@angular/core';
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { Router } from '@angular/router';
 import { MatIcon } from '@angular/material/icon';
+import { MatDialog } from '@angular/material/dialog';
 import { FormBuilder, FormGroup, ReactiveFormsModule, Validators } from '@angular/forms';
 import { MatProgressSpinnerModule } from '@angular/material/progress-spinner';
 import { finalize } from 'rxjs';
@@ -10,6 +11,7 @@ import { UserService } from '../../core/auth/user/user.service';
 import { NotificationService } from '../../shared/services/notification/notification.service';
 import { CommonModule } from '@angular/common';
 import { UserStateService } from '../../core/auth/user/user-state.service';
+import { SocialUnavailableComponent, SocialProvider } from '../../shared/components/social-unavailable/social-unavailable.component';
 
 @Component({
   selector: 'app-login',
@@ -25,6 +27,7 @@ import { UserStateService } from '../../core/auth/user/user-state.service';
 export class LoginComponent {
   private notify = inject(NotificationService);
   private destroyRef = inject(DestroyRef);
+  private dialog = inject(MatDialog);
   router = inject(Router);
   userService = inject(UserService);
   userStateService = inject(UserStateService);
@@ -42,6 +45,16 @@ export class LoginComponent {
   clickEventPassword(event: MouseEvent) {
     this.hide1.set(!this.hide1());
     event.stopPropagation();
+  }
+
+  openSocialUnavailable(provider: SocialProvider): void {
+    this.dialog.open(SocialUnavailableComponent, {
+      data: { provider },
+      autoFocus: 'first-tabbable',
+      restoreFocus: true,
+      width: '440px',
+      maxWidth: '95vw'
+    });
   }
 
   isInvalid(control: string): boolean {

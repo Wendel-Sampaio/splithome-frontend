@@ -13,7 +13,7 @@ import { UserService } from '../../core/auth/user/user.service';
 import { User } from '../../core/models/user/user';
 import { PlanFeature, PlanService } from '../../core/plan/plan.service';
 import { ComprasComponent } from '../../shared/components/compras/compras.component';
-import { DespesasComponent } from '../../shared/components/despesas/despesas.component';
+import { DespesasFixasComponent } from '../../shared/components/despesas-fixas/despesas-fixas.component';
 import { LogoutComponent } from '../../shared/components/logout/logout.component';
 import { MeuPerfilComponent } from '../../shared/components/meu-perfil/meu-perfil.component';
 import { EstatisticasComponent } from '../estatisticas/estatisticas.component';
@@ -22,7 +22,7 @@ import { ResumoFinanceiroComponent } from '../resumo-financeiro/resumo-financeir
 
 @Component({
   selector: 'app-home',
-  imports: [MatCardModule, MatIcon, MatButtonModule, MatMenuModule, ComprasComponent, DespesasComponent, MeuPerfilComponent, EstatisticasComponent, ResumoFinanceiroComponent, DashboardInicioComponent, CommonModule, MatToolbarModule],
+  imports: [MatCardModule, MatIcon, MatButtonModule, MatMenuModule, ComprasComponent, DespesasFixasComponent, MeuPerfilComponent, EstatisticasComponent, ResumoFinanceiroComponent, DashboardInicioComponent, CommonModule, MatToolbarModule],
   templateUrl: './home.component.html',
   styleUrl: './home.component.scss'
 })
@@ -89,8 +89,8 @@ export class HomeComponent {
   }
 
   abrirDespesas(): void {
-    this.currentView = 'despesas';
-    this.currentViewTitle = 'Despesas';
+    this.currentView = 'despesasFixas';
+    this.currentViewTitle = 'Despesas Fixas';
   }
 
   abrirGraficos(): void {

@@ -59,9 +59,7 @@ export class DialogPagamentoComponent implements OnInit {
       id: this.data.id,
       remainingPayers: this.data.remainingPayers
     };
-    const request = this.data.tipo === 'despesa'
-      ? this.compraService.atualizarDespesa(modeloPagamento)
-      : this.compraService.atualizarCompra(modeloPagamento);
+    const request = this.compraService.atualizarCompra(modeloPagamento);
 
     this.loading.set(true);
     request.pipe(
