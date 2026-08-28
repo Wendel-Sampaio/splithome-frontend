@@ -66,6 +66,10 @@ export class CompraService {
     return this.http.get<Page<DespesaFixa>>(`${this.API}/fixed-expenses`, { params });
   }
 
+  listarDespesas(): Observable<any[]> {
+    return this.listarDespesasFixas({ size: 1000 }).pipe(map(page => page.content));
+  }
+
   cadastrarDespesaFixa(data: any): Observable<DespesaFixa> {
     return this.http.post<DespesaFixa>(`${this.API}/new-fixed-expense`, data);
   }
@@ -76,6 +80,18 @@ export class CompraService {
 
   excluirDespesaFixa(id: string): Observable<string> {
     return this.http.delete<string>(`${this.API}/delete-fixed-expense/${id}`, { responseType: 'text' as 'json' });
+  }
+
+  cadastrarDespesa(data: any): Observable<any> {
+    return this.cadastrarDespesaFixa(data);
+  }
+
+  atualizarDespesa(data: any): Observable<any> {
+    return this.atualizarDespesaFixa(data.id, data);
+  }
+
+  deleteDespesa(id: string): Observable<string> {
+    return this.excluirDespesaFixa(id);
   }
 
   listarParcelas(expenseId: string): Observable<Parcela[]> {

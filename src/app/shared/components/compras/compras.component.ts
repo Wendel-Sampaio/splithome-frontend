@@ -29,6 +29,7 @@ import { ReactiveFormsModule, FormBuilder } from '@angular/forms';
 import { TransacaoService } from '../../services/transacao/transacao.service';
 import { parseOfxExpenses } from '../../services/ofx/ofx-parser';
 import { forkJoin } from 'rxjs';
+import { ModalService } from '../ui/modal';
 
 interface Purchaser {
   id: string;
@@ -60,6 +61,7 @@ interface Purchaser {
 export class ComprasComponent implements OnInit {
   private destroyRef = inject(DestroyRef);
   private fb = inject(FormBuilder);
+  private modal = inject(ModalService);
   readonly dialog = inject(MatDialog);
   compraService = inject(CompraService);
   userService = inject(UserService);
@@ -148,9 +150,8 @@ export class ComprasComponent implements OnInit {
   }
 
   abrirFormCompra() {
-    const formRef = this.dialog.open(FormTransacaoComponent, {
-      width: '760px',
-      maxWidth: '95vw',
+    const formRef = this.modal.open(FormTransacaoComponent, {
+      size: 'lg',
       disableClose: true,
     });
     formRef.afterClosed().pipe(takeUntilDestroyed(this.destroyRef)).subscribe(result => {
@@ -160,9 +161,8 @@ export class ComprasComponent implements OnInit {
   }
 
   editarCompra(compra: Compra): void {
-    const formRef = this.dialog.open(FormTransacaoComponent, {
-      width: '760px',
-      maxWidth: '95vw',
+    const formRef = this.modal.open(FormTransacaoComponent, {
+      size: 'lg',
       disableClose: true,
       data: {
         tipo: 'compra',
@@ -203,7 +203,8 @@ export class ComprasComponent implements OnInit {
       });
       return;
     }
-    const dialogRef = this.dialog.open(DialogPagamentoComponent, {
+    const dialogRef = this.modal.open(DialogPagamentoComponent, {
+      size: 'sm',
       data: element
     });
     dialogRef.afterClosed().pipe(takeUntilDestroyed(this.destroyRef)).subscribe(result => {
@@ -354,9 +355,8 @@ export class ComprasComponent implements OnInit {
   }
 
   deleteCompra(compra: Compra): void {
-    const dialogRef = this.dialog.open<ConfirmDeleteComponent, ConfirmDeleteDialogData, boolean>(ConfirmDeleteComponent, {
-      width: '420px',
-      maxWidth: 'calc(100vw - 32px)',
+    const dialogRef = this.modal.open<ConfirmDeleteComponent, ConfirmDeleteDialogData, boolean>(ConfirmDeleteComponent, {
+      size: 'sm',
       data: {
         itemType: 'a compra',
         title: compra.title,

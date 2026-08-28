@@ -16,6 +16,7 @@ import { ConfirmDeleteComponent, ConfirmDeleteDialogData } from "../confirm-dele
 import { DialogPagamentoComponent } from "../dialog-pagamento/dialog-pagamento.component";
 import { FormTransacaoComponent } from "../form-transacao/form-transacao.component";
 import { parseOfxExpenses } from "../../services/ofx/ofx-parser";
+import { ModalService } from "../ui/modal";
 
 @Component({
   selector: 'tabela-despesas',
@@ -33,6 +34,7 @@ import { parseOfxExpenses } from "../../services/ofx/ofx-parser";
 })
 export class DespesasComponent {
   readonly dialog = inject(MatDialog);
+  private modal = inject(ModalService);
   private destroyRef = inject(DestroyRef);
   private notify = inject(NotificationService);
   despesaService = inject(CompraService);
@@ -69,8 +71,8 @@ export class DespesasComponent {
   ];
 
   abrirFormDespesa(): void {
-    const formRef = this.dialog.open(FormTransacaoComponent, {
-      width: '550px',
+    const formRef = this.modal.open(FormTransacaoComponent, {
+      size: 'lg',
       data: { tipo: 'despesa' }
     });
     formRef.afterClosed().pipe(takeUntilDestroyed(this.destroyRef)).subscribe(result => {
@@ -172,7 +174,8 @@ export class DespesasComponent {
       return;
     }
 
-    const dialogRef = this.dialog.open(DialogPagamentoComponent, {
+    const dialogRef = this.modal.open(DialogPagamentoComponent, {
+      size: 'sm',
       data: { ...element, tipo: 'despesa' }
     });
     dialogRef.afterClosed().pipe(takeUntilDestroyed(this.destroyRef)).subscribe(result => {
@@ -210,9 +213,8 @@ export class DespesasComponent {
   }
 
   deleteDespesa(despesa: Despesa): void {
-    const dialogRef = this.dialog.open<ConfirmDeleteComponent, ConfirmDeleteDialogData, boolean>(ConfirmDeleteComponent, {
-      width: '420px',
-      maxWidth: 'calc(100vw - 32px)',
+    const dialogRef = this.modal.open<ConfirmDeleteComponent, ConfirmDeleteDialogData, boolean>(ConfirmDeleteComponent, {
+      size: 'sm',
       data: {
         itemType: 'a despesa',
         title: despesa.title,

@@ -15,6 +15,7 @@ import { Cartao, CreditCardBrand } from '../../../core/models/cartao/cartao';
 import { CompraService } from '../../services/compra/compra.service';
 import { NotificationService } from '../../services/notification/notification.service';
 import { ConfirmDeleteComponent, ConfirmDeleteDialogData } from '../confirm-delete/confirm-delete.component';
+import { ModalService } from '../ui/modal';
 
 @Component({
   selector: 'tabela-cartoes',
@@ -38,6 +39,7 @@ export class CartoesComponent implements OnInit {
   private readonly destroyRef = inject(DestroyRef);
   private readonly fb = inject(FormBuilder);
   private readonly notify = inject(NotificationService);
+  private readonly modal = inject(ModalService);
   readonly dialog = inject(MatDialog);
   readonly compraService = inject(CompraService);
 
@@ -126,9 +128,8 @@ export class CartoesComponent implements OnInit {
   }
 
   excluir(cartao: Cartao): void {
-    const ref = this.dialog.open<ConfirmDeleteComponent, ConfirmDeleteDialogData, boolean>(ConfirmDeleteComponent, {
-      width: '420px',
-      maxWidth: 'calc(100vw - 32px)',
+    const ref = this.modal.open<ConfirmDeleteComponent, ConfirmDeleteDialogData, boolean>(ConfirmDeleteComponent, {
+      size: 'sm',
       data: {
         itemType: 'o cartão',
         title: cartao.name,

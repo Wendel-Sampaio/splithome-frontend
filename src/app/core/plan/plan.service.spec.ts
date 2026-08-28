@@ -1,23 +1,23 @@
 import { TestBed } from '@angular/core/testing';
-import { MatDialog } from '@angular/material/dialog';
 import { PlanService } from './plan.service';
 import { UserService } from '../auth/user/user.service';
 import { UpgradeComponent } from '../../shared/components/upgrade/upgrade.component';
+import { ModalService } from '../../shared/components/ui/modal';
 
 describe('PlanService', () => {
   let service: PlanService;
   let userServiceSpy: jasmine.SpyObj<UserService>;
-  let dialogSpy: jasmine.SpyObj<MatDialog>;
+  let modalSpy: jasmine.SpyObj<ModalService>;
 
   beforeEach(() => {
     userServiceSpy = jasmine.createSpyObj<UserService>('UserService', ['isPremium']);
-    dialogSpy = jasmine.createSpyObj<MatDialog>('MatDialog', ['open']);
+    modalSpy = jasmine.createSpyObj<ModalService>('ModalService', ['open']);
 
     TestBed.configureTestingModule({
       providers: [
         PlanService,
         { provide: UserService, useValue: userServiceSpy },
-        { provide: MatDialog, useValue: dialogSpy }
+        { provide: ModalService, useValue: modalSpy }
       ]
     });
 
@@ -42,10 +42,8 @@ describe('PlanService', () => {
 
     service.requiresPremium('split-payments');
 
-    expect(dialogSpy.open).toHaveBeenCalledWith(UpgradeComponent, {
-      width: '460px',
-      maxWidth: 'calc(100vw - 32px)',
-      panelClass: 'upgrade-dialog',
+    expect(modalSpy.open).toHaveBeenCalledWith(UpgradeComponent, {
+      size: 'md',
       data: { feature: 'split-payments' }
     });
   });
@@ -55,6 +53,6 @@ describe('PlanService', () => {
 
     service.requiresPremium('split-payments');
 
-    expect(dialogSpy.open).not.toHaveBeenCalled();
+    expect(modalSpy.open).not.toHaveBeenCalled();
   });
 });
