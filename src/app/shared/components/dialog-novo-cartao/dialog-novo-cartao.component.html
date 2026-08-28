@@ -1,39 +1,50 @@
-<h2 mat-dialog-title>Novo cartão de crédito</h2>
-<mat-dialog-content>
-  <form [formGroup]="form" class="form-cartao">
-    <mat-form-field appearance="outline">
-      <mat-label>Nome do cartão</mat-label>
-      <input matInput formControlName="name" autocomplete="off" />
-    </mat-form-field>
+<app-modal-header
+  title="Novo cartão de crédito"
+  description="Cadastre um cartão para usar nas suas despesas."
+  icon="credit_card" />
 
-    <mat-form-field appearance="outline">
-      <mat-label>Bandeira</mat-label>
-      <mat-select formControlName="brand">
-        <mat-option [value]="null">Sem bandeira</mat-option>
-        <mat-option *ngFor="let m of marcas" [value]="m">{{ m }}</mat-option>
-      </mat-select>
-    </mat-form-field>
+<app-modal-body>
+  <form [formGroup]="form">
+    <app-form-section title="Identificação" description="Como você quer identificar este cartão?">
+      <mat-form-field appearance="outline" class="sh-full-row">
+        <mat-label>Nome do cartão</mat-label>
+        <input matInput formControlName="name" autocomplete="off" />
+      </mat-form-field>
 
-    <mat-form-field appearance="outline">
-      <mat-label>Últimos 4 dígitos</mat-label>
-      <input matInput formControlName="lastDigits" maxlength="4" inputmode="numeric" />
-    </mat-form-field>
+      <mat-form-field appearance="outline">
+        <mat-label>Bandeira</mat-label>
+        <mat-select formControlName="brand">
+          <mat-option [value]="null">Sem bandeira</mat-option>
+          @for (marca of marcas; track marca) {
+            <mat-option [value]="marca">{{ marca }}</mat-option>
+          }
+        </mat-select>
+      </mat-form-field>
+    </app-form-section>
 
-    <mat-form-field appearance="outline">
-      <mat-label>Dia de fechamento</mat-label>
-      <input matInput formControlName="billingDay" type="number" min="1" max="31" />
-    </mat-form-field>
+    <app-form-section title="Fatura" description="Defina quando a fatura fecha e vence." [optional]="true" [columns]="2">
+      <mat-form-field appearance="outline">
+        <mat-label>Últimos 4 dígitos</mat-label>
+        <input matInput formControlName="lastDigits" maxlength="4" inputmode="numeric" />
+      </mat-form-field>
 
-    <mat-form-field appearance="outline">
-      <mat-label>Dia de vencimento</mat-label>
-      <input matInput formControlName="dueDay" type="number" min="1" max="31" />
-    </mat-form-field>
+      <mat-form-field appearance="outline">
+        <mat-label>Dia de fechamento</mat-label>
+        <input matInput formControlName="billingDay" type="number" min="1" max="31" />
+      </mat-form-field>
+
+      <mat-form-field appearance="outline">
+        <mat-label>Dia de vencimento</mat-label>
+        <input matInput formControlName="dueDay" type="number" min="1" max="31" />
+      </mat-form-field>
+    </app-form-section>
   </form>
-</mat-dialog-content>
-<mat-dialog-actions align="end">
+</app-modal-body>
+
+<app-modal-footer align="end">
   <button mat-button (click)="cancelar()">Cancelar</button>
   <button mat-flat-button color="primary" (click)="salvar()" [disabled]="loading() || form.invalid">
     <mat-spinner *ngIf="loading()" diameter="18"></mat-spinner>
     <span *ngIf="!loading()">Cadastrar</span>
   </button>
-</mat-dialog-actions>
+</app-modal-footer>

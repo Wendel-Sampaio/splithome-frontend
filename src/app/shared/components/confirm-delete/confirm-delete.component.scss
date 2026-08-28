@@ -1,45 +1,28 @@
-:host {
-  display: block;
+:host { display: block; }
+
+.sh-confirm-delete__lead {
+  color: var(--sh-color-text);
+  font-size: 15px;
+  line-height: 1.55;
+  margin: 0 0 var(--sh-space-3);
 }
 
-.title {
+.sh-confirm-delete__value {
   align-items: center;
-  color: var(--mat-sys-error, #ba1a1a);
+  background: var(--sh-color-bg-strong);
+  border: 1px solid var(--sh-color-border);
+  border-radius: var(--sh-radius-md);
+  color: var(--sh-color-text);
   display: flex;
-  font-size: 24px;
-  font-weight: 600;
-  gap: 8px;
-  line-height: 1.2;
-}
-
-.content {
-  color: var(--mat-sys-on-surface, #1b1b1f);
-  padding-top: 4px;
-}
-
-.content p {
-  margin: 0;
-}
-
-.content p + p {
-  margin-top: 10px;
-}
-
-.value {
-  color: var(--mat-sys-primary, #005cbb);
-}
-
-.warning {
-  color: var(--mat-sys-on-surface-variant, #44474e);
   font-size: 14px;
-}
+  gap: var(--sh-space-2);
+  margin: 0;
+  padding: var(--sh-space-3) var(--sh-space-4);
 
-.actions {
-  gap: 8px;
-  padding-top: 12px;
-}
-
-.confirm-button {
-  background-color: var(--mat-sys-error, #ba1a1a) !important;
-  color: var(--mat-sys-on-error, #ffffff) !important;
+  mat-icon {
+    color: var(--sh-color-primary-strong);
+    font-size: 18px;
+    height: 18px;
+    width: 18px;
+  }
 }

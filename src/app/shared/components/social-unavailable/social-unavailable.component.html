@@ -1,27 +1,23 @@
-<h2 class="social-unavailable-title" mat-dialog-title>
-  <mat-icon class="title-icon" aria-hidden="true">schedule</mat-icon>
-  <span>Login com {{ providerName }} em breve</span>
-</h2>
+<app-modal-header
+  title="Login com {{ providerName }} em breve"
+  description="Estamos preparando essa novidade para você."
+  icon="schedule" />
 
-<mat-dialog-content class="social-unavailable-content">
-  <p class="lead-message">
+<app-modal-body>
+  <p class="sh-social__lead">
     O acesso via <strong>{{ providerName }}</strong> ainda não está disponível,
     mas estamos preparando essa novidade para você.
   </p>
 
-  <div class="info-card" role="note">
-    <mat-icon aria-hidden="true">auto_awesome</mat-icon>
-    <span>
-      Por enquanto, crie sua conta manualmente em poucos segundos e comece a
-      controlar os gastos da sua casa agora mesmo.
-    </span>
-  </div>
-</mat-dialog-content>
+  <app-summary-block title="Por enquanto" icon="auto_awesome" variant="primary">
+    Crie sua conta manualmente em poucos segundos e comece a controlar os gastos da sua casa agora mesmo.
+  </app-summary-block>
+</app-modal-body>
 
-<mat-dialog-actions class="social-unavailable-actions" align="end">
+<app-modal-footer align="end">
   <button mat-button mat-dialog-close>Agora não</button>
-  <button mat-flat-button color="primary" class="register-cta" (click)="goToRegister()">
+  <button mat-flat-button color="primary" (click)="goToRegister()">
     <mat-icon aria-hidden="true">person_add</mat-icon>
-    <span>Criar minha conta</span>
+    Criar minha conta
   </button>
-</mat-dialog-actions>
+</app-modal-footer>

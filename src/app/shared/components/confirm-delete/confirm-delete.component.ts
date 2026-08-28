@@ -1,7 +1,10 @@
-import { Component, inject } from '@angular/core';
+import { ChangeDetectionStrategy, Component, inject } from '@angular/core';
 import { MatButtonModule } from '@angular/material/button';
-import { MAT_DIALOG_DATA, MatDialogActions, MatDialogClose, MatDialogContent, MatDialogTitle } from '@angular/material/dialog';
+import { MAT_DIALOG_DATA, MatDialogClose } from '@angular/material/dialog';
 import { MatIconModule } from '@angular/material/icon';
+import { ModalBodyComponent } from '../ui/modal-body/modal-body.component';
+import { ModalFooterComponent } from '../ui/modal-footer/modal-footer.component';
+import { ModalHeaderComponent } from '../ui/modal-header/modal-header.component';
 
 export type ConfirmDeleteDialogData = {
   itemType: string;
@@ -11,9 +14,17 @@ export type ConfirmDeleteDialogData = {
 
 @Component({
   selector: 'app-confirm-delete',
-  imports: [MatButtonModule, MatDialogActions, MatDialogClose, MatDialogContent, MatDialogTitle, MatIconModule],
+  standalone: true,
+  changeDetection: ChangeDetectionStrategy.OnPush,
+  imports: [
+    MatButtonModule,
+    MatDialogClose,
+    MatIconModule,
+    ModalHeaderComponent,
+    ModalBodyComponent,
+    ModalFooterComponent,
+  ],
   templateUrl: './confirm-delete.component.html',
-  styleUrl: './confirm-delete.component.scss'
 })
 export class ConfirmDeleteComponent {
   readonly data = inject<ConfirmDeleteDialogData>(MAT_DIALOG_DATA);

@@ -1,20 +1,27 @@
-<h2 class="title" mat-dialog-title>
-  <mat-icon aria-hidden="true">warning</mat-icon>
-  Confirmar exclusão
-</h2>
+<app-modal-header
+  title="Confirmar exclusão"
+  description="Esta ação não pode ser desfeita."
+  icon="warning"
+  variant="danger" />
 
-<mat-dialog-content class="content">
-  <p>
-    Tem certeza que deseja excluir {{ data.itemType }} <strong>{{ data.title }}</strong>?
+<app-modal-body>
+  <p class="sh-confirm-delete__lead">
+    Tem certeza que deseja excluir {{ data.itemType }}
+    <strong>{{ data.title }}</strong>?
   </p>
-  <p class="value">Valor: <strong>{{ data.valueLabel }}</strong></p>
-  <p class="warning">Essa ação não pode ser desfeita.</p>
-</mat-dialog-content>
 
-<mat-dialog-actions class="actions" align="end">
-  <button mat-button [mat-dialog-close]="false" cdkFocusInitial>Cancelar</button>
-  <button class="confirm-button" mat-flat-button [mat-dialog-close]="true">
+  @if (data.valueLabel) {
+    <p class="sh-confirm-delete__value">
+      <mat-icon aria-hidden="true">payments</mat-icon>
+      <span>Valor: <strong>{{ data.valueLabel }}</strong></span>
+    </p>
+  }
+</app-modal-body>
+
+<app-modal-footer align="end">
+  <button mat-button cdkFocusInitial [mat-dialog-close]="false">Cancelar</button>
+  <button mat-flat-button color="warn" [mat-dialog-close]="true">
     <mat-icon aria-hidden="true">delete</mat-icon>
     Excluir
   </button>
-</mat-dialog-actions>
+</app-modal-footer>

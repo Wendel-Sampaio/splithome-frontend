@@ -1,14 +1,20 @@
-import { Component, DestroyRef, inject, Inject, OnInit, signal } from '@angular/core';
+import { ChangeDetectionStrategy, Component, DestroyRef, inject, Inject, OnInit, signal } from '@angular/core';
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
+import { AsyncPipe, CommonModule, CurrencyPipe } from '@angular/common';
 import { finalize } from 'rxjs';
-import { CommonModule } from '@angular/common';
 import { MatButtonModule } from '@angular/material/button';
-import { MAT_DIALOG_DATA, MatDialogModule, MatDialogRef } from '@angular/material/dialog';
+import { MAT_DIALOG_DATA, MatDialogRef } from '@angular/material/dialog';
+import { MatIconModule } from '@angular/material/icon';
 import { MatProgressSpinnerModule } from '@angular/material/progress-spinner';
 import { UserService } from '../../../core/auth/user/user.service';
 import { User } from '../../../core/models/user/user';
 import { CompraService } from '../../services/compra/compra.service';
 import { NotificationService } from '../../services/notification/notification.service';
+import { FormSectionComponent } from '../ui/form-section/form-section.component';
+import { ModalBodyComponent } from '../ui/modal-body/modal-body.component';
+import { ModalFooterComponent } from '../ui/modal-footer/modal-footer.component';
+import { ModalHeaderComponent } from '../ui/modal-header/modal-header.component';
+import { SummaryBlockComponent } from '../ui/summary-block/summary-block.component';
 
 export interface ModeloPagamento {
   id: string;
@@ -17,31 +23,47 @@ export interface ModeloPagamento {
 
 @Component({
   selector: 'app-dialog-pagamento',
-  imports: [CommonModule, MatDialogModule, MatButtonModule, MatProgressSpinnerModule],
+  standalone: true,
+  changeDetection: ChangeDetectionStrategy.OnPush,
+  imports: [
+    AsyncPipe,
+    CommonModule,
+    CurrencyPipe,
+    MatButtonModule,
+    MatIconModule,
+    MatProgressSpinnerModule,
+    ModalHeaderComponent,
+    ModalBodyComponent,
+    ModalFooterComponent,
+    FormSectionComponent,
+    SummaryBlockComponent,
+  ],
   templateUrl: './dialog-pagamento.component.html',
-  styleUrl: './dialog-pagamento.component.scss'
+  styleUrl: './dialog-pagamento.component.scss',
 })
 export class DialogPagamentoComponent implements OnInit {
-
-  constructor(
-    public dialogRef: MatDialogRef<DialogPagamentoComponent>,
-    @Inject(MAT_DIALOG_DATA) public data: any
-  ) {}
-
-  userService = inject(UserService);
-  compraService = inject(CompraService);
-  private notify = inject(NotificationService);
-  private destroyRef = inject(DestroyRef);
+  private readonly userService = inject(UserService);
+  private readonly compraService = inject(CompraService);
+  private readonly notify = inject(NotificationService);
+  private readonly destroyRef = inject(DestroyRef);
 
   user!: User;
   loading = signal(false);
+
+  constructor(
+    public dialogRef: MatDialogRef<DialogPagamentoComponent>,
+    @Inject(MAT_DIALOG_DATA) public data: { id: string; remainingPayers: string[]; unitValue: number; responsibleId?: string; purchaserId?: string }
+  ) {}
 
   ngOnInit(): void {
     this.pegarComprador();
   }
 
-  pegarComprador() {
+  pegarComprador(): void {
     const userId = this.data.responsibleId ?? this.data.purchaserId;
+    if (!userId) {
+      return;
+    }
     this.userService.getUserById(userId).pipe(takeUntilDestroyed(this.destroyRef)).subscribe({
       next: user => {
         this.user = user;
@@ -49,7 +71,11 @@ export class DialogPagamentoComponent implements OnInit {
     });
   }
 
-  efetuarPagamento() {
+  cancelar(): void {
+    this.dialogRef.close(false);
+  }
+
+  efetuarPagamento(): void {
     const nomePagador = this.userService.getUser().name;
     const index = this.data.remainingPayers.indexOf(nomePagador);
     if (index !== -1) {
@@ -59,10 +85,8 @@ export class DialogPagamentoComponent implements OnInit {
       id: this.data.id,
       remainingPayers: this.data.remainingPayers
     };
-    const request = this.compraService.atualizarCompra(modeloPagamento);
-
     this.loading.set(true);
-    request.pipe(
+    this.compraService.atualizarCompra(modeloPagamento).pipe(
       finalize(() => this.loading.set(false)),
       takeUntilDestroyed(this.destroyRef)
     ).subscribe({

@@ -1,32 +1,35 @@
-<h2 class="upgrade-title" mat-dialog-title>Recurso exclusivo do plano Premium</h2>
+<app-modal-header
+  title="Recurso Premium"
+  description="Esta funcionalidade faz parte do plano Premium da SplitHome."
+  icon="workspace_premium" />
 
-<mat-dialog-content class="upgrade-content">
-  <p class="feature-message">{{ message }}</p>
+<app-modal-body>
+  <app-form-section title="Por que fazer upgrade" [description]="message" />
 
-  <ul class="benefits-list" aria-label="Benefícios do plano Premium">
-    @for (benefit of benefits; track benefit.title) {
-      <li>
-        <span class="benefit-icon">
-          <mat-icon aria-hidden="true">{{ benefit.icon }}</mat-icon>
-        </span>
-
-        <span class="benefit-text">
-          <strong>{{ benefit.title }}</strong>
-          <span>{{ benefit.description }}</span>
-        </span>
-      </li>
-    }
-  </ul>
+  <app-form-section title="Benefícios inclusos" description="Tudo o que você desbloqueia ao ser Premium.">
+    <ul class="sh-upgrade__benefits" aria-label="Benefícios do plano Premium">
+      @for (benefit of benefits; track benefit.title) {
+        <li class="sh-upgrade__benefit">
+          <span class="sh-upgrade__benefit-icon" aria-hidden="true">
+            <mat-icon>{{ benefit.icon }}</mat-icon>
+          </span>
+          <span class="sh-upgrade__benefit-text">
+            <strong>{{ benefit.title }}</strong>
+            <span>{{ benefit.description }}</span>
+          </span>
+        </li>
+      }
+    </ul>
+  </app-form-section>
 
   @if (showInstructions) {
-    <div class="upgrade-instructions" role="status">
-      <strong>Como fazer upgrade</strong>
-      <span>Entre em contato pelo canal de atendimento da SplitHome e solicite a ativação do plano Premium para sua conta.</span>
-    </div>
+    <app-summary-block title="Como fazer upgrade" icon="support_agent" variant="info">
+      Entre em contato pelo canal de atendimento da SplitHome e solicite a ativação do plano Premium para sua conta.
+    </app-summary-block>
   }
-</mat-dialog-content>
+</app-modal-body>
 
-<mat-dialog-actions class="upgrade-actions" align="end">
+<app-modal-footer align="end">
   <button mat-button mat-dialog-close>Agora não</button>
   <button mat-flat-button color="primary" cdkFocusInitial (click)="showUpgradeInstructions()">Fazer upgrade</button>
-</mat-dialog-actions>
+</app-modal-footer>
