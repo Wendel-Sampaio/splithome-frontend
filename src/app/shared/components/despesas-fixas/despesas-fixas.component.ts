@@ -18,6 +18,7 @@ import { ConfirmDeleteComponent, ConfirmDeleteDialogData } from '../confirm-dele
 import { FormTransacaoComponent } from '../form-transacao/form-transacao.component';
 import { CategoriaPipe } from '../../pipes/categoria.pipe';
 import { BehaviorSubject, catchError, finalize, of, switchMap, tap } from 'rxjs';
+import { ModalService } from '../ui/modal';
 
 @Component({
   selector: 'tabela-despesas-fixas',
@@ -38,6 +39,7 @@ import { BehaviorSubject, catchError, finalize, of, switchMap, tap } from 'rxjs'
 })
 export class DespesasFixasComponent implements OnInit {
   private readonly destroyRef = inject(DestroyRef);
+  private modal = inject(ModalService);
   readonly dialog = inject(MatDialog);
   private readonly notify = inject(NotificationService);
   private readonly userService = inject(UserService);
@@ -131,9 +133,8 @@ export class DespesasFixasComponent implements OnInit {
   }
 
   abrirForm(): void {
-    const ref = this.dialog.open(FormTransacaoComponent, {
-      width: '760px',
-      maxWidth: '95vw',
+    const ref = this.modal.open(FormTransacaoComponent, {
+      size: 'lg',
       disableClose: true,
       data: { tipo: 'despesa-fixa' }
     });
@@ -145,9 +146,8 @@ export class DespesasFixasComponent implements OnInit {
   }
 
   editar(despesa: DespesaFixa): void {
-    const ref = this.dialog.open(FormTransacaoComponent, {
-      width: '760px',
-      maxWidth: '95vw',
+    const ref = this.modal.open(FormTransacaoComponent, {
+      size: 'lg',
       disableClose: true,
       data: {
         tipo: 'despesa-fixa',
@@ -181,9 +181,8 @@ export class DespesasFixasComponent implements OnInit {
   }
 
   delete(despesa: DespesaFixa): void {
-    const ref = this.dialog.open<ConfirmDeleteComponent, ConfirmDeleteDialogData, boolean>(ConfirmDeleteComponent, {
-      width: '420px',
-      maxWidth: 'calc(100vw - 32px)',
+    const ref = this.modal.open<ConfirmDeleteComponent, ConfirmDeleteDialogData, boolean>(ConfirmDeleteComponent, {
+      size: 'sm',
       data: {
         itemType: 'a despesa fixa',
         title: despesa.title,

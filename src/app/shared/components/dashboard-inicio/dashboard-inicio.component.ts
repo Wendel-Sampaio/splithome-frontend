@@ -13,6 +13,7 @@ import { CompraService } from '../../services/compra/compra.service';
 import { EstatisticasResumo, EstatisticasService } from '../../services/estatisticas/estatisticas.service';
 import { ResumoFinanceiro, ResumoFinanceiroService } from '../../services/resumo-financeiro/resumo-financeiro.service';
 import { FormTransacaoComponent } from '../form-transacao/form-transacao.component';
+import { ModalService } from '../ui/modal';
 
 export type DashboardView = 'compras' | 'despesas' | 'graficos' | 'resumoFinanceiro' | 'cartoes';
 
@@ -46,6 +47,7 @@ export class DashboardInicioComponent implements OnInit {
   private readonly compraService = inject(CompraService);
   private readonly userService = inject(UserService);
   private readonly dialog = inject(MatDialog);
+  private readonly modal = inject(ModalService);
   private readonly destroyRef = inject(DestroyRef);
 
   readonly carregando = signal(true);
@@ -153,9 +155,8 @@ export class DashboardInicioComponent implements OnInit {
   }
 
   private abrirFormulario(tipo: 'compra' | 'despesa-fixa'): void {
-    const ref = this.dialog.open(FormTransacaoComponent, {
-      width: '760px',
-      maxWidth: '95vw',
+    const ref = this.modal.open(FormTransacaoComponent, {
+      size: 'lg',
       disableClose: true,
       data: { tipo }
     });

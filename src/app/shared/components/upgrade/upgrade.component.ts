@@ -1,8 +1,13 @@
-import { Component, inject } from '@angular/core';
+import { ChangeDetectionStrategy, Component, inject } from '@angular/core';
 import { MatButtonModule } from '@angular/material/button';
 import { MatIconModule } from '@angular/material/icon';
-import { MAT_DIALOG_DATA, MatDialogActions, MatDialogClose, MatDialogContent, MatDialogTitle } from '@angular/material/dialog';
+import { MAT_DIALOG_DATA, MatDialogClose } from '@angular/material/dialog';
 import type { PlanFeature } from '../../../core/plan/plan.service';
+import { FormSectionComponent } from '../ui/form-section/form-section.component';
+import { ModalBodyComponent } from '../ui/modal-body/modal-body.component';
+import { ModalFooterComponent } from '../ui/modal-footer/modal-footer.component';
+import { ModalHeaderComponent } from '../ui/modal-header/modal-header.component';
+import { SummaryBlockComponent } from '../ui/summary-block/summary-block.component';
 
 type UpgradeDialogData = {
   feature: PlanFeature;
@@ -35,9 +40,20 @@ const PREMIUM_BENEFITS = [
 
 @Component({
   selector: 'app-upgrade',
-  imports: [MatButtonModule, MatDialogActions, MatDialogClose, MatDialogContent, MatDialogTitle, MatIconModule],
+  standalone: true,
+  changeDetection: ChangeDetectionStrategy.OnPush,
+  imports: [
+    MatButtonModule,
+    MatDialogClose,
+    MatIconModule,
+    ModalHeaderComponent,
+    ModalBodyComponent,
+    ModalFooterComponent,
+    FormSectionComponent,
+    SummaryBlockComponent,
+  ],
   templateUrl: './upgrade.component.html',
-  styleUrl: './upgrade.component.scss'
+  styleUrl: './upgrade.component.scss',
 })
 export class UpgradeComponent {
   readonly data = inject<UpgradeDialogData>(MAT_DIALOG_DATA);

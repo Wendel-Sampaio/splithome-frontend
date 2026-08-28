@@ -15,7 +15,7 @@ describe('DialogPagamentoComponent', () => {
   let dialogRef: jasmine.SpyObj<MatDialogRef<DialogPagamentoComponent>>;
 
   beforeEach(async () => {
-    compraService = jasmine.createSpyObj<CompraService>('CompraService', ['atualizarCompra', 'atualizarDespesa']);
+    compraService = jasmine.createSpyObj<CompraService>('CompraService', ['atualizarCompra', 'atualizarDespesaFixa']);
     const userService = jasmine.createSpyObj<UserService>('UserService', ['getUser', 'getUserById']);
     userService.getUser.and.returnValue({ id: 'u1', name: 'Eu' } as any);
     userService.getUserById.and.returnValue(of({ id: 'u2', name: 'Outro' } as any));

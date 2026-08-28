@@ -1,0 +1,24 @@
+<div class="sh-modal-header" [class.sh-modal-header--danger]="variant === 'danger'" [class.sh-modal-header--success]="variant === 'success'">
+  @if (icon) {
+    <span class="sh-modal-header__icon" aria-hidden="true">
+      <mat-icon>{{ icon }}</mat-icon>
+    </span>
+  }
+
+  <div class="sh-modal-header__text">
+    <h2 mat-dialog-title class="sh-modal-header__title">{{ title }}</h2>
+    @if (description) {
+      <p class="sh-modal-header__description">{{ description }}</p>
+    }
+  </div>
+
+  @if (showClose) {
+    <button
+      type="button"
+      class="sh-modal-header__close"
+      aria-label="Fechar"
+      (click)="close()">
+      <mat-icon aria-hidden="true">close</mat-icon>
+    </button>
+  }
+</div>

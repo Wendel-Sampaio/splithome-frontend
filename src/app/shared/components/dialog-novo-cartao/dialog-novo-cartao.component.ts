@@ -1,9 +1,8 @@
-import { Component, DestroyRef, inject, signal } from '@angular/core';
-import { CommonModule } from '@angular/common';
+import { ChangeDetectionStrategy, Component, DestroyRef, inject, signal } from '@angular/core';
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { FormBuilder, FormGroup, ReactiveFormsModule, Validators } from '@angular/forms';
 import { MatButtonModule } from '@angular/material/button';
-import { MatDialogModule, MatDialogRef } from '@angular/material/dialog';
+import { MatDialogRef } from '@angular/material/dialog';
 import { MatFormFieldModule } from '@angular/material/form-field';
 import { MatInputModule } from '@angular/material/input';
 import { MatProgressSpinnerModule } from '@angular/material/progress-spinner';
@@ -11,21 +10,29 @@ import { MatSelectModule } from '@angular/material/select';
 import { CompraService } from '../../services/compra/compra.service';
 import { Cartao, CreditCardBrand } from '../../../core/models/cartao/cartao';
 import { NotificationService } from '../../services/notification/notification.service';
+import { FormSectionComponent } from '../ui/form-section/form-section.component';
+import { ModalBodyComponent } from '../ui/modal-body/modal-body.component';
+import { ModalFooterComponent } from '../ui/modal-footer/modal-footer.component';
+import { ModalHeaderComponent } from '../ui/modal-header/modal-header.component';
 
 @Component({
   selector: 'app-dialog-novo-cartao',
-  templateUrl: './dialog-novo-cartao.component.html',
-  styleUrl: './dialog-novo-cartao.component.scss',
+  standalone: true,
+  changeDetection: ChangeDetectionStrategy.OnPush,
   imports: [
-    CommonModule,
     ReactiveFormsModule,
-    MatDialogModule,
     MatButtonModule,
     MatFormFieldModule,
     MatInputModule,
     MatSelectModule,
-    MatProgressSpinnerModule
-  ]
+    MatProgressSpinnerModule,
+    ModalHeaderComponent,
+    ModalBodyComponent,
+    ModalFooterComponent,
+    FormSectionComponent,
+  ],
+  templateUrl: './dialog-novo-cartao.component.html',
+  styleUrl: './dialog-novo-cartao.component.scss',
 })
 export class DialogNovoCartaoComponent {
   private readonly fb = inject(FormBuilder);
@@ -37,17 +44,13 @@ export class DialogNovoCartaoComponent {
   readonly marcas: CreditCardBrand[] = ['VISA', 'MASTERCARD', 'ELO', 'AMEX', 'HIPERCARD', 'OUTROS'];
   loading = signal(false);
 
-  form!: FormGroup;
-
-  constructor() {
-    this.form = this.fb.group({
-      name: ['', [Validators.required, Validators.minLength(2)]],
-      brand: [null as CreditCardBrand | null],
-      lastDigits: ['', [Validators.pattern(/^\d{0,4}$/)]],
-      billingDay: [1, [Validators.required, Validators.min(1), Validators.max(31)]],
-      dueDay: [10, [Validators.required, Validators.min(1), Validators.max(31)]]
-    });
-  }
+  readonly form: FormGroup = this.fb.group({
+    name: ['', [Validators.required, Validators.minLength(2)]],
+    brand: [null as CreditCardBrand | null],
+    lastDigits: ['', [Validators.pattern(/^\d{0,4}$/)]],
+    billingDay: [1, [Validators.required, Validators.min(1), Validators.max(31)]],
+    dueDay: [10, [Validators.required, Validators.min(1), Validators.max(31)]]
+  });
 
   cancelar(): void {
     this.dialogRef.close(null);

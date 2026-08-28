@@ -1,8 +1,10 @@
-<h2 class="title" mat-dialog-title>Sair</h2>
-<mat-dialog-content>
-  <p>Você tem certeza que deseja sair?</p>
-</mat-dialog-content>
-<mat-dialog-actions>
-  <button cdkFocusInitial class="cancel-button" mat-button mat-dialog-close>Cancelar</button>
-  <button class="confirm-button" mat-button mat-dialog-close (click)="logout()">Sim</button>
-</mat-dialog-actions>
+<app-modal-header title="Sair" description="Encerrar a sessão atual" icon="logout" />
+
+<app-modal-body>
+  <p>Você tem certeza que deseja sair da sua conta agora?</p>
+</app-modal-body>
+
+<app-modal-footer align="space-between">
+  <button mat-button cdkFocusInitial (click)="cancel()">Cancelar</button>
+  <button mat-flat-button color="primary" (click)="logout()">Sim, sair</button>
+</app-modal-footer>

@@ -1,7 +1,7 @@
 import { Injectable, inject } from '@angular/core';
-import { MatDialog } from '@angular/material/dialog';
 import { UserService } from '../auth/user/user.service';
 import { UpgradeComponent } from '../../shared/components/upgrade/upgrade.component';
+import { ModalService } from '../../shared/components/ui/modal';
 
 export type PlanFeature =
   | 'family-sharing'
@@ -12,7 +12,7 @@ export type PlanFeature =
 @Injectable({ providedIn: 'root' })
 export class PlanService {
   private readonly userService = inject(UserService);
-  private readonly dialog = inject(MatDialog);
+  private readonly modal = inject(ModalService);
 
   isPremium(): boolean {
     return this.userService.isPremium();
@@ -27,10 +27,8 @@ export class PlanService {
       return;
     }
 
-    this.dialog.open(UpgradeComponent, {
-      width: '460px',
-      maxWidth: 'calc(100vw - 32px)',
-      panelClass: 'upgrade-dialog',
+    this.modal.open(UpgradeComponent, {
+      size: 'md',
       data: { feature }
     });
   }

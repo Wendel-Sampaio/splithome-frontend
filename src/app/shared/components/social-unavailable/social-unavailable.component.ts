@@ -1,8 +1,12 @@
-import { Component, inject } from '@angular/core';
+import { ChangeDetectionStrategy, Component, inject } from '@angular/core';
 import { MatButtonModule } from '@angular/material/button';
 import { MatIconModule } from '@angular/material/icon';
-import { MAT_DIALOG_DATA, MatDialogActions, MatDialogClose, MatDialogContent, MatDialogRef, MatDialogTitle } from '@angular/material/dialog';
+import { MAT_DIALOG_DATA, MatDialogClose, MatDialogRef } from '@angular/material/dialog';
 import { Router } from '@angular/router';
+import { ModalBodyComponent } from '../ui/modal-body/modal-body.component';
+import { ModalFooterComponent } from '../ui/modal-footer/modal-footer.component';
+import { ModalHeaderComponent } from '../ui/modal-header/modal-header.component';
+import { SummaryBlockComponent } from '../ui/summary-block/summary-block.component';
 
 export type SocialProvider = 'google' | 'facebook';
 
@@ -17,9 +21,18 @@ const PROVIDER_LABELS: Record<SocialProvider, string> = {
 
 @Component({
   selector: 'app-social-unavailable',
-  imports: [MatButtonModule, MatDialogActions, MatDialogClose, MatDialogContent, MatDialogTitle, MatIconModule],
+  standalone: true,
+  changeDetection: ChangeDetectionStrategy.OnPush,
+  imports: [
+    MatButtonModule,
+    MatDialogClose,
+    MatIconModule,
+    ModalHeaderComponent,
+    ModalBodyComponent,
+    ModalFooterComponent,
+    SummaryBlockComponent,
+  ],
   templateUrl: './social-unavailable.component.html',
-  styleUrl: './social-unavailable.component.scss'
 })
 export class SocialUnavailableComponent {
   private readonly dialogRef = inject(MatDialogRef<SocialUnavailableComponent>);

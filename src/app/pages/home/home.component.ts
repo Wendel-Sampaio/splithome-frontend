@@ -19,6 +19,7 @@ import { MeuPerfilComponent } from '../../shared/components/meu-perfil/meu-perfi
 import { EstatisticasComponent } from '../estatisticas/estatisticas.component';
 import { UserStateService } from '../../core/auth/user/user-state.service';
 import { ResumoFinanceiroComponent } from '../resumo-financeiro/resumo-financeiro.component';
+import { ModalService } from '../../shared/components/ui/modal';
 
 @Component({
   selector: 'app-home',
@@ -33,6 +34,7 @@ export class HomeComponent {
   userStateService = inject(UserStateService);
   private cdr = inject(ChangeDetectorRef);
   private destroyRef = inject(DestroyRef);
+  private modal = inject(ModalService);
   readonly dialog = inject(MatDialog);
 
   user!: User;
@@ -138,8 +140,8 @@ export class HomeComponent {
   }
 
   openDialog(enterAnimationDuration: string, exitAnimationDuration: string): void {
-    this.dialog.open(LogoutComponent, {
-      width: '250px',
+    this.modal.open(LogoutComponent, {
+      size: 'xs',
       enterAnimationDuration,
       exitAnimationDuration,
     });
