@@ -42,6 +42,14 @@ body {
   --sh-sidebar-width: 292px;
   --sh-sidebar-collapsed-width: 92px;
   --sh-topbar-height: 76px;
+
+  /* Modal tokens */
+  --sh-modal-surface-radius: var(--sh-radius-lg);
+  --sh-modal-header-padding: var(--sh-space-6);
+  --sh-modal-body-padding: var(--sh-space-2) var(--sh-space-6) var(--sh-space-6);
+  --sh-modal-footer-padding: var(--sh-space-4) var(--sh-space-6);
+  --sh-modal-max-height: calc(100vh - 64px);
+  --sh-modal-z-index: 1100;
 }
 
 * {
@@ -272,5 +280,60 @@ a:hover {
 
   .payed-style {
     background: var(--sh-color-primary-soft);
+  }
+}
+
+/* ===== Modal design system ===== */
+.cdk-overlay-pane.sh-modal {
+  display: flex;
+  max-height: var(--sh-modal-max-height);
+}
+
+.cdk-overlay-pane.sh-modal .mat-mdc-dialog-container {
+  background: var(--sh-color-surface);
+  border-radius: var(--sh-modal-surface-radius);
+  box-shadow: var(--sh-shadow-lg);
+  display: flex;
+  flex-direction: column;
+  max-height: var(--sh-modal-max-height);
+  overflow: hidden;
+  padding: 0;
+}
+
+.cdk-overlay-pane.sh-modal .mat-mdc-dialog-container .mat-mdc-dialog-surface {
+  background: transparent;
+  border-radius: inherit;
+  box-shadow: none;
+}
+
+.cdk-overlay-pane.sh-modal .mat-mdc-dialog-content {
+  color: var(--sh-color-text);
+  font-size: 14px;
+  line-height: 1.5;
+  max-height: none;
+  padding: 0;
+}
+
+.cdk-overlay-pane.sh-modal .mat-mdc-dialog-title {
+  margin: 0;
+}
+
+.cdk-overlay-pane.sh-modal .mat-mdc-dialog-actions {
+  margin: 0;
+  min-height: auto;
+  padding: 0;
+}
+
+@media (max-width: 600px) {
+  :root {
+    --sh-modal-max-height: 100vh;
+    --sh-modal-body-padding: var(--sh-space-2) var(--sh-space-4) var(--sh-space-5);
+    --sh-modal-header-padding: var(--sh-space-5) var(--sh-space-4);
+    --sh-modal-footer-padding: var(--sh-space-3) var(--sh-space-4);
+  }
+  .cdk-overlay-pane.sh-modal .mat-mdc-dialog-container {
+    border-bottom-left-radius: 0;
+    border-bottom-right-radius: 0;
+    max-height: var(--sh-modal-max-height);
   }
 }
