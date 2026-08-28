@@ -5,16 +5,16 @@ import { MatButtonModule } from '@angular/material/button';
 import { MatDialog } from '@angular/material/dialog';
 import { MatIcon } from '@angular/material/icon';
 import { forkJoin, of } from 'rxjs';
-import { catchError, finalize } from 'rxjs/operators';
+import { catchError, finalize, map } from 'rxjs/operators';
 import { Compra } from '../../../core/models/compra/compra';
-import { Despesa } from '../../../core/models/despesa/despesa';
+import { DespesaFixa } from '../../../core/models/despesa-fixa/despesa-fixa';
 import { UserService } from '../../../core/auth/user/user.service';
 import { CompraService } from '../../services/compra/compra.service';
 import { EstatisticasResumo, EstatisticasService } from '../../services/estatisticas/estatisticas.service';
 import { ResumoFinanceiro, ResumoFinanceiroService } from '../../services/resumo-financeiro/resumo-financeiro.service';
 import { FormTransacaoComponent } from '../form-transacao/form-transacao.component';
 
-export type DashboardView = 'compras' | 'despesas' | 'graficos' | 'resumoFinanceiro';
+export type DashboardView = 'compras' | 'despesas' | 'graficos' | 'resumoFinanceiro' | 'cartoes';
 
 interface Atividade {
   title: string;
@@ -74,7 +74,10 @@ export class DashboardInicioComponent implements OnInit {
       compras: this.compraService
         .listarCompras({ size: 5, sort: 'purchaseDate,desc' })
         .pipe(catchError(() => of(null))),
-      despesas: this.compraService.listarDespesas().pipe(catchError(() => of([] as Despesa[])))
+      despesas: this.compraService.listarDespesasFixas({ size: 5, sort: 'createdAt,desc' }).pipe(
+        map(page => page?.content ?? []),
+        catchError(() => of([] as DespesaFixa[]))
+      )
     })
       .pipe(
         finalize(() => this.carregando.set(false)),
@@ -84,7 +87,7 @@ export class DashboardInicioComponent implements OnInit {
         this.aplicarEstatisticas(estatisticas);
         this.aplicarResumo(resumo);
         this.totalCompras.set(compras?.totalElements ?? 0);
-        this.montarAtividades(compras?.content ?? [], despesas ?? []);
+        this.montarAtividades(compras?.content ?? [], despesas);
       });
   }
 
@@ -114,7 +117,7 @@ export class DashboardInicioComponent implements OnInit {
     this.totalEmAberto.set(resumo.totalOutstanding ?? 0);
   }
 
-  private montarAtividades(compras: Compra[], despesas: Despesa[]): void {
+  private montarAtividades(compras: Compra[], despesas: DespesaFixa[]): void {
     const deCompras: Atividade[] = compras.map((c) => ({
       title: c.title,
       category: c.category,
@@ -127,8 +130,8 @@ export class DashboardInicioComponent implements OnInit {
     const deDespesas: Atividade[] = despesas.map((d) => ({
       title: d.title,
       category: d.category,
-      value: d.value,
-      date: d.paymentDate,
+      value: d.valorTotal,
+      date: d.dataInicio,
       tipo: 'despesa',
       autor: d.responsibleName
     }));
@@ -146,10 +149,10 @@ export class DashboardInicioComponent implements OnInit {
   }
 
   novaDespesa(): void {
-    this.abrirFormulario('despesa');
+    this.abrirFormulario('despesa-fixa');
   }
 
-  private abrirFormulario(tipo: 'compra' | 'despesa'): void {
+  private abrirFormulario(tipo: 'compra' | 'despesa-fixa'): void {
     const ref = this.dialog.open(FormTransacaoComponent, {
       width: '760px',
       maxWidth: '95vw',

@@ -82,6 +82,37 @@ mat-dialog-actions {
   }
 }
 
+.grid-2 {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 1rem;
+}
+
+.preview {
+  background: #f1f8e9;
+  border-left: 3px solid #48A75A;
+  padding: 0.75rem 1rem;
+  border-radius: 4px;
+  display: flex;
+  flex-direction: column;
+  gap: 0.25rem;
+  margin-bottom: 1rem;
+
+  strong {
+    color: #2e7031;
+  }
+
+  span {
+    color: #555;
+    font-size: 0.9rem;
+  }
+}
+
+.novo-cartao-option {
+  border-top: 1px solid #eee;
+  color: #1976d2;
+}
+
 .confirm-button {
   background-color: #48A75A;
   color: #fff;

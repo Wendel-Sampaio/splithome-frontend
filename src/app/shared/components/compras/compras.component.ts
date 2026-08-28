@@ -27,6 +27,8 @@ import { MatDatepickerModule } from '@angular/material/datepicker';
 import { MatNativeDateModule } from '@angular/material/core';
 import { ReactiveFormsModule, FormBuilder } from '@angular/forms';
 import { TransacaoService } from '../../services/transacao/transacao.service';
+import { parseOfxExpenses } from '../../services/ofx/ofx-parser';
+import { forkJoin } from 'rxjs';
 
 interface Purchaser {
   id: string;
@@ -207,6 +209,70 @@ export class ComprasComponent implements OnInit {
     dialogRef.afterClosed().pipe(takeUntilDestroyed(this.destroyRef)).subscribe(result => {
       this.recarregarCompras();
       console.log(`Dialog result: ${result}`);
+    });
+  }
+
+  importarOfxHandler(event: Event): void {
+    const input = event.target as HTMLInputElement;
+    const file = input.files?.[0];
+    input.value = '';
+
+    if (!file) {
+      return;
+    }
+
+    if (!file.name.toLowerCase().endsWith('.ofx')) {
+      this.notify.error('Selecione um arquivo OFX válido.');
+      return;
+    }
+
+    this.loadingAcao.set(true);
+    this.lerArquivo(file).pipe(
+      switchMap(content => {
+        const items = parseOfxExpenses(content);
+        if (!items.length) {
+          this.notify.info('Nenhuma despesa encontrada no arquivo OFX.');
+          this.loadingAcao.set(false);
+          return of([]);
+        }
+        return forkJoin(items.map(item => this.compraService.cadastrarCompra(this.criarPayloadOfx(item))));
+      }),
+      finalize(() => this.loadingAcao.set(false)),
+      takeUntilDestroyed(this.destroyRef)
+    ).subscribe({
+      next: (criadas: any[]) => {
+        if (criadas.length) {
+          this.notify.success(`${criadas.length} compra(s) importada(s) com sucesso!`);
+          this.recarregarCompras();
+        }
+      },
+      error: () => this.notify.error('Não foi possível importar o arquivo OFX.')
+    });
+  }
+
+  private criarPayloadOfx(item: { title: string; value: number; paymentDate: string }): Record<string, unknown> {
+    const user = this.userService.getUser();
+    return {
+      title: item.title,
+      category: 'OTHERS',
+      value: item.value,
+      paymentDate: item.paymentDate,
+      purchaserId: user.id,
+      purchaseDate: item.paymentDate,
+      payers: [user.name],
+      remainingPayers: [user.name]
+    };
+  }
+
+  private lerArquivo(file: File): Observable<string> {
+    return new Observable<string>(observer => {
+      const reader = new FileReader();
+      reader.onload = () => {
+        observer.next(String(reader.result ?? ''));
+        observer.complete();
+      };
+      reader.onerror = () => observer.error(reader.error);
+      reader.readAsText(file);
     });
   }
 

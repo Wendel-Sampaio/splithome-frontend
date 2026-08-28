@@ -28,9 +28,9 @@
                     </button>
                     <button (click)="abrirDespesas()"
                             class="botoes-menu-lateral"
-                            [ngClass]="{'selected': currentView === 'despesas'}">
+                            [ngClass]="{'selected': currentView === 'despesasFixas'}">
                         <mat-icon class="icones-botao">payments</mat-icon>
-                        <span class="menu-label">Despesas</span>
+                        <span class="menu-label">Despesas Fixas</span>
                     </button>
                 </div>
 
@@ -133,8 +133,8 @@
                 <mat-card-content><tabela-compras></tabela-compras></mat-card-content>
             </mat-card>
 
-            <mat-card class="content-card" appearance="outlined" *ngIf="currentView === 'despesas'">
-                <mat-card-content><tabela-despesas></tabela-despesas></mat-card-content>
+            <mat-card class="content-card" appearance="outlined" *ngIf="currentView === 'despesasFixas'">
+                <mat-card-content><tabela-despesas-fixas></tabela-despesas-fixas></mat-card-content>
             </mat-card>
 
             <mat-card class="content-card" appearance="outlined" *ngIf="currentView === 'graficos'">

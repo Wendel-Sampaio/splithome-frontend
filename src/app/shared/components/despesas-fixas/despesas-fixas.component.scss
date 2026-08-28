@@ -1,0 +1,56 @@
+.despesas-fixas-container {
+  padding: 16px;
+
+  .header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 16px;
+  }
+
+  .loading {
+    display: flex;
+    justify-content: center;
+    padding: 32px;
+  }
+
+  .empty {
+    text-align: center;
+    color: #777;
+    padding: 32px;
+  }
+
+  .parcelas-section {
+    margin-top: 24px;
+
+    h3 {
+      margin-bottom: 8px;
+    }
+  }
+
+  .parcelas-table {
+    width: 100%;
+    border-collapse: collapse;
+
+    th, td {
+      padding: 8px 12px;
+      text-align: left;
+      border-bottom: 1px solid #eee;
+    }
+
+    .status {
+      padding: 2px 8px;
+      border-radius: 12px;
+      font-size: 12px;
+
+      &.pago {
+        background: #e6f4ea;
+        color: #1e7c3a;
+      }
+      &.pendente {
+        background: #fff4e5;
+        color: #b25c00;
+      }
+    }
+  }
+}

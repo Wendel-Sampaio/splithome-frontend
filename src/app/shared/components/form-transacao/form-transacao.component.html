@@ -10,13 +10,12 @@
           <mat-error *ngIf="controlInvalido('titulo')">{{ getMensagemErroCampo('titulo') }}</mat-error>
         </mat-form-field>
       </div>
-      
+
       <div class="categoria-input">
         <mat-form-field appearance="outline">
           <mat-label>Categoria</mat-label>
-          <mat-select formControlName="categoria">        
-            <!-- O [value]="categoria" é usado para atribuir o valor do select à variável categoria. -->
-            <mat-option *ngFor="let categoria of categorias$ | async" [value]="categoria"> 
+          <mat-select formControlName="categoria">
+            <mat-option *ngFor="let categoria of categorias$ | async" [value]="categoria">
               {{ categoria | categoria }}
             </mat-option>
           </mat-select>
@@ -24,32 +23,87 @@
         </mat-form-field>
       </div>
 
-      <div class="valor-input">
-        <mat-form-field floatLabel="always" appearance="outline">
-          <mat-label>Valor</mat-label>
-          <input matInput formControlName="valor" placeholder="0" /> 
-          <span matTextPrefix>R$&nbsp;</span>
-          <mat-error *ngIf="controlInvalido('valor')">{{ getMensagemErroCampo('valor') }}</mat-error>
-        </mat-form-field>
-      </div>
+      <!-- Campos compra avulsa -->
+      <ng-container *ngIf="!isDespesaFixa">
+        <div class="valor-input">
+          <mat-form-field floatLabel="always" appearance="outline">
+            <mat-label>Valor</mat-label>
+            <input matInput formControlName="valor" placeholder="0" />
+            <span matTextPrefix>R$&nbsp;</span>
+            <mat-error *ngIf="controlInvalido('valor')">{{ getMensagemErroCampo('valor') }}</mat-error>
+          </mat-form-field>
+        </div>
 
-      <div class="date-input">
+        <div class="date-input">
+          <mat-form-field appearance="outline">
+            <mat-label>Data pagamento</mat-label>
+            <input matInput formControlName="dataPagamento" [matDatepicker]="dp3" >
+            <mat-datepicker-toggle matIconSuffix [for]="dp3"></mat-datepicker-toggle>
+            <mat-datepicker #dp3 disabled="false"></mat-datepicker>
+            <mat-error *ngIf="controlInvalido('dataPagamento')">{{ getMensagemErroCampo('dataPagamento') }}</mat-error>
+          </mat-form-field>
+        </div>
+      </ng-container>
+
+      <!-- Campos despesa fixa -->
+      <ng-container *ngIf="isDespesaFixa">
+        <div class="grid-2">
+          <mat-form-field floatLabel="always" appearance="outline">
+            <mat-label>Valor total</mat-label>
+            <input matInput formControlName="valorTotal" placeholder="0" type="number" />
+            <span matTextPrefix>R$&nbsp;</span>
+            <mat-error *ngIf="controlInvalido('valorTotal')">{{ getMensagemErroCampo('valorTotal') }}</mat-error>
+          </mat-form-field>
+
+          <mat-form-field appearance="outline">
+            <mat-label>Quantidade de parcelas</mat-label>
+            <input matInput formControlName="quantidadeParcelas" type="number" min="1" max="240" />
+            <mat-error *ngIf="controlInvalido('quantidadeParcelas')">{{ getMensagemErroCampo('quantidadeParcelas') }}</mat-error>
+          </mat-form-field>
+        </div>
+
+        <div class="grid-2">
+          <mat-form-field appearance="outline">
+            <mat-label>Dia de vencimento (1-31)</mat-label>
+            <input matInput formControlName="diaVencimento" type="number" min="1" max="31" />
+            <mat-error *ngIf="controlInvalido('diaVencimento')">{{ getMensagemErroCampo('diaVencimento') }}</mat-error>
+          </mat-form-field>
+
+          <mat-form-field appearance="outline">
+            <mat-label>Data da 1ª parcela</mat-label>
+            <input matInput formControlName="dataInicio" [matDatepicker]="dpInicio" />
+            <mat-datepicker-toggle matIconSuffix [for]="dpInicio"></mat-datepicker-toggle>
+            <mat-datepicker #dpInicio disabled="false"></mat-datepicker>
+            <mat-error *ngIf="controlInvalido('dataInicio')">{{ getMensagemErroCampo('dataInicio') }}</mat-error>
+          </mat-form-field>
+        </div>
+
         <mat-form-field appearance="outline">
-          <mat-label>Data pagamento</mat-label>
-          <input matInput formControlName="dataPagamento" [matDatepicker]="dp3" >
-          <mat-datepicker-toggle matIconSuffix [for]="dp3"></mat-datepicker-toggle>
-          <mat-datepicker #dp3 disabled="false"></mat-datepicker>
-          <mat-error *ngIf="controlInvalido('dataPagamento')">{{ getMensagemErroCampo('dataPagamento') }}</mat-error>
+          <mat-label>Cartão de crédito (opcional)</mat-label>
+          <mat-select formControlName="cartaoId">
+            <mat-option [value]="null">Sem cartão</mat-option>
+            <mat-option *ngFor="let cartao of cartoes" [value]="cartao.id">
+              {{ cartao.name }} {{ cartao.lastDigits ? '(****' + cartao.lastDigits + ')' : '' }}
+            </mat-option>
+            <mat-option [value]="NOVO_CARTAO_ID" class="novo-cartao-option">
+              <mat-icon>add</mat-icon> Criar novo cartão...
+            </mat-option>
+          </mat-select>
         </mat-form-field>
-      </div>
-  
+
+        <div class="preview" *ngIf="valorParcela && primeiraDataVencimento">
+          <strong>Em {{ quantidadeParcelas }}x de {{ formatCurrency(valorParcela) }}</strong>
+          <span>— primeira em {{ primeiraDataVencimento | date: 'dd/MM/yyyy' }}</span>
+        </div>
+      </ng-container>
+
       <div *ngIf="isPremium">
         <label> Selecione os pagadores </label>
         <mat-chip-listbox class="users-layout" [multiple]="true" aria-label="Seleção de pagadores">
-          <mat-chip-option 
+          <mat-chip-option
             class="users"
             *ngFor="let usuario of usuarios$ | async"
-            [selected]="usuarioSelecionado(usuario)" 
+            [selected]="usuarioSelecionado(usuario)"
             (click)="mudarSelecaoUsuario(usuario)">
             <img matChipAvatar [src]="getProfilePhoto(usuario)" alt="Foto do Usuário"/>
             {{ usuario.name }}
@@ -57,7 +111,7 @@
         </mat-chip-listbox>
         <p class="field-error" *ngIf="tentouEnviar && !pagadores.length">Selecione pelo menos um pagador.</p>
       </div>
-  
+
     </form>
   </div>
 </mat-dialog-content>

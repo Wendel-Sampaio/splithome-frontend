@@ -11,6 +11,8 @@ import { finalize } from 'rxjs';
 import { User } from '../../../core/models/user/user';
 import { UserService } from '../../../core/auth/user/user.service';
 import { FormsModule } from '@angular/forms';
+import { CartoesComponent } from '../cartoes/cartoes.component';
+import { MatTabsModule } from '@angular/material/tabs';
 import { NotificationService } from '../../services/notification/notification.service';
 
 @Component({
@@ -19,7 +21,8 @@ import { NotificationService } from '../../services/notification/notification.se
   styleUrl: 'meu-perfil.component.scss',
   imports: [
     MatCardModule, MatButtonModule, MatIcon, MatFormFieldModule,
-    MatInputModule, MatProgressSpinnerModule, CommonModule, FormsModule
+    MatInputModule, MatProgressSpinnerModule, CommonModule, FormsModule,
+    MatTabsModule, CartoesComponent
   ],
   changeDetection: ChangeDetectionStrategy.OnPush,
 })

@@ -4,6 +4,10 @@
         <p class="sh-page-subtitle">Gerencie as compras compartilhadas da casa.</p>
     </div>
     <div class="sh-page-actions">
+        <button class="sh-btn-secondary" type="button" (click)="importarOfx.click()">
+            <mat-icon>upload_file</mat-icon>Importar OFX
+        </button>
+        <input #importarOfx type="file" accept=".ofx" hidden (change)="importarOfxHandler($event)" />
         <button class="sh-btn-primary" type="button" (click)="abrirFormCompra()">
             <mat-icon>add_circle</mat-icon>Nova compra
         </button>
