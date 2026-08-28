@@ -149,22 +149,27 @@ export class FormTransacaoComponent {
   }
 
   ngOnInit(): void {
-    this.formTransacao = new FormGroup({
+    const baseControls: Record<string, FormControl> = {
       titulo: new FormControl('', [Validators.required]),
       categoria: new FormControl('', [Validators.required]),
-      valor: new FormControl('', [Validators.required, Validators.min(0.01)]),
-      dataPagamento: new FormControl('', [Validators.required]),
-    });
+    };
+
+    if (this.isDespesaFixa) {
+      baseControls['valorTotal'] = new FormControl('', [Validators.required, Validators.min(0.01)]);
+      baseControls['quantidadeParcelas'] = new FormControl(1, [Validators.required, Validators.min(1), Validators.max(240)]);
+      baseControls['diaVencimento'] = new FormControl(10, [Validators.required, Validators.min(1), Validators.max(31)]);
+      baseControls['dataInicio'] = new FormControl(new Date(), [Validators.required]);
+      baseControls['cartaoId'] = new FormControl(null);
+    } else {
+      baseControls['valor'] = new FormControl('', [Validators.required, Validators.min(0.01)]);
+      baseControls['dataPagamento'] = new FormControl('', [Validators.required]);
+    }
+
+    this.formTransacao = new FormGroup(baseControls);
 
     this.cartoes$.pipe(takeUntilDestroyed(this.destroyRef)).subscribe(c => this.cartoes = c);
 
     if (this.isDespesaFixa) {
-      this.formTransacao.addControl('valorTotal', new FormControl('', [Validators.required, Validators.min(0.01)]));
-      this.formTransacao.addControl('quantidadeParcelas', new FormControl(1, [Validators.required, Validators.min(1), Validators.max(240)]));
-      this.formTransacao.addControl('diaVencimento', new FormControl(10, [Validators.required, Validators.min(1), Validators.max(31)]));
-      this.formTransacao.addControl('dataInicio', new FormControl(new Date(), [Validators.required]));
-      this.formTransacao.addControl('cartaoId', new FormControl(null));
-
       this.formTransacao.get('cartaoId')?.valueChanges.pipe(takeUntilDestroyed(this.destroyRef)).subscribe(value => {
         if (value === this.NOVO_CARTAO_ID) {
           this.formTransacao.get('cartaoId')?.setValue(null, { emitEvent: false });
