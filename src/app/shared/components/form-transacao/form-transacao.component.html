@@ -1,129 +1,143 @@
-<h2 class="title" mat-dialog-title>{{ tituloDialog }}</h2>
-<mat-dialog-content class="form-body">
-  <div>
-    <form [formGroup]="formTransacao" (ngSubmit)="cadastrarTransacao()">
+<app-modal-header
+  [title]="tituloDialog"
+  [description]="descricaoDialog"
+  [icon]="isDespesaFixa ? 'autorenew' : 'shopping_bag'" />
 
-      <div class="title-input">
-        <mat-form-field class="input-name" appearance="outline">
-          <mat-label>Insira o título</mat-label>
-          <input matInput formControlName="titulo">
-          <mat-error *ngIf="controlInvalido('titulo')">{{ getMensagemErroCampo('titulo') }}</mat-error>
+<app-modal-body>
+  <form [formGroup]="formTransacao" (ngSubmit)="cadastrarTransacao()">
+    <app-form-section title="Detalhes" description="O que está sendo registrado?">
+      <mat-form-field appearance="outline" class="sh-full-row">
+        <mat-label>Título</mat-label>
+        <input matInput formControlName="titulo" autocomplete="off" />
+        <mat-error *ngIf="controlInvalido('titulo')">{{ getMensagemErroCampo('titulo') }}</mat-error>
+      </mat-form-field>
+
+      <mat-form-field appearance="outline">
+        <mat-label>Categoria</mat-label>
+        <mat-select formControlName="categoria">
+          @for (categoria of categorias$ | async; track categoria) {
+            <mat-option [value]="categoria">{{ categoria | categoria }}</mat-option>
+          }
+        </mat-select>
+        <mat-error *ngIf="controlInvalido('categoria')">{{ getMensagemErroCampo('categoria') }}</mat-error>
+      </mat-form-field>
+    </app-form-section>
+
+    @if (!isDespesaFixa) {
+      <app-form-section title="Valor e data" [columns]="2">
+        <mat-form-field appearance="outline" floatLabel="always">
+          <mat-label>Valor</mat-label>
+          <input matInput formControlName="valor" placeholder="0" />
+          <span matTextPrefix>R$&nbsp;</span>
+          <mat-error *ngIf="controlInvalido('valor')">Informe um valor maior que R$ 0,00.</mat-error>
         </mat-form-field>
-      </div>
-
-      <div class="categoria-input">
-        <mat-form-field appearance="outline">
-          <mat-label>Categoria</mat-label>
-          <mat-select formControlName="categoria">
-            <mat-option *ngFor="let categoria of categorias$ | async" [value]="categoria">
-              {{ categoria | categoria }}
-            </mat-option>
-          </mat-select>
-          <mat-error *ngIf="controlInvalido('categoria')">{{ getMensagemErroCampo('categoria') }}</mat-error>
-        </mat-form-field>
-      </div>
-
-      <!-- Campos compra avulsa -->
-      <ng-container *ngIf="!isDespesaFixa">
-        <div class="valor-input">
-          <mat-form-field floatLabel="always" appearance="outline">
-            <mat-label>Valor</mat-label>
-            <input matInput formControlName="valor" placeholder="0" />
-            <span matTextPrefix>R$&nbsp;</span>
-            <mat-error *ngIf="controlInvalido('valor')">{{ getMensagemErroCampo('valor') }}</mat-error>
-          </mat-form-field>
-        </div>
-
-        <div class="date-input">
-          <mat-form-field appearance="outline">
-            <mat-label>Data pagamento</mat-label>
-            <input matInput formControlName="dataPagamento" [matDatepicker]="dp3" >
-            <mat-datepicker-toggle matIconSuffix [for]="dp3"></mat-datepicker-toggle>
-            <mat-datepicker #dp3 disabled="false"></mat-datepicker>
-            <mat-error *ngIf="controlInvalido('dataPagamento')">{{ getMensagemErroCampo('dataPagamento') }}</mat-error>
-          </mat-form-field>
-        </div>
-      </ng-container>
-
-      <!-- Campos despesa fixa -->
-      <ng-container *ngIf="isDespesaFixa">
-        <div class="grid-2">
-          <mat-form-field floatLabel="always" appearance="outline">
-            <mat-label>Valor total</mat-label>
-            <input matInput formControlName="valorTotal" placeholder="0" type="number" />
-            <span matTextPrefix>R$&nbsp;</span>
-            <mat-error *ngIf="controlInvalido('valorTotal')">{{ getMensagemErroCampo('valorTotal') }}</mat-error>
-          </mat-form-field>
-
-          <mat-form-field appearance="outline">
-            <mat-label>Quantidade de parcelas</mat-label>
-            <input matInput formControlName="quantidadeParcelas" type="number" min="1" max="240" />
-            <mat-error *ngIf="controlInvalido('quantidadeParcelas')">{{ getMensagemErroCampo('quantidadeParcelas') }}</mat-error>
-          </mat-form-field>
-        </div>
-
-        <div class="grid-2">
-          <mat-form-field appearance="outline">
-            <mat-label>Dia de vencimento (1-31)</mat-label>
-            <input matInput formControlName="diaVencimento" type="number" min="1" max="31" />
-            <mat-error *ngIf="controlInvalido('diaVencimento')">{{ getMensagemErroCampo('diaVencimento') }}</mat-error>
-          </mat-form-field>
-
-          <mat-form-field appearance="outline">
-            <mat-label>Data da 1ª parcela</mat-label>
-            <input matInput formControlName="dataInicio" [matDatepicker]="dpInicio" />
-            <mat-datepicker-toggle matIconSuffix [for]="dpInicio"></mat-datepicker-toggle>
-            <mat-datepicker #dpInicio disabled="false"></mat-datepicker>
-            <mat-error *ngIf="controlInvalido('dataInicio')">{{ getMensagemErroCampo('dataInicio') }}</mat-error>
-          </mat-form-field>
-        </div>
 
         <mat-form-field appearance="outline">
-          <mat-label>Cartão de crédito (opcional)</mat-label>
+          <mat-label>Data do pagamento</mat-label>
+          <input matInput formControlName="dataPagamento" [matDatepicker]="dp3" />
+          <mat-datepicker-toggle matIconSuffix [for]="dp3"></mat-datepicker-toggle>
+          <mat-datepicker #dp3 disabled="false"></mat-datepicker>
+          <mat-error *ngIf="controlInvalido('dataPagamento')">Informe a data do pagamento.</mat-error>
+        </mat-form-field>
+      </app-form-section>
+    }
+
+    @if (isDespesaFixa) {
+      <app-form-section title="Parcelamento" [columns]="2">
+        <mat-form-field appearance="outline" floatLabel="always">
+          <mat-label>Valor total</mat-label>
+          <input matInput formControlName="valorTotal" placeholder="0" type="number" />
+          <span matTextPrefix>R$&nbsp;</span>
+          <mat-error *ngIf="controlInvalido('valorTotal')">Informe um valor maior que R$ 0,00.</mat-error>
+        </mat-form-field>
+
+        <mat-form-field appearance="outline">
+          <mat-label>Quantidade de parcelas</mat-label>
+          <input matInput formControlName="quantidadeParcelas" type="number" min="1" max="240" />
+          <mat-error *ngIf="controlInvalido('quantidadeParcelas')">Informe entre 1 e 240 parcelas.</mat-error>
+        </mat-form-field>
+
+        <mat-form-field appearance="outline">
+          <mat-label>Dia de vencimento</mat-label>
+          <input matInput formControlName="diaVencimento" type="number" min="1" max="31" />
+          <mat-error *ngIf="controlInvalido('diaVencimento')">Informe um dia entre 1 e 31.</mat-error>
+        </mat-form-field>
+
+        <mat-form-field appearance="outline">
+          <mat-label>Data da 1ª parcela</mat-label>
+          <input matInput formControlName="dataInicio" [matDatepicker]="dpInicio" />
+          <mat-datepicker-toggle matIconSuffix [for]="dpInicio"></mat-datepicker-toggle>
+          <mat-datepicker #dpInicio disabled="false"></mat-datepicker>
+          <mat-error *ngIf="controlInvalido('dataInicio')">Informe a data de início.</mat-error>
+        </mat-form-field>
+      </app-form-section>
+
+      <app-form-section title="Cartão de crédito" description="Opcional: vincule um cartão para registrar a fatura." [optional]="true">
+        <mat-form-field appearance="outline" class="sh-full-row">
+          <mat-label>Cartão de crédito</mat-label>
           <mat-select formControlName="cartaoId">
             <mat-option [value]="null">Sem cartão</mat-option>
-            <mat-option *ngFor="let cartao of cartoes" [value]="cartao.id">
-              {{ cartao.name }} {{ cartao.lastDigits ? '(****' + cartao.lastDigits + ')' : '' }}
-            </mat-option>
-            <mat-option [value]="NOVO_CARTAO_ID" class="novo-cartao-option">
-              <mat-icon>add</mat-icon> Criar novo cartão...
+            @for (cartao of cartoes; track cartao.id) {
+              <mat-option [value]="cartao.id">
+                {{ cartao.name }} {{ cartao.lastDigits ? '(****' + cartao.lastDigits + ')' : '' }}
+              </mat-option>
+            }
+            <mat-option [value]="NOVO_CARTAO_ID" class="sh-novo-cartao-option">
+              <mat-icon>add</mat-icon> Criar novo cartão
             </mat-option>
           </mat-select>
         </mat-form-field>
+      </app-form-section>
 
-        <div class="preview" *ngIf="valorParcela && primeiraDataVencimento">
-          <strong>Em {{ quantidadeParcelas }}x de {{ formatCurrency(valorParcela) }}</strong>
-          <span>— primeira em {{ primeiraDataVencimento | date: 'dd/MM/yyyy' }}</span>
-        </div>
-      </ng-container>
+      @if (valorParcela && primeiraDataVencimento) {
+        <app-summary-block title="Resumo do parcelamento" icon="autorenew" variant="primary">
+          <p class="sh-transacao__summary-main">
+            Em <strong>{{ quantidadeParcelas }}x</strong> de
+            <strong>{{ formatCurrency(valorParcela) }}</strong>
+          </p>
+          <p class="sh-transacao__summary-sub">
+            Primeira parcela em {{ primeiraDataVencimento | date: 'dd/MM/yyyy' }}
+          </p>
+        </app-summary-block>
+      }
+    }
 
-      <div *ngIf="isPremium">
-        <label> Selecione os pagadores </label>
-        <mat-chip-listbox class="users-layout" [multiple]="true" aria-label="Seleção de pagadores">
-          <mat-chip-option
-            class="users"
-            *ngFor="let usuario of usuarios$ | async"
-            [selected]="usuarioSelecionado(usuario)"
-            (click)="mudarSelecaoUsuario(usuario)">
-            <img matChipAvatar [src]="getProfilePhoto(usuario)" alt="Foto do Usuário"/>
-            {{ usuario.name }}
-          </mat-chip-option>
+    @if (isPremium) {
+      <app-form-section
+        title="Pagadores"
+        [optional]="true"
+        [description]="pagadores.length === 0
+          ? 'Nenhum pagador selecionado — você será o único responsável.'
+          : (pagadores.length === 1
+              ? '1 pagador selecionado.'
+              : pagadores.length + ' pagadores selecionados.')">
+        <mat-chip-listbox class="sh-chip-payer-list" [multiple]="true" aria-label="Seleção de pagadores">
+          @for (usuario of usuarios$ | async; track usuario.id) {
+            <mat-chip-option
+              class="sh-chip-payer"
+              [class.sh-chip-payer--selected]="usuarioSelecionado(usuario)"
+              [selected]="usuarioSelecionado(usuario)"
+              (click)="mudarSelecaoUsuario(usuario)">
+              <img matChipAvatar [src]="getProfilePhoto(usuario)" alt="" />
+              {{ usuario.name }}
+            </mat-chip-option>
+          }
         </mat-chip-listbox>
-        <p class="field-error" *ngIf="tentouEnviar && !pagadores.length">Selecione pelo menos um pagador.</p>
-      </div>
+      </app-form-section>
+    }
+  </form>
+</app-modal-body>
 
-    </form>
-  </div>
-</mat-dialog-content>
-<mat-dialog-actions>
-  <button mat-button class="cancel-button" mat-dialog-close>Cancelar</button>
+<app-modal-footer align="space-between">
+  <button mat-button class="sh-btn-cancel" mat-dialog-close>Cancelar</button>
   <button
-    mat-button
-    class="confirm-button"
+    mat-flat-button
+    color="primary"
+    class="sh-btn-primary"
     cdkFocusInitial
     [disabled]="!isFormularioProntoParaEnvio || loading()"
     (click)="cadastrarTransacao()">
-    <mat-spinner *ngIf="loading()" diameter="20"></mat-spinner>
+    <mat-spinner *ngIf="loading()" diameter="18"></mat-spinner>
     <span *ngIf="!loading()">{{ textoBotaoConfirmacao }}</span>
   </button>
-</mat-dialog-actions>
+</app-modal-footer>

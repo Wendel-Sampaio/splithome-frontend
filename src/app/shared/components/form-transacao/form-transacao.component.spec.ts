@@ -6,6 +6,7 @@ import { FormTransacaoComponent } from './form-transacao.component';
 import { CompraService } from '../../services/compra/compra.service';
 import { TransacaoService } from '../../services/transacao/transacao.service';
 import { UserService } from '../../../core/auth/user/user.service';
+import { UserStateService } from '../../../core/auth/user/user-state.service';
 import { PlanService } from '../../../core/plan/plan.service';
 import { NotificationService } from '../../services/notification/notification.service';
 
@@ -18,16 +19,20 @@ describe('FormTransacaoComponent', () => {
 
   beforeEach(async () => {
     compraService = jasmine.createSpyObj<CompraService>('CompraService',
-      ['cadastrarCompra', 'cadastrarDespesa', 'atualizarCompra']);
+      ['cadastrarCompra', 'atualizarCompra', 'listarCartoes']);
+    compraService.listarCartoes.and.returnValue(of([]));
     const transacaoService = jasmine.createSpyObj<TransacaoService>('TransacaoService', ['listarCategorias']);
     transacaoService.listarCategorias.and.returnValue(of([]));
     const userService = jasmine.createSpyObj<UserService>('UserService',
-      ['getUser', 'getAllUsers', 'getProfilePhoto']);
+      ['getUser', 'getAllUsers', 'getProfilePhoto', 'getUserById']);
     userService.getUser.and.returnValue({
       id: 'u1', name: 'Eu', email: '', phoneNumber: '', pixKey: '',
       familyCode: 'F1', plan: 'PREMIUM', profilePhoto: ''
     } as any);
     userService.getAllUsers.and.returnValue(of([]));
+    userService.getUserById.and.returnValue(of({ id: 'u2', name: 'Outro' } as any));
+    const userStateService = jasmine.createSpyObj<any>('UserStateService', ['getFamilyUsers']);
+    userStateService.getFamilyUsers.and.returnValue(of([]));
     const planService = jasmine.createSpyObj<PlanService>('PlanService', ['isPremium']);
     planService.isPremium.and.returnValue(true);
     notify = jasmine.createSpyObj<NotificationService>('NotificationService',
@@ -41,6 +46,7 @@ describe('FormTransacaoComponent', () => {
         { provide: CompraService, useValue: compraService },
         { provide: TransacaoService, useValue: transacaoService },
         { provide: UserService, useValue: userService },
+        { provide: UserStateService, useValue: userStateService },
         { provide: PlanService, useValue: planService },
         { provide: NotificationService, useValue: notify },
         { provide: MatDialogRef, useValue: dialogRef },
@@ -64,12 +70,14 @@ describe('FormTransacaoComponent', () => {
     expect(component.loading()).toBe(false);
   });
 
-  it('sem pagador notifica warning e não dispara request', () => {
+  it('sem pagador não bloqueia mais o envio (pagadores são opcionais)', () => {
+    compraService.cadastrarCompra.and.returnValue(of({} as any));
     preencher();
     component.pagadores = [];
     component.cadastrarTransacao();
-    expect(notify.warning).toHaveBeenCalledWith('Selecione pelo menos um pagador.');
-    expect(compraService.cadastrarCompra).not.toHaveBeenCalled();
+    expect(notify.warning).not.toHaveBeenCalledWith('Selecione pelo menos um pagador.');
+    expect(notify.warning).not.toHaveBeenCalled();
+    expect(compraService.cadastrarCompra).toHaveBeenCalled();
   });
 
   it('sucesso de compra notifica success e fecha dialog', () => {
@@ -85,7 +93,7 @@ describe('FormTransacaoComponent', () => {
     compraService.cadastrarCompra.and.returnValue(throwError(() => ({ status: 500 })));
     preencher();
     component.cadastrarTransacao();
-    expect(notify.error).toHaveBeenCalledWith('Erro ao cadastrar compra!');
+    expect(notify.error).toHaveBeenCalledWith('Erro ao cadastrar compra.');
     expect(dialogRef.close).not.toHaveBeenCalled();
     expect(component.loading()).toBe(false);
   });

@@ -1,32 +1,37 @@
 import { ChangeDetectionStrategy, ChangeDetectorRef, Component, DestroyRef, Inject, inject, Optional, signal } from '@angular/core';
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
+import { AsyncPipe, CommonModule, DatePipe } from '@angular/common';
 import { FormControl, FormGroup, FormsModule, ReactiveFormsModule, Validators } from '@angular/forms';
 import { MatButtonModule } from '@angular/material/button';
-import { MatCardModule } from '@angular/material/card';
-import { MAT_DIALOG_DATA, MatDialog, MatDialogModule, MatDialogRef } from '@angular/material/dialog';
+import { MAT_DIALOG_DATA, MatDialog, MatDialogClose, MatDialogModule, MatDialogRef } from '@angular/material/dialog';
 import { MatFormFieldModule } from '@angular/material/form-field';
 import { MatInputModule } from '@angular/material/input';
 import { MatSelectModule } from '@angular/material/select';
 import { MatDatepickerModule } from '@angular/material/datepicker';
 import { provideNativeDateAdapter } from '@angular/material/core';
 import { MatChipsModule } from '@angular/material/chips';
+import { MatProgressSpinnerModule } from '@angular/material/progress-spinner';
+import { MatIconModule } from '@angular/material/icon';
+import { finalize, map, shareReplay } from 'rxjs';
 import { TransacaoService } from '../../services/transacao/transacao.service';
-import { CommonModule } from '@angular/common';
 import { User } from '../../../core/models/user/user';
 import { UserService } from '../../../core/auth/user/user.service';
 import { format } from 'date-fns';
 import { CompraService } from '../../services/compra/compra.service';
-import { MatProgressSpinnerModule } from '@angular/material/progress-spinner';
-import { MatIconModule } from '@angular/material/icon';
 import { Compra } from '../../../core/models/compra/compra';
 import { DespesaFixa } from '../../../core/models/despesa-fixa/despesa-fixa';
-import { finalize, map, shareReplay, switchMap } from 'rxjs';
 import { NotificationService } from '../../services/notification/notification.service';
 import { CategoriaPipe } from '../../pipes/categoria.pipe';
 import { PlanService } from '../../../core/plan/plan.service';
 import { UserStateService } from '../../../core/auth/user/user-state.service';
 import { Cartao, CreditCardBrand } from '../../../core/models/cartao/cartao';
 import { DialogNovoCartaoComponent } from '../dialog-novo-cartao/dialog-novo-cartao.component';
+import { ModalService } from '../ui/modal';
+import { ModalBodyComponent } from '../ui/modal-body/modal-body.component';
+import { ModalFooterComponent } from '../ui/modal-footer/modal-footer.component';
+import { ModalHeaderComponent } from '../ui/modal-header/modal-header.component';
+import { FormSectionComponent } from '../ui/form-section/form-section.component';
+import { SummaryBlockComponent } from '../ui/summary-block/summary-block.component';
 
 type FormTransacaoData = {
   tipo?: 'compra' | 'despesa-fixa';
@@ -36,23 +41,30 @@ type FormTransacaoData = {
 
 @Component({
   selector: 'dialog-content-example-dialog',
+  standalone: true,
   styleUrl: 'form-transacao.component.scss',
   templateUrl: 'form-transacao.component.html',
   imports: [
-    MatDialogModule,
-    MatButtonModule,
-    MatCardModule,
-    MatSelectModule,
+    AsyncPipe,
+    CommonModule,
+    DatePipe,
     FormsModule,
+    ReactiveFormsModule,
+    MatButtonModule,
+    MatDialogClose,
+    MatSelectModule,
     MatFormFieldModule,
     MatInputModule,
     MatDatepickerModule,
-    ReactiveFormsModule,
     MatChipsModule,
-    CommonModule,
     CategoriaPipe,
     MatProgressSpinnerModule,
     MatIconModule,
+    ModalHeaderComponent,
+    ModalBodyComponent,
+    ModalFooterComponent,
+    FormSectionComponent,
+    SummaryBlockComponent,
   ],
   providers: [provideNativeDateAdapter()],
   changeDetection: ChangeDetectionStrategy.OnPush,
@@ -69,6 +81,7 @@ export class FormTransacaoComponent {
   loading = signal(false);
   private dialogRef = inject(MatDialogRef<FormTransacaoComponent>, { optional: true });
   private dialog = inject(MatDialog);
+  private modal = inject(ModalService);
   private destroyRef = inject(DestroyRef);
   private cdr = inject(ChangeDetectorRef);
   readonly isPremium = this.planService.isPremium();
@@ -123,6 +136,18 @@ export class FormTransacaoComponent {
       return 'Editar despesa fixa';
     }
     return this.isDespesaFixa ? 'Nova despesa fixa' : 'Nova compra';
+  }
+
+  get descricaoDialog(): string {
+    if (this.isEdicaoCompra) {
+      return 'Atualize as informações da compra.';
+    }
+    if (this.isEdicaoDespesaFixa) {
+      return 'Edite a despesa fixa e o parcelamento.';
+    }
+    return this.isDespesaFixa
+      ? 'Cadastre uma despesa recorrente com parcelamento.'
+      : 'Registre uma nova compra avulsa.';
   }
 
   get textoBotaoConfirmacao(): string {
@@ -190,12 +215,8 @@ export class FormTransacaoComponent {
   }
 
   private abrirDialogNovoCartao(): void {
-    const ref = this.dialog.open(DialogNovoCartaoComponent, {
-      width: '480px',
-      maxWidth: '95vw',
-      disableClose: false
-    });
-    ref.afterClosed().pipe(takeUntilDestroyed(this.destroyRef)).subscribe((novoCartao: Cartao | null) => {
+    const ref = this.modal.open<DialogNovoCartaoComponent, unknown, Cartao | null>(DialogNovoCartaoComponent, { size: 'sm' });
+    ref.afterClosed().pipe(takeUntilDestroyed(this.destroyRef)).subscribe((novoCartao) => {
       if (novoCartao) {
         this.recarregarCartoes(novoCartao.id);
       }
@@ -242,7 +263,7 @@ export class FormTransacaoComponent {
     if (!this.formTransacao) {
       return false;
     }
-    return this.formTransacao.valid && (!this.isPremium || this.pagadores.length > 0);
+    return this.formTransacao.valid;
   }
 
   controlInvalido(controlName: string): boolean {
@@ -267,7 +288,7 @@ export class FormTransacaoComponent {
     return 'Valor inválido.';
   }
 
-  cadastrarTransacao() {
+  cadastrarTransacao(): void {
     this.tentouEnviar = true;
 
     if (this.formTransacao.invalid) {
@@ -276,8 +297,8 @@ export class FormTransacaoComponent {
       return;
     }
 
-    if (this.isPremium && !this.pagadores.length) {
-      this.notify.warning('Selecione pelo menos um pagador.');
+    if (!this.isPremium) {
+      this.notify.warning('Esta funcionalidade é exclusiva do plano Premium.');
       return;
     }
 
@@ -357,11 +378,11 @@ export class FormTransacaoComponent {
       takeUntilDestroyed(this.destroyRef)
     ).subscribe({
       next: () => {
-        this.notify.success(this.isEdicaoCompra ? 'Compra atualizada!' : 'Compra cadastrada!');
+        this.notify.success(this.isEdicaoCompra ? 'Compra atualizada com sucesso!' : 'Compra cadastrada com sucesso!');
         this.dialogRef?.close(true);
       },
       error: (err) => {
-        this.notify.error(this.extrairMensagemErro(err) || 'Erro ao salvar compra.');
+        this.notify.error(this.extrairMensagemErro(err) || 'Erro ao cadastrar compra.');
       }
     });
   }
