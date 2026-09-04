@@ -65,10 +65,32 @@ describe('CadastroComponent', () => {
       expect(c?.hasError('pattern')).toBeTrue();
     });
 
+    it('informa o que falta quando a senha não atinge o padrão mínimo', () => {
+      const c = component.cadastroForm.get('password');
+      c?.setValue('abc');
+      c?.markAsTouched();
+
+      expect(component.passwordRequirementMessages()).toEqual([
+        'Use pelo menos 8 caracteres (faltam 5 caracteres).',
+        'Inclua pelo menos um caractere especial: !@#$%^&*(),.?":{}|<>'
+      ]);
+    });
+
     it('senha válida é aceita', () => {
       const c = component.cadastroForm.get('password');
       c?.setValue('Senha@123');
       expect(c?.errors).toBeNull();
+    });
+
+    it('exibe feedback de senha no template quando o campo está inválido e tocado', () => {
+      const c = component.cadastroForm.get('password');
+      c?.setValue('abc');
+      c?.markAsTouched();
+      fixture.detectChanges();
+
+      const feedback = fixture.nativeElement.querySelector('#password-requirements');
+      expect(feedback?.textContent).toContain('Use pelo menos 8 caracteres');
+      expect(feedback?.textContent).toContain('Inclua pelo menos um caractere especial');
     });
   });
 

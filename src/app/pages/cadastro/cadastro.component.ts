@@ -24,6 +24,9 @@ import { AbstractControl, ValidationErrors } from '@angular/forms';
   styleUrls: ['./cadastro.component.scss']
 })
 export class CadastroComponent {
+  private readonly minPasswordLength = 8;
+  private readonly passwordSpecialCharacterPattern = /[!@#$%^&*(),.?":{}|<>]/;
+  readonly passwordSpecialCharacters = '!@#$%^&*(),.?":{}|<>';
   cadastroForm: FormGroup;
   router = inject(Router);
   userService = inject(UserService);
@@ -37,7 +40,11 @@ export class CadastroComponent {
     this.cadastroForm = this.fb.group({
       name: ['', [Validators.required, Validators.maxLength(20)]],
       email: ['', [Validators.required, Validators.email]],
-      password: ['', [Validators.required, Validators.minLength(8), Validators.pattern(/[!@#$%^&*(),.?":{}|<>]/)]],
+      password: ['', [
+        Validators.required,
+        Validators.minLength(this.minPasswordLength),
+        Validators.pattern(this.passwordSpecialCharacterPattern)
+      ]],
       repeatPassword: ['', [Validators.required], [this.passwordMatchValidator.bind(this)]],
     });
   }
@@ -65,8 +72,38 @@ export class CadastroComponent {
     return !!field && field.invalid && (field.dirty || field.touched);
   }
 
+  passwordRequirementMessages(): string[] {
+    const field = this.cadastroForm.get('password');
+
+    if (!field || !field.invalid || !(field.dirty || field.touched)) {
+      return [];
+    }
+
+    const messages: string[] = [];
+
+    if (field.hasError('required')) {
+      messages.push('Informe uma senha.');
+    }
+
+    if (field.hasError('minlength')) {
+      const error = field.getError('minlength');
+      const requiredLength = error?.requiredLength ?? this.minPasswordLength;
+      const actualLength = error?.actualLength ?? 0;
+      const missingLength = Math.max(requiredLength - actualLength, 0);
+      const suffix = missingLength === 1 ? 'falta 1 caractere' : `faltam ${missingLength} caracteres`;
+      messages.push(`Use pelo menos ${requiredLength} caracteres (${suffix}).`);
+    }
+
+    if (field.hasError('pattern')) {
+      messages.push(`Inclua pelo menos um caractere especial: ${this.passwordSpecialCharacters}`);
+    }
+
+    return messages;
+  }
+
   registrar() {
     if (this.cadastroForm.invalid) {
+      this.cadastroForm.markAllAsTouched();
       return;
     }
 

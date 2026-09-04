@@ -178,6 +178,15 @@ $grey-text: #9aa3ab;
   }
 }
 
+.field-feedback {
+  color: var(--sh-color-danger, #c62828);
+  font-size: 12px;
+  line-height: 1.35;
+  list-style: disc;
+  margin: -14px 0 0;
+  padding-left: 18px;
+}
+
 /* ---------- Redes sociais ---------- */
 .social {
   align-items: center;

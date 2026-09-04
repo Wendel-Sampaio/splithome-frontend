@@ -32,12 +32,16 @@
 
         <div class="field" [class.field--invalid]="isInvalid('password')">
           <input formControlName="password" [type]="hide1() ? 'password' : 'text'" placeholder="Criar senha"
-            autocomplete="new-password" aria-label="Criar senha">
+            autocomplete="new-password" aria-label="Criar senha" aria-describedby="password-requirements">
           <button type="button" class="field-toggle" (click)="clickEventPassword($event)"
             [attr.aria-label]="hide1() ? 'Mostrar senha' : 'Ocultar senha'" [attr.aria-pressed]="!hide1()">
             <mat-icon>{{ hide1() ? 'visibility' : 'visibility_off' }}</mat-icon>
           </button>
         </div>
+        <ul class="field-feedback" id="password-requirements" *ngIf="passwordRequirementMessages().length > 0"
+          aria-live="polite">
+          <li *ngFor="let message of passwordRequirementMessages()">{{ message }}</li>
+        </ul>
 
         <div class="field" [class.field--invalid]="isInvalid('repeatPassword')">
           <input formControlName="repeatPassword" [type]="hide2() ? 'password' : 'text'" placeholder="Confirmar senha"
