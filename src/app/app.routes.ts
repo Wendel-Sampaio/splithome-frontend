@@ -5,7 +5,6 @@ import { HomeComponent } from './pages/home/home.component';
 import { RecadosComponent } from './pages/recados/recados.component';
 import { loginGuard } from './core/auth/guards/login.guard';
 import { homeGuard } from './core/auth/guards/home.guard';
-import { FamiliaComponent } from './pages/familia/familia.component';
 
 export const routes: Routes = [
 
@@ -13,6 +12,6 @@ export const routes: Routes = [
     {path: "login", component: LoginComponent, canActivate: [homeGuard]},
     {path: "cadastro", component: CadastroComponent, canActivate: [homeGuard]},
     {path: "home", component: HomeComponent, canActivate: [loginGuard]},
-    {path: "familia", component: FamiliaComponent, canActivate: [loginGuard]},
+    {path: "familia", component: HomeComponent, canActivate: [loginGuard], data: {initialView: 'familia'}},
     {path: "recados", component: RecadosComponent, canActivate: [loginGuard]}
 ];

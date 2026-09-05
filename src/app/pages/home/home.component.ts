@@ -1,7 +1,7 @@
 import { ChangeDetectorRef, Component, DestroyRef, inject } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
-import { Router } from '@angular/router';
+import { ActivatedRoute, Router } from '@angular/router';
 import { MatButtonModule } from '@angular/material/button';
 import { MatCardModule } from '@angular/material/card';
 import { MatDialog } from '@angular/material/dialog';
@@ -20,16 +20,18 @@ import { EstatisticasComponent } from '../estatisticas/estatisticas.component';
 import { UserStateService } from '../../core/auth/user/user-state.service';
 import { ResumoFinanceiroComponent } from '../resumo-financeiro/resumo-financeiro.component';
 import { ModalService } from '../../shared/components/ui/modal';
+import { FamiliaComponent } from '../familia/familia.component';
 
 @Component({
   selector: 'app-home',
-  imports: [MatCardModule, MatIcon, MatButtonModule, MatMenuModule, ComprasComponent, DespesasFixasComponent, MeuPerfilComponent, EstatisticasComponent, ResumoFinanceiroComponent, DashboardInicioComponent, CommonModule, MatToolbarModule],
+  imports: [MatCardModule, MatIcon, MatButtonModule, MatMenuModule, ComprasComponent, DespesasFixasComponent, MeuPerfilComponent, EstatisticasComponent, ResumoFinanceiroComponent, DashboardInicioComponent, FamiliaComponent, CommonModule, MatToolbarModule],
   templateUrl: './home.component.html',
   styleUrl: './home.component.scss'
 })
 export class HomeComponent {
   loginService = inject(UserService);
   router = inject(Router);
+  route = inject(ActivatedRoute);
   planService = inject(PlanService);
   userStateService = inject(UserStateService);
   private cdr = inject(ChangeDetectorRef);
@@ -54,6 +56,10 @@ export class HomeComponent {
 
     if (this.isPremium) {
       this.userStateService.getFamilyUsers().pipe(takeUntilDestroyed(this.destroyRef)).subscribe();
+    }
+
+    if (this.route.snapshot.data['initialView'] === 'familia') {
+      this.abrirFamilia();
     }
   }
 
@@ -127,7 +133,8 @@ export class HomeComponent {
   }
 
   abrirFamilia(): void {
-    this.router.navigate(['/familia']);
+    this.currentView = 'familia';
+    this.currentViewTitle = 'Família';
   }
 
   abrirRecados(): void {

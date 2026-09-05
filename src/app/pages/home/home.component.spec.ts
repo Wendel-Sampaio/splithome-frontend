@@ -38,6 +38,12 @@ describe('HomeComponent', () => {
     expect(component.currentViewTitle).toBe('Compras');
   });
 
+  it('abrirFamilia() deve manter o shell e trocar para a view família', () => {
+    component.abrirFamilia();
+    expect(component.currentView).toBe('familia');
+    expect(component.currentViewTitle).toBe('Família');
+  });
+
   it('alternarMenu() deve minimizar e expandir o menu lateral', () => {
     expect(component.isMenuCollapsed).toBeFalse();
 

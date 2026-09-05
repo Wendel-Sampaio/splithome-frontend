@@ -1,5 +1,5 @@
 import { CommonModule } from '@angular/common';
-import { Component, DestroyRef, OnInit, inject } from '@angular/core';
+import { Component, DestroyRef, EventEmitter, OnInit, Output, inject } from '@angular/core';
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { FormsModule } from '@angular/forms';
 import { MatButtonModule } from '@angular/material/button';
@@ -32,6 +32,8 @@ export class FamiliaComponent implements OnInit {
   private readonly route = inject(ActivatedRoute);
   private readonly snackBar = inject(MatSnackBar);
   private readonly destroyRef = inject(DestroyRef);
+
+  @Output() voltarInicio = new EventEmitter<void>();
 
   user: User = this.userService.getUser();
   family: Familia | null = null;
@@ -76,11 +78,24 @@ export class FamiliaComponent implements OnInit {
     return this.user.plan === 'PREMIUM' && !!this.user.familyCode;
   }
 
+  get isPremium(): boolean {
+    return this.user.plan === 'PREMIUM';
+  }
+
   get podeCriarFamilia(): boolean {
     return !this.criandoFamilia && !this.entrandoFamilia;
   }
 
+  get codigoFamilia(): string {
+    return (this.family?.familyCode || this.user.familyCode || '').trim();
+  }
+
+  get totalMembros(): number {
+    return this.familyMembers.length;
+  }
+
   voltarParaHome(): void {
+    this.voltarInicio.emit();
     this.router.navigate(['/home']);
   }
 
@@ -99,6 +114,7 @@ export class FamiliaComponent implements OnInit {
         next: (token) => {
           this.userService.addToken(token);
           this.snackBar.open('Família criada com sucesso!', '', { duration: 4000 });
+          this.voltarInicio.emit();
           this.router.navigate(['/home']);
         },
         error: () => {
@@ -128,6 +144,7 @@ export class FamiliaComponent implements OnInit {
         next: (token) => {
           this.userService.addToken(token);
           this.snackBar.open('Você entrou na família com sucesso!', '', { duration: 4000 });
+          this.voltarInicio.emit();
           this.router.navigate(['/home']);
         },
         error: () => {

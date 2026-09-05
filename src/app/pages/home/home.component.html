@@ -57,7 +57,8 @@
                 <div class="menu-group">
                     <span class="group-label">Fam&iacute;lia</span>
                     <button (click)="abrirFamilia()"
-                            class="botoes-menu-lateral">
+                            class="botoes-menu-lateral"
+                            [ngClass]="{'selected': currentView === 'familia'}">
                         <mat-icon class="icones-botao">groups</mat-icon>
                         <span class="menu-label">Fam&iacute;lia</span>
                     </button>
@@ -148,6 +149,8 @@
             <mat-card class="content-card" appearance="outlined" *ngIf="currentView === 'resumoFinanceiro'">
                 <mat-card-content><app-resumo-financeiro></app-resumo-financeiro></mat-card-content>
             </mat-card>
+
+            <app-familia *ngIf="currentView === 'familia'" (voltarInicio)="abrirInicio()"></app-familia>
 
             <meu-perfil class="meu-perfil" *ngIf="currentView === 'meuPerfil'" (profilePhotoUpdated)="atualizarFotoPerfil($event)"></meu-perfil>
         </section>
