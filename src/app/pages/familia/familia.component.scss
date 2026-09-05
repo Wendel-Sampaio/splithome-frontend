@@ -112,10 +112,10 @@ button mat-icon {
 }
 
 .familia-grid {
-  align-items: stretch;
+  align-items: start;
   display: grid;
   gap: var(--sh-space-5);
-  grid-template-columns: minmax(0, 1.4fr) minmax(280px, 0.8fr);
+  grid-template-columns: minmax(360px, 0.95fr) minmax(360px, 1.05fr);
 }
 
 .family-onboarding,
@@ -177,6 +177,17 @@ button mat-icon {
   gap: 8px;
 }
 
+.familia-status-panel button {
+  --mdc-filled-button-container-color: var(--sh-color-primary);
+  --mdc-filled-button-label-text-color: #ffffff;
+  --mat-filled-button-state-layer-color: #ffffff;
+  --mat-filled-button-ripple-color: rgba(255, 255, 255, 0.18);
+}
+
+.familia-status-panel button:hover:not(:disabled) {
+  --mdc-filled-button-container-color: var(--sh-color-primary-strong);
+}
+
 .join-box {
   align-items: flex-start;
   background: var(--sh-color-surface-alt);
@@ -187,6 +198,18 @@ button mat-icon {
   grid-template-columns: minmax(0, 1fr) auto;
   margin-top: var(--sh-space-5);
   padding: var(--sh-space-4);
+}
+
+.join-box button {
+  --mdc-outlined-button-label-text-color: var(--sh-color-primary-strong);
+  --mdc-outlined-button-outline-color: var(--sh-color-primary);
+  --mat-outlined-button-state-layer-color: var(--sh-color-primary);
+  --mat-outlined-button-ripple-color: rgba(47, 158, 68, 0.12);
+}
+
+.join-box button:hover:not(:disabled) {
+  background: var(--sh-color-primary-soft);
+  border-color: var(--sh-color-primary-strong);
 }
 
 .join-box mat-form-field {
@@ -385,7 +408,7 @@ button mat-icon {
   background: linear-gradient(135deg, var(--sh-color-surface), var(--sh-color-primary-soft));
 }
 
-@media (max-width: 980px) {
+@media (max-width: 1100px) {
   .familia-hero,
   .familia-grid,
   .family-dashboard {
