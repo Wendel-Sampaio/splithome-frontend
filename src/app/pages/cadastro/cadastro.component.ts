@@ -24,6 +24,7 @@ import { AbstractControl, ValidationErrors } from '@angular/forms';
   styleUrls: ['./cadastro.component.scss']
 })
 export class CadastroComponent {
+  private readonly maxNameLength = 20;
   private readonly minPasswordLength = 8;
   private readonly passwordSpecialCharacterPattern = /[!@#$%^&*(),.?":{}|<>]/;
   readonly passwordSpecialCharacters = '!@#$%^&*(),.?":{}|<>';
@@ -38,7 +39,7 @@ export class CadastroComponent {
 
   constructor(private fb: FormBuilder) {
     this.cadastroForm = this.fb.group({
-      name: ['', [Validators.required, Validators.maxLength(20)]],
+      name: ['', [Validators.required, Validators.maxLength(this.maxNameLength)]],
       email: ['', [Validators.required, Validators.email]],
       password: ['', [
         Validators.required,
@@ -70,6 +71,31 @@ export class CadastroComponent {
   isInvalid(control: string): boolean {
     const field = this.cadastroForm.get(control);
     return !!field && field.invalid && (field.dirty || field.touched);
+  }
+
+  nameRequirementMessages(): string[] {
+    const field = this.cadastroForm.get('name');
+
+    if (!field || !field.invalid || !(field.dirty || field.touched)) {
+      return [];
+    }
+
+    const messages: string[] = [];
+
+    if (field.hasError('required')) {
+      messages.push('Informe seu nome.');
+    }
+
+    if (field.hasError('maxlength')) {
+      const error = field.getError('maxlength');
+      const requiredLength = error?.requiredLength ?? this.maxNameLength;
+      const actualLength = error?.actualLength ?? 0;
+      const excessLength = Math.max(actualLength - requiredLength, 0);
+      const suffix = excessLength === 1 ? 'remova 1 caractere' : `remova ${excessLength} caracteres`;
+      messages.push(`Use no máximo ${requiredLength} caracteres (${suffix}).`);
+    }
+
+    return messages;
   }
 
   passwordRequirementMessages(): string[] {

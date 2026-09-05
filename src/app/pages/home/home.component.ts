@@ -101,6 +101,10 @@ export class HomeComponent {
   }
 
   abrirResumoFinanceiro(): void {
+    if (!this.canOpenPremiumFeature('financial-summary')) {
+      return;
+    }
+
     this.currentView = 'resumoFinanceiro';
     this.currentViewTitle = 'Resumo financeiro';
   }

@@ -53,6 +53,33 @@ describe('CadastroComponent', () => {
       expect(c?.hasError('maxlength')).toBeTrue();
     });
 
+    it('informa o que falta quando o nome não atinge o padrão aceito', () => {
+      const c = component.cadastroForm.get('name');
+      c?.setValue('');
+      c?.markAsTouched();
+
+      expect(component.nameRequirementMessages()).toEqual(['Informe seu nome.']);
+    });
+
+    it('informa quantos caracteres remover quando o nome passa do limite', () => {
+      const c = component.cadastroForm.get('name');
+      c?.setValue('NomeMuitoLongoParaOCampoX');
+      c?.markAsTouched();
+
+      expect(component.nameRequirementMessages()).toEqual(['Use no máximo 20 caracteres (remova 5 caracteres).']);
+    });
+
+    it('exibe feedback de nome no template quando o campo está inválido e tocado', () => {
+      const c = component.cadastroForm.get('name');
+      c?.setValue('NomeMuitoLongoParaOCampoX');
+      c?.markAsTouched();
+      fixture.detectChanges();
+
+      const feedback = fixture.nativeElement.querySelector('#name-requirements');
+      expect(feedback?.textContent).toContain('Use no máximo 20 caracteres');
+      expect(feedback?.textContent).toContain('remova 5 caracteres');
+    });
+
     it('email inválido é rejeitado', () => {
       const c = component.cadastroForm.get('email');
       c?.setValue('email-invalido');

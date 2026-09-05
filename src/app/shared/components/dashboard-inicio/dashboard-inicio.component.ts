@@ -72,7 +72,9 @@ export class DashboardInicioComponent implements OnInit {
 
     forkJoin({
       estatisticas: this.estatisticasService.buscarResumo().pipe(catchError(() => of(null))),
-      resumo: this.resumoService.buscarResumo().pipe(catchError(() => of(null))),
+      resumo: this.userService.isPremium()
+        ? this.resumoService.buscarResumo().pipe(catchError(() => of(null)))
+        : of(null),
       compras: this.compraService
         .listarCompras({ size: 5, sort: 'purchaseDate,desc' })
         .pipe(catchError(() => of(null))),

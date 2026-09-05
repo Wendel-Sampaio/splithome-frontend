@@ -1,8 +1,88 @@
-:host { display: block; }
+:host {
+  display: block;
+  --sh-modal-body-padding: var(--sh-space-5) var(--sh-space-6) var(--sh-space-6);
+  --sh-modal-footer-padding: var(--sh-space-4) var(--sh-space-6) var(--sh-space-5);
+}
+
+.sh-upgrade__hero {
+  align-items: center;
+  background: var(--sh-color-primary-soft);
+  border: 1px solid var(--sh-color-primary-muted);
+  border-radius: 8px;
+  display: flex;
+  gap: var(--sh-space-4);
+  margin-bottom: var(--sh-space-6);
+  padding: var(--sh-space-4);
+}
+
+.sh-upgrade__hero-icon {
+  align-items: center;
+  background: var(--sh-color-primary);
+  border-radius: 8px;
+  color: #ffffff;
+  display: inline-flex;
+  flex: 0 0 44px;
+  height: 44px;
+  justify-content: center;
+  width: 44px;
+
+  mat-icon {
+    font-size: 24px;
+    height: 24px;
+    line-height: 24px;
+    width: 24px;
+  }
+}
+
+.sh-upgrade__hero-text {
+  display: grid;
+  gap: var(--sh-space-1);
+  min-width: 0;
+
+  > span {
+    color: var(--sh-color-primary-strong);
+    font-size: 12px;
+    font-weight: 800;
+    letter-spacing: 0.02em;
+    text-transform: uppercase;
+  }
+
+  strong {
+    color: var(--sh-color-text);
+    font-size: 17px;
+    font-weight: 700;
+    line-height: 1.3;
+  }
+}
+
+.sh-upgrade__section {
+  display: grid;
+  gap: var(--sh-space-4);
+}
+
+.sh-upgrade__section-header {
+  display: grid;
+  gap: var(--sh-space-1);
+
+  span {
+    color: var(--sh-color-text);
+    font-size: 14px;
+    font-weight: 700;
+    text-transform: uppercase;
+  }
+
+  p {
+    color: var(--sh-color-text-muted);
+    font-size: 13px;
+    line-height: 1.45;
+    margin: 0;
+  }
+}
 
 .sh-upgrade__benefits {
   display: grid;
   gap: var(--sh-space-3);
+  grid-template-columns: repeat(2, minmax(0, 1fr));
   list-style: none;
   margin: 0;
   padding: 0;
@@ -10,36 +90,43 @@
 
 .sh-upgrade__benefit {
   align-items: flex-start;
-  background: var(--sh-color-primary-soft);
-  border: 1px solid var(--sh-color-primary-muted);
-  border-radius: var(--sh-radius-md);
+  background: var(--sh-color-surface-alt);
+  border: 1px solid var(--sh-color-border);
+  border-radius: 8px;
   display: flex;
   gap: var(--sh-space-3);
-  padding: var(--sh-space-3) var(--sh-space-4);
+  min-height: 104px;
+  padding: var(--sh-space-4);
+}
+
+.sh-upgrade__benefit:first-child {
+  grid-column: 1 / -1;
+  min-height: 0;
 }
 
 .sh-upgrade__benefit-icon {
   align-items: center;
-  background: var(--sh-color-primary);
+  background: var(--sh-color-primary-soft);
   border-radius: 50%;
-  color: #ffffff;
+  color: var(--sh-color-primary-strong);
   display: inline-flex;
-  flex: 0 0 36px;
-  height: 36px;
+  flex: 0 0 34px;
+  height: 34px;
   justify-content: center;
-  width: 36px;
+  width: 34px;
 
   mat-icon {
-    font-size: 20px;
-    height: 20px;
-    line-height: 20px;
-    width: 20px;
+    font-size: 19px;
+    height: 19px;
+    line-height: 19px;
+    width: 19px;
   }
 }
 
 .sh-upgrade__benefit-text {
   display: grid;
   gap: 4px;
+  min-width: 0;
 
   strong {
     color: var(--sh-color-text);
@@ -51,5 +138,59 @@
     color: var(--sh-color-text-muted);
     font-size: 13px;
     line-height: 1.4;
+  }
+}
+
+.sh-upgrade__cancel.mat-mdc-outlined-button {
+  --mdc-outlined-button-label-text-color: var(--sh-color-primary-strong);
+  --mdc-outlined-button-outline-color: var(--sh-color-primary-muted);
+  --mat-outlined-button-state-layer-color: var(--sh-color-primary);
+  color: var(--sh-color-primary-strong);
+  font-weight: 700;
+}
+
+.sh-upgrade__cta.mat-mdc-unelevated-button {
+  --mdc-filled-button-container-color: var(--sh-color-primary);
+  --mdc-filled-button-label-text-color: #ffffff;
+  --mat-filled-button-state-layer-color: #ffffff;
+  color: #ffffff;
+  font-weight: 700;
+  min-width: 156px;
+
+  mat-icon {
+    font-size: 19px;
+    height: 19px;
+    line-height: 19px;
+    margin-right: var(--sh-space-1);
+    width: 19px;
+  }
+
+  &:hover {
+    --mdc-filled-button-container-color: var(--sh-color-primary-strong);
+  }
+}
+
+@media (max-width: 560px) {
+  :host {
+    --sh-modal-body-padding: var(--sh-space-4);
+    --sh-modal-footer-padding: var(--sh-space-3) var(--sh-space-4) var(--sh-space-4);
+  }
+
+  .sh-upgrade__hero {
+    padding: var(--sh-space-4);
+  }
+
+  .sh-upgrade__benefits {
+    grid-template-columns: 1fr;
+  }
+
+  .sh-upgrade__benefit:first-child {
+    grid-column: auto;
+  }
+
+  .sh-upgrade__hero-icon {
+    flex-basis: 40px;
+    height: 40px;
+    width: 40px;
   }
 }

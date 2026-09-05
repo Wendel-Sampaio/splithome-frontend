@@ -7,7 +7,8 @@ export type PlanFeature =
   | 'family-sharing'
   | 'split-payments'
   | 'family-management'
-  | 'messages';
+  | 'messages'
+  | 'financial-summary';
 
 @Injectable({ providedIn: 'root' })
 export class PlanService {

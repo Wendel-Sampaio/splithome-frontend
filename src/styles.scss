@@ -314,6 +314,10 @@ a:hover {
   padding: 0;
 }
 
+.cdk-overlay-pane.sh-modal .mat-mdc-dialog-content.sh-modal-body {
+  padding: var(--sh-modal-body-padding, var(--sh-space-2) var(--sh-space-6) var(--sh-space-6));
+}
+
 .cdk-overlay-pane.sh-modal .mat-mdc-dialog-title {
   margin: 0;
 }
@@ -322,6 +326,10 @@ a:hover {
   margin: 0;
   min-height: auto;
   padding: 0;
+}
+
+.cdk-overlay-pane.sh-modal .mat-mdc-dialog-actions.sh-modal-footer {
+  padding: var(--sh-modal-footer-padding, var(--sh-space-4) var(--sh-space-6));
 }
 
 @media (max-width: 600px) {

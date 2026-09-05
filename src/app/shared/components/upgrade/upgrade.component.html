@@ -1,12 +1,24 @@
 <app-modal-header
   title="Recurso Premium"
-  description="Esta funcionalidade faz parte do plano Premium da SplitHome."
-  icon="workspace_premium" />
+  description="Esta funcionalidade faz parte do plano Premium da SplitHome." />
 
 <app-modal-body>
-  <app-form-section title="Por que fazer upgrade" [description]="message" />
+  <section class="sh-upgrade__hero" aria-label="Aviso de recurso Premium">
+    <span class="sh-upgrade__hero-icon" aria-hidden="true">
+      <mat-icon>lock_open</mat-icon>
+    </span>
+    <div class="sh-upgrade__hero-text">
+      <span>Upgrade necessário</span>
+      <strong>{{ message }}</strong>
+    </div>
+  </section>
 
-  <app-form-section title="Benefícios inclusos" description="Tudo o que você desbloqueia ao ser Premium.">
+  <section class="sh-upgrade__section" aria-label="Benefícios inclusos">
+    <div class="sh-upgrade__section-header">
+      <span>Benefícios inclusos</span>
+      <p>Recursos para dividir gastos, acompanhar saldos e manter a casa organizada.</p>
+    </div>
+
     <ul class="sh-upgrade__benefits" aria-label="Benefícios do plano Premium">
       @for (benefit of benefits; track benefit.title) {
         <li class="sh-upgrade__benefit">
@@ -20,7 +32,7 @@
         </li>
       }
     </ul>
-  </app-form-section>
+  </section>
 
   @if (showInstructions) {
     <app-summary-block title="Como fazer upgrade" icon="support_agent" variant="info">
@@ -30,6 +42,9 @@
 </app-modal-body>
 
 <app-modal-footer align="end">
-  <button mat-button mat-dialog-close>Agora não</button>
-  <button mat-flat-button color="primary" cdkFocusInitial (click)="showUpgradeInstructions()">Fazer upgrade</button>
+  <button class="sh-upgrade__cancel" mat-stroked-button mat-dialog-close>Agora não</button>
+  <button class="sh-upgrade__cta" mat-flat-button cdkFocusInitial (click)="showUpgradeInstructions()">
+    <mat-icon>workspace_premium</mat-icon>
+    Fazer upgrade
+  </button>
 </app-modal-footer>

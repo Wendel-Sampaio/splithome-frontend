@@ -44,9 +44,13 @@
                     </button>
                     <button (click)="abrirResumoFinanceiro()"
                             class="botoes-menu-lateral"
-                            [ngClass]="{'selected': currentView === 'resumoFinanceiro'}">
+                            [ngClass]="{'selected': currentView === 'resumoFinanceiro', 'premium-locked': !isPremium}">
                         <mat-icon class="icones-botao">account_balance_wallet</mat-icon>
                         <span class="menu-label">Resumo financeiro</span>
+                        <span *ngIf="!isPremium" class="premium-lock">
+                            <mat-icon class="lock-icon" aria-hidden="true">lock</mat-icon>
+                            Premium
+                        </span>
                     </button>
                 </div>
 

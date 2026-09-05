@@ -3,7 +3,6 @@ import { MatButtonModule } from '@angular/material/button';
 import { MatIconModule } from '@angular/material/icon';
 import { MAT_DIALOG_DATA, MatDialogClose } from '@angular/material/dialog';
 import type { PlanFeature } from '../../../core/plan/plan.service';
-import { FormSectionComponent } from '../ui/form-section/form-section.component';
 import { ModalBodyComponent } from '../ui/modal-body/modal-body.component';
 import { ModalFooterComponent } from '../ui/modal-footer/modal-footer.component';
 import { ModalHeaderComponent } from '../ui/modal-header/modal-header.component';
@@ -17,7 +16,8 @@ const FEATURE_MESSAGES: Record<PlanFeature, string> = {
   'family-sharing': 'O compartilhamento familiar está disponível apenas para usuários Premium.',
   'split-payments': 'A divisão de gastos está disponível apenas para usuários Premium.',
   'family-management': 'O gerenciamento familiar está disponível apenas para usuários Premium.',
-  messages: 'Os recados estão disponíveis apenas para usuários Premium.'
+  messages: 'Os recados estão disponíveis apenas para usuários Premium.',
+  'financial-summary': 'O resumo financeiro familiar está disponível apenas para usuários Premium.'
 };
 
 const PREMIUM_BENEFITS = [
@@ -49,7 +49,6 @@ const PREMIUM_BENEFITS = [
     ModalHeaderComponent,
     ModalBodyComponent,
     ModalFooterComponent,
-    FormSectionComponent,
     SummaryBlockComponent,
   ],
   templateUrl: './upgrade.component.html',

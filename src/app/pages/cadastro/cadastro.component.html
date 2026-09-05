@@ -21,9 +21,14 @@
     <div class="form-side">
       <form class="auth-form" [formGroup]="cadastroForm" (ngSubmit)="registrar()">
         <div class="field" [class.field--invalid]="isInvalid('name')">
-          <input formControlName="name" type="text" placeholder="Nome" autocomplete="name" aria-label="Nome">
+          <input formControlName="name" type="text" placeholder="Nome" autocomplete="name" aria-label="Nome"
+            aria-describedby="name-requirements">
           <mat-icon>person</mat-icon>
         </div>
+        <ul class="field-feedback" id="name-requirements" *ngIf="nameRequirementMessages().length > 0"
+          aria-live="polite">
+          <li *ngFor="let message of nameRequirementMessages()">{{ message }}</li>
+        </ul>
 
         <div class="field" [class.field--invalid]="isInvalid('email')">
           <input formControlName="email" type="email" placeholder="E-mail" autocomplete="email" aria-label="E-mail">
