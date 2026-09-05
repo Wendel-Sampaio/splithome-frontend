@@ -11,6 +11,7 @@ import { MatInputModule } from '@angular/material/input';
 import { MatProgressSpinnerModule } from '@angular/material/progress-spinner';
 import { MatSelectModule } from '@angular/material/select';
 import { MatTableModule } from '@angular/material/table';
+import { MatTooltipModule } from '@angular/material/tooltip';
 import { Cartao, CreditCardBrand } from '../../../core/models/cartao/cartao';
 import { CompraService } from '../../services/compra/compra.service';
 import { NotificationService } from '../../services/notification/notification.service';
@@ -32,7 +33,8 @@ import { ModalService } from '../ui/modal';
     MatFormFieldModule,
     MatInputModule,
     MatSelectModule,
-    MatProgressSpinnerModule
+    MatProgressSpinnerModule,
+    MatTooltipModule
   ]
 })
 export class CartoesComponent implements OnInit {
@@ -50,6 +52,10 @@ export class CartoesComponent implements OnInit {
   editandoId: string | null = null;
 
   displayedColumns: string[] = ['name', 'brand', 'lastDigits', 'dueDay', 'billingDay', 'actions'];
+
+  get totalCartoes(): number {
+    return this.cartoes.length;
+  }
 
   ngOnInit(): void {
     this.formCartao = this.fb.group({
@@ -92,6 +98,27 @@ export class CartoesComponent implements OnInit {
     this.formCartao.reset({
       brand: null, billingDay: 1, dueDay: 10
     });
+  }
+
+  brandLabel(brand: CreditCardBrand | null): string {
+    const labels: Record<CreditCardBrand, string> = {
+      VISA: 'Visa',
+      MASTERCARD: 'Mastercard',
+      ELO: 'Elo',
+      AMEX: 'Amex',
+      HIPERCARD: 'Hipercard',
+      OUTROS: 'Outros'
+    };
+
+    return brand ? labels[brand] : 'Sem bandeira';
+  }
+
+  brandInitial(brand: CreditCardBrand | null): string {
+    return this.brandLabel(brand).slice(0, 2).toUpperCase();
+  }
+
+  maskedDigits(cartao: Cartao): string {
+    return cartao.lastDigits ? `**** ${cartao.lastDigits}` : '-';
   }
 
   salvar(): void {

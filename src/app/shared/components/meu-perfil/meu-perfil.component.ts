@@ -7,6 +7,7 @@ import { MatFormFieldModule } from '@angular/material/form-field';
 import { MatIcon } from '@angular/material/icon';
 import { MatInputModule } from '@angular/material/input';
 import { MatProgressSpinnerModule } from '@angular/material/progress-spinner';
+import { MatTooltipModule } from '@angular/material/tooltip';
 import { finalize } from 'rxjs';
 import { User } from '../../../core/models/user/user';
 import { UserService } from '../../../core/auth/user/user.service';
@@ -22,7 +23,7 @@ import { NotificationService } from '../../services/notification/notification.se
   imports: [
     MatCardModule, MatButtonModule, MatIcon, MatFormFieldModule,
     MatInputModule, MatProgressSpinnerModule, CommonModule, FormsModule,
-    MatTabsModule, CartoesComponent
+    MatTabsModule, MatTooltipModule, CartoesComponent
   ],
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
@@ -56,6 +57,15 @@ export class MeuPerfilComponent implements OnInit {
     this.isEditable = !this.isEditable;
   }
 
+  handlePrimaryAction() {
+    if (!this.isEditable) {
+      this.toggleEditMode();
+      return;
+    }
+
+    this.atualizarUsuario();
+  }
+
   cancelEdit() {
     this.isEditable = false;
     this.loadUserData();
@@ -63,6 +73,22 @@ export class MeuPerfilComponent implements OnInit {
 
   get profilePhotoUrl(): string {
     return this.userService.getProfilePhoto(this.userData);
+  }
+
+  get userInitials(): string {
+    const initials = (this.userData.name || this.userData.email || '?')
+      .trim()
+      .split(/\s+/)
+      .filter(Boolean)
+      .slice(0, 2)
+      .map(part => part.charAt(0).toUpperCase())
+      .join('');
+
+    return initials || '?';
+  }
+
+  get planLabel(): string {
+    return this.userData.plan === 'PREMIUM' ? 'Premium' : 'Grátis';
   }
 
   onProfilePhotoSelected(event: Event) {
@@ -127,6 +153,7 @@ export class MeuPerfilComponent implements OnInit {
     ).subscribe({
       next: () => {
         this.notify.success('Usuário atualizado com sucesso!');
+        this.isEditable = false;
         this.loadUserData();
       },
       error: () => {

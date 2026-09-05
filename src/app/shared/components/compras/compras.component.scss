@@ -1,120 +1,349 @@
-// Definindo variáveis de cores
-$primary-color: #4caf50;        // Cor principal (verde)
-$secondary-color: #4caf50;      // Cor azul para o botão de pagamento
-$secondary-hover: #21f321;      // Cor de hover para o botão de pagamento
-$paid-background: #e8f5e9;      // Cor de fundo para itens pagos (verde claro)
-$paid-border-color: #66bb6a;    // Cor de borda para itens pagos
-$remove-button-color: #f443369f;  // Cor do botão de remover (vermelho)
-$remove-button-hover: #f44336;  // Cor de hover para o botão de remover
-$header-background: #f4f4f4;    // Cor de fundo das cabeçalhos da tabela
-$error-text-color: #f44336;     // Cor de erro (texto vermelho)
-$white-color: #ffffff;          // Cor branca
-
-
-
-// Painel de filtros
-.filter-bar {
-  display: flex;
-  flex-wrap: wrap;
-  gap: 12px;
-  padding: 12px 16px 0;
-
-  .filter-field {
-    flex: 1 1 180px;
-    min-width: 160px;
-    max-width: 260px;
-  }
-}
-
-.table table .edit-buttom {
-  background-color: #005cbb;
-  margin-right: 6px;
-
-  &:hover {
-    background-color: #004494;
-  }
-}
-
-// Estilos para a tabela de compras
-.table {
-  margin-top: 20px;
-  overflow-x: auto;
+:host {
   display: block;
+}
 
-  // Estilo da tabela
-  table {
-    width: 100%;
-    border-collapse: collapse;
-    border: 1px solid #ddd;    
-  
+.compras-page {
+  display: grid;
+  gap: var(--sh-space-5);
+}
 
-    // Estilo das colunas (cabeçalhos)
-    .column-name {
-      text-align: left;                 
-      font-weight: bold;                
-      background-color: $header-background;
-      padding: 10px;                    
-    }
+.compras-hero {
+  align-items: stretch;
+  background:
+    linear-gradient(135deg, rgba(233, 248, 237, 0.94), rgba(255, 255, 255, 0.98)),
+    radial-gradient(circle at top right, rgba(37, 99, 235, 0.1), transparent 34%);
+  border: 1px solid var(--sh-color-border);
+  border-radius: var(--sh-radius-lg);
+  display: grid;
+  gap: var(--sh-space-5);
+  grid-template-columns: minmax(260px, 1fr) minmax(260px, 0.9fr) auto;
+  padding: var(--sh-space-6);
+}
 
-    // Estilo das células da tabela
-    td {
-      padding: 10px;                    
-      text-align: left;                
-      border-bottom: 1px solid #ddd;    
-    }
+.section-label {
+  color: var(--sh-color-text-muted);
+  font-size: 12px;
+  font-weight: 800;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+}
 
-    // Estilo para itens pagos
-    .payed-style {
-      background-color: $paid-background;  
-    }
+.compras-copy {
+  align-self: center;
+}
 
+.compras-summary {
+  display: grid;
+  gap: var(--sh-space-3);
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+}
 
-    // Estilo para o botão de pagamento
-    .payment-button {
-      background-color: $secondary-color;  // Cor de fundo para o botão
-      color: $white-color;                 // Cor do texto (branco)
-      padding: 8px 17px;                   // Padding interno do botão
-      border: none;                        // Sem borda
-      cursor: pointer;                    // Cursor de clique
-      border-radius: 4px;                  // Bordas arredondadas
-      font-weight: bold;                   // Negrito no texto do botão
-      &:hover {
-        background-color: $secondary-hover;  // Cor de fundo ao passar o mouse
-      }
+.summary-item {
+  background: rgba(255, 255, 255, 0.78);
+  border: 1px solid var(--sh-color-border);
+  border-radius: var(--sh-radius-md);
+  display: grid;
+  gap: 6px;
+  min-height: 76px;
+  padding: var(--sh-space-3);
+}
 
-      // Estilo para o botão quando o pagamento já foi efetuado
-      &.payed-button {
-        background-color: $paid-border-color;  // Cor de fundo para o botão quando pago
-        cursor: not-allowed;                   // Cursor desabilitado
-        &:hover {
-          background-color: $primary-color;    // Não permite mudança de cor no hover
-        }
-      }
-    }
+.summary-item span {
+  color: var(--sh-color-text-muted);
+  font-size: 12px;
+  font-weight: 700;
+}
 
-    // Estilo para o texto de erro "Indisponível"
-    span {
-      color: $error-text-color;  // Cor vermelha para o erro
-    }
+.summary-item strong {
+  color: var(--sh-color-text);
+  font-size: 22px;
+  font-weight: 900;
+  line-height: 1;
+}
 
-    // Estilo para o botão de remover
-    button {
-      padding: 5px 10px;                      // Padding interno do botão
-      background-color: $remove-button-color;  // Cor de fundo para o botão
-      color: $white-color;                     // Cor do texto (branco)
-      border: none;                            // Sem borda
-      cursor: pointer;                        // Cursor de clique
-      border-radius: 4px;                      // Bordas arredondadas
-      &:hover {
-        background-color: $remove-button-hover; // Cor de fundo ao passar o mouse
-      }
-    }
+.compras-actions {
+  align-content: center;
+  display: grid;
+  gap: var(--sh-space-3);
+}
+
+.compras-actions button,
+.filter-heading button,
+.payment-button {
+  gap: 8px;
+}
+
+.compras-actions .mat-mdc-unelevated-button,
+.compras-actions .mat-mdc-flat-button {
+  --mdc-filled-button-container-color: var(--sh-color-primary);
+  --mdc-filled-button-label-text-color: #ffffff;
+  font-weight: 800;
+}
+
+.compras-actions .mat-mdc-outlined-button,
+.filter-heading .mat-mdc-outlined-button {
+  --mdc-outlined-button-label-text-color: var(--sh-color-primary-strong);
+  --mdc-outlined-button-outline-color: var(--sh-color-primary-muted);
+  font-weight: 800;
+}
+
+.filter-panel,
+.compras-list-panel {
+  border: 1px solid var(--sh-color-border);
+  border-radius: var(--sh-radius-lg);
+}
+
+.filter-panel {
+  background: var(--sh-color-surface-alt);
+  padding: var(--sh-space-5);
+}
+
+.filter-heading,
+.list-toolbar,
+.purchase-cell,
+.row-actions {
+  align-items: center;
+  display: flex;
+}
+
+.filter-heading,
+.list-toolbar {
+  gap: var(--sh-space-4);
+  justify-content: space-between;
+  margin-bottom: var(--sh-space-4);
+}
+
+.filter-heading h2,
+.list-toolbar h2 {
+  color: var(--sh-color-text);
+  font-size: 20px;
+  font-weight: 800;
+  line-height: 1.2;
+  margin: 5px 0 0;
+}
+
+.filter-grid {
+  display: grid;
+  gap: var(--sh-space-3);
+  grid-template-columns: minmax(240px, 1.4fr) repeat(4, minmax(170px, 1fr));
+}
+
+.filter-grid mat-form-field {
+  min-width: 0;
+  width: 100%;
+}
+
+.compras-list-panel {
+  background: var(--sh-color-surface);
+  overflow: hidden;
+  padding: var(--sh-space-5);
+}
+
+.results-chip,
+.category-chip,
+.buyer-pill,
+.unavailable-chip {
+  align-items: center;
+  border-radius: 999px;
+  display: inline-flex;
+  font-size: 12px;
+  font-weight: 800;
+  min-height: 28px;
+  padding: 5px 10px;
+}
+
+.results-chip {
+  background: var(--sh-color-primary-soft);
+  border: 1px solid var(--sh-color-primary-muted);
+  color: var(--sh-color-primary-strong);
+  gap: 6px;
+}
+
+.results-chip mat-icon {
+  font-size: 17px;
+  height: 17px;
+  width: 17px;
+}
+
+.table-shell {
+  border: 1px solid var(--sh-color-border);
+  border-radius: var(--sh-radius-md);
+  overflow: auto;
+}
+
+table {
+  min-width: 980px;
+  width: 100%;
+}
+
+.mat-mdc-header-row {
+  background: var(--sh-color-surface-alt);
+}
+
+.mat-mdc-header-cell {
+  color: var(--sh-color-text-muted);
+  font-size: 12px;
+  font-weight: 800;
+  text-transform: uppercase;
+}
+
+.mat-mdc-cell {
+  color: var(--sh-color-text);
+}
+
+.mat-mdc-row:hover {
+  background: var(--sh-color-bg-strong);
+}
+
+.payed-style {
+  background: var(--sh-color-primary-soft);
+}
+
+.purchase-cell {
+  gap: var(--sh-space-3);
+  min-width: 210px;
+}
+
+.purchase-icon,
+.empty-icon {
+  align-items: center;
+  background: var(--sh-color-primary-soft);
+  border: 1px solid var(--sh-color-primary-muted);
+  border-radius: var(--sh-radius-md);
+  color: var(--sh-color-primary-strong);
+  display: inline-flex;
+  justify-content: center;
+}
+
+.purchase-icon {
+  flex: 0 0 40px;
+  height: 40px;
+  width: 40px;
+}
+
+.purchase-cell strong {
+  color: var(--sh-color-text);
+  display: block;
+  font-weight: 800;
+  max-width: 190px;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.purchase-cell span,
+.people-text {
+  color: var(--sh-color-text-muted);
+  font-size: 13px;
+}
+
+.category-chip,
+.buyer-pill {
+  background: var(--sh-color-surface-alt);
+  border: 1px solid var(--sh-color-border);
+  color: var(--sh-color-text-muted);
+}
+
+.money-value {
+  color: var(--sh-color-text);
+  font-weight: 900;
+}
+
+.payment-button.mat-mdc-outlined-button {
+  --mdc-outlined-button-label-text-color: var(--sh-color-primary-strong);
+  --mdc-outlined-button-outline-color: var(--sh-color-primary-muted);
+  min-width: 96px;
+}
+
+.payment-button.payed-button {
+  --mdc-outlined-button-label-text-color: var(--sh-color-success);
+  --mdc-outlined-button-outline-color: var(--sh-color-primary-muted);
+  background: var(--sh-color-primary-soft);
+}
+
+.unavailable-chip {
+  background: #fff4f4;
+  border: 1px solid #ffd8d8;
+  color: var(--sh-color-danger);
+}
+
+.row-actions {
+  gap: 2px;
+}
+
+.row-actions button {
+  color: var(--sh-color-primary-strong);
+}
+
+.row-actions .danger-action {
+  color: var(--sh-color-danger);
+}
+
+.loading-overlay,
+.empty-state {
+  align-items: center;
+  color: var(--sh-color-text-muted);
+  display: grid;
+  gap: var(--sh-space-3);
+  justify-items: center;
+  padding: var(--sh-space-8);
+  text-align: center;
+}
+
+.empty-state {
+  background: var(--sh-color-surface-alt);
+  border: 1px dashed var(--sh-color-border-strong);
+  border-radius: var(--sh-radius-md);
+}
+
+.empty-icon {
+  height: 48px;
+  width: 48px;
+}
+
+.empty-state strong {
+  color: var(--sh-color-text);
+  font-size: 17px;
+}
+
+.empty-state p {
+  line-height: 1.5;
+  margin: 0;
+}
+
+mat-paginator {
+  border-top: 1px solid var(--sh-color-border);
+}
+
+@media (max-width: 1180px) {
+  .compras-hero {
+    grid-template-columns: 1fr;
+  }
+
+  .compras-actions {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+
+  .filter-grid {
+    grid-template-columns: repeat(2, minmax(220px, 1fr));
   }
 }
 
+@media (max-width: 680px) {
+  .compras-hero,
+  .filter-heading,
+  .list-toolbar {
+    align-items: stretch;
+  }
 
-.loading-overlay {
-  display: flex;
-  justify-content: center;
-  padding: 2rem 0;
+  .compras-summary,
+  .compras-actions,
+  .filter-grid {
+    grid-template-columns: 1fr;
+  }
+
+  .filter-heading,
+  .list-toolbar {
+    flex-direction: column;
+  }
 }

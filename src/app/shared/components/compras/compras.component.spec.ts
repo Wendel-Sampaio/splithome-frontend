@@ -78,4 +78,16 @@ describe('ComprasComponent', () => {
       expect(resultado).toEqual([]);
     });
   });
+
+  it('identifica e limpa filtros ativos', () => {
+    component.filterForm.patchValue({ title: 'mercado' });
+
+    expect(component.hasActiveFilters).toBeTrue();
+
+    component.limparFiltros();
+
+    expect(component.hasActiveFilters).toBeFalse();
+    expect(component.filterForm.value.title).toBe('');
+    expect(component.filterForm.value.category).toBeNull();
+  });
 });

@@ -52,6 +52,7 @@ describe('MeuPerfilComponent', () => {
     component.atualizarUsuario();
     expect(userService.atualizarUsuario).toHaveBeenCalled();
     expect(notify.success).toHaveBeenCalledWith('Usuário atualizado com sucesso!');
+    expect(component.isEditable).toBeFalse();
     expect(component.loading()).toBe(false);
   });
 
@@ -68,5 +69,24 @@ describe('MeuPerfilComponent', () => {
     userService.atualizarUsuario.calls.reset();
     component.atualizarUsuario();
     expect(userService.atualizarUsuario).not.toHaveBeenCalled();
+  });
+
+  it('handlePrimaryAction habilita edição quando está em visualização', () => {
+    component.isEditable = false;
+    userService.atualizarUsuario.calls.reset();
+    component.handlePrimaryAction();
+    expect(component.isEditable).toBeTrue();
+    expect(userService.atualizarUsuario).not.toHaveBeenCalled();
+  });
+
+  it('handlePrimaryAction salva quando já está editando', () => {
+    component.isEditable = true;
+    component.handlePrimaryAction();
+    expect(userService.atualizarUsuario).toHaveBeenCalled();
+  });
+
+  it('userInitials usa nome quando disponível', () => {
+    component.userData = { ...fakeUser, name: 'Nataniel Cesar' };
+    expect(component.userInitials).toBe('NC');
   });
 });

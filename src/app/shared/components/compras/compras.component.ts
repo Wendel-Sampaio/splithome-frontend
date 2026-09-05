@@ -30,6 +30,8 @@ import { TransacaoService } from '../../services/transacao/transacao.service';
 import { parseOfxExpenses } from '../../services/ofx/ofx-parser';
 import { forkJoin } from 'rxjs';
 import { ModalService } from '../ui/modal';
+import { MatButtonModule } from '@angular/material/button';
+import { MatTooltipModule } from '@angular/material/tooltip';
 
 interface Purchaser {
   id: string;
@@ -55,7 +57,9 @@ interface Purchaser {
     MatDatepickerModule,
     MatNativeDateModule,
     ReactiveFormsModule,
-    MatProgressSpinnerModule
+    MatProgressSpinnerModule,
+    MatButtonModule,
+    MatTooltipModule
   ],
 })
 export class ComprasComponent implements OnInit {
@@ -309,8 +313,23 @@ export class ComprasComponent implements OnInit {
     return this.isPremium ? this.premiumColumns : this.freeColumns;
   }
 
+  get hasActiveFilters(): boolean {
+    const f = this.filterForm.value;
+    return Boolean(f.title || f.category || f.purchaserId || f.startDate || f.endDate);
+  }
+
   recarregarCompras() {
     this.recarregarComprasSubject.next();
+  }
+
+  limparFiltros(): void {
+    this.filterForm.reset({
+      title: '',
+      category: null,
+      purchaserId: null,
+      startDate: null,
+      endDate: null,
+    });
   }
 
   tratamentoLista(compras: Compra[]): Observable<Compra[]> {

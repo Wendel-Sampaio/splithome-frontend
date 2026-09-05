@@ -1,84 +1,158 @@
-<div class="cartoes-container">
-  <h2>Cartões de crédito</h2>
-
-  <form [formGroup]="formCartao" (ngSubmit)="salvar()" class="form-cartao">
-    <mat-form-field appearance="outline">
-      <mat-label>Nome do cartão</mat-label>
-      <input matInput formControlName="name" />
-    </mat-form-field>
-
-    <mat-form-field appearance="outline">
-      <mat-label>Bandeira</mat-label>
-      <mat-select formControlName="brand">
-        <mat-option [value]="null">Sem bandeira</mat-option>
-        <mat-option *ngFor="let m of marcas" [value]="m">{{ m }}</mat-option>
-      </mat-select>
-    </mat-form-field>
-
-    <mat-form-field appearance="outline">
-      <mat-label>Últimos 4 dígitos</mat-label>
-      <input matInput formControlName="lastDigits" maxlength="4" />
-    </mat-form-field>
-
-    <mat-form-field appearance="outline">
-      <mat-label>Dia de fechamento</mat-label>
-      <input matInput formControlName="billingDay" type="number" min="1" max="31" />
-    </mat-form-field>
-
-    <mat-form-field appearance="outline">
-      <mat-label>Dia de vencimento</mat-label>
-      <input matInput formControlName="dueDay" type="number" min="1" max="31" />
-    </mat-form-field>
-
-    <div class="form-actions">
-      <button mat-stroked-button type="button" (click)="cancelarEdicao()" *ngIf="editandoId">Cancelar</button>
-      <button mat-flat-button color="primary" type="submit" [disabled]="loading()">
-        {{ editandoId ? 'Salvar alterações' : 'Cadastrar cartão' }}
-      </button>
+<section class="cartoes-container">
+  <header class="cartoes-header">
+    <div>
+      <span class="section-label">Pagamentos</span>
+      <h2>Cartões de crédito</h2>
+      <p>Cadastre os cartões usados nas compras da casa.</p>
     </div>
-  </form>
 
-  <div *ngIf="loading() && !cartoes.length" class="loading">
-    <mat-spinner diameter="32"></mat-spinner>
+    <div class="cartoes-count">
+      <span>{{ totalCartoes }}</span>
+      <strong>{{ totalCartoes === 1 ? 'cartão' : 'cartões' }}</strong>
+    </div>
+  </header>
+
+  <div class="cartoes-layout">
+    <form [formGroup]="formCartao" (ngSubmit)="salvar()" class="card-form-panel">
+      <div class="form-heading">
+        <span class="form-icon">
+          <mat-icon aria-hidden="true">{{ editandoId ? 'edit_square' : 'add_card' }}</mat-icon>
+        </span>
+        <div>
+          <h3>{{ editandoId ? 'Editar cartão' : 'Novo cartão' }}</h3>
+          <p>{{ editandoId ? 'Atualize os dados deste cartão.' : 'Inclua um cartão para usar nas compras.' }}</p>
+        </div>
+      </div>
+
+      <div class="form-grid">
+        <mat-form-field appearance="outline" class="full-row">
+          <mat-label>Nome do cartão</mat-label>
+          <input matInput formControlName="name" />
+          <mat-icon matSuffix>credit_card</mat-icon>
+        </mat-form-field>
+
+        <mat-form-field appearance="outline">
+          <mat-label>Bandeira</mat-label>
+          <mat-select formControlName="brand">
+            <mat-option [value]="null">Sem bandeira</mat-option>
+            <mat-option *ngFor="let m of marcas" [value]="m">{{ brandLabel(m) }}</mat-option>
+          </mat-select>
+        </mat-form-field>
+
+        <mat-form-field appearance="outline">
+          <mat-label>Final</mat-label>
+          <input matInput formControlName="lastDigits" maxlength="4" inputmode="numeric" />
+          <mat-icon matSuffix>pin</mat-icon>
+        </mat-form-field>
+
+        <mat-form-field appearance="outline">
+          <mat-label>Fechamento</mat-label>
+          <input matInput formControlName="billingDay" type="number" min="1" max="31" />
+        </mat-form-field>
+
+        <mat-form-field appearance="outline">
+          <mat-label>Vencimento</mat-label>
+          <input matInput formControlName="dueDay" type="number" min="1" max="31" />
+        </mat-form-field>
+      </div>
+
+      <div class="form-actions">
+        <button class="btn-cancel" mat-stroked-button type="button" (click)="cancelarEdicao()" *ngIf="editandoId">
+          <mat-icon aria-hidden="true">close</mat-icon>
+          Cancelar
+        </button>
+        <button class="btn-submit" mat-flat-button type="submit" [disabled]="loading()">
+          <mat-spinner *ngIf="loading()" diameter="18"></mat-spinner>
+          <ng-container *ngIf="!loading()">
+            <mat-icon aria-hidden="true">{{ editandoId ? 'check' : 'add' }}</mat-icon>
+            {{ editandoId ? 'Salvar alterações' : 'Cadastrar cartão' }}
+          </ng-container>
+        </button>
+      </div>
+    </form>
+
+    <section class="cards-list-panel" aria-label="Cartões cadastrados">
+      <div class="list-heading">
+        <div>
+          <span class="section-label">Carteira</span>
+          <h3>Cartões cadastrados</h3>
+        </div>
+
+        <button mat-icon-button type="button" (click)="recarregar()" [disabled]="loading()" matTooltip="Atualizar lista">
+          <mat-icon aria-hidden="true">refresh</mat-icon>
+        </button>
+      </div>
+
+      <div *ngIf="loading() && !cartoes.length" class="loading">
+        <mat-spinner diameter="32"></mat-spinner>
+        <span>Carregando cartões...</span>
+      </div>
+
+      <div class="table-shell" *ngIf="!loading() || cartoes.length">
+        <table mat-table [dataSource]="cartoes">
+          <ng-container matColumnDef="name">
+            <th mat-header-cell *matHeaderCellDef>Cartão</th>
+            <td mat-cell *matCellDef="let c">
+              <div class="card-name-cell">
+                <span class="brand-mark">{{ brandInitial(c.brand) }}</span>
+                <div>
+                  <strong>{{ c.name }}</strong>
+                  <span>{{ c.lastDigits ? 'Final ' + c.lastDigits : 'Final não informado' }}</span>
+                </div>
+              </div>
+            </td>
+          </ng-container>
+
+          <ng-container matColumnDef="brand">
+            <th mat-header-cell *matHeaderCellDef>Bandeira</th>
+            <td mat-cell *matCellDef="let c">
+              <span class="brand-chip">{{ brandLabel(c.brand) }}</span>
+            </td>
+          </ng-container>
+
+          <ng-container matColumnDef="lastDigits">
+            <th mat-header-cell *matHeaderCellDef>Final</th>
+            <td mat-cell *matCellDef="let c">{{ maskedDigits(c) }}</td>
+          </ng-container>
+
+          <ng-container matColumnDef="dueDay">
+            <th mat-header-cell *matHeaderCellDef>Vencimento</th>
+            <td mat-cell *matCellDef="let c">
+              <span class="day-pill">Dia {{ c.dueDay }}</span>
+            </td>
+          </ng-container>
+
+          <ng-container matColumnDef="billingDay">
+            <th mat-header-cell *matHeaderCellDef>Fechamento</th>
+            <td mat-cell *matCellDef="let c">Dia {{ c.billingDay }}</td>
+          </ng-container>
+
+          <ng-container matColumnDef="actions">
+            <th mat-header-cell *matHeaderCellDef>Ações</th>
+            <td mat-cell *matCellDef="let c">
+              <div class="row-actions">
+                <button mat-icon-button type="button" (click)="iniciarEdicao(c)" matTooltip="Editar cartão">
+                  <mat-icon aria-hidden="true">edit</mat-icon>
+                </button>
+                <button mat-icon-button type="button" class="danger-action" (click)="excluir(c)" matTooltip="Excluir cartão">
+                  <mat-icon aria-hidden="true">delete</mat-icon>
+                </button>
+              </div>
+            </td>
+          </ng-container>
+
+          <tr mat-header-row *matHeaderRowDef="displayedColumns"></tr>
+          <tr mat-row *matRowDef="let row; columns: displayedColumns;"></tr>
+        </table>
+      </div>
+
+      <div *ngIf="!loading() && !cartoes.length" class="empty">
+        <span class="empty-icon">
+          <mat-icon aria-hidden="true">credit_card_off</mat-icon>
+        </span>
+        <strong>Nenhum cartão cadastrado</strong>
+        <p>Adicione o primeiro cartão para vinculá-lo às próximas compras.</p>
+      </div>
+    </section>
   </div>
-
-  <table mat-table [dataSource]="cartoes" class="mat-elevation-z1" *ngIf="!loading() || cartoes.length">
-    <ng-container matColumnDef="name">
-      <th mat-header-cell *matHeaderCellDef>Nome</th>
-      <td mat-cell *matCellDef="let c">{{ c.name }}</td>
-    </ng-container>
-
-    <ng-container matColumnDef="brand">
-      <th mat-header-cell *matHeaderCellDef>Bandeira</th>
-      <td mat-cell *matCellDef="let c">{{ c.brand || '-' }}</td>
-    </ng-container>
-
-    <ng-container matColumnDef="lastDigits">
-      <th mat-header-cell *matHeaderCellDef>Final</th>
-      <td mat-cell *matCellDef="let c">{{ c.lastDigits ? '**** ' + c.lastDigits : '-' }}</td>
-    </ng-container>
-
-    <ng-container matColumnDef="dueDay">
-      <th mat-header-cell *matHeaderCellDef>Vencimento</th>
-      <td mat-cell *matCellDef="let c">Dia {{ c.dueDay }}</td>
-    </ng-container>
-
-    <ng-container matColumnDef="billingDay">
-      <th mat-header-cell *matHeaderCellDef>Fechamento</th>
-      <td mat-cell *matCellDef="let c">Dia {{ c.billingDay }}</td>
-    </ng-container>
-
-    <ng-container matColumnDef="actions">
-      <th mat-header-cell *matHeaderCellDef>Ações</th>
-      <td mat-cell *matCellDef="let c">
-        <button mat-icon-button (click)="iniciarEdicao(c)"><mat-icon>edit</mat-icon></button>
-        <button mat-icon-button (click)="excluir(c)"><mat-icon>delete</mat-icon></button>
-      </td>
-    </ng-container>
-
-    <tr mat-header-row *matHeaderRowDef="displayedColumns"></tr>
-    <tr mat-row *matRowDef="let row; columns: displayedColumns;"></tr>
-  </table>
-
-  <p *ngIf="!loading() && !cartoes.length" class="empty">Nenhum cartão cadastrado.</p>
-</div>
+</section>

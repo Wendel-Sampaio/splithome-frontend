@@ -1,155 +1,236 @@
-<header class="sh-page-header">
-    <div>
-        <h1 class="sh-page-title">Compras</h1>
-        <p class="sh-page-subtitle">Gerencie as compras compartilhadas da casa.</p>
-    </div>
-    <div class="sh-page-actions">
-        <button class="sh-btn-secondary" type="button" (click)="importarOfx.click()">
-            <mat-icon>upload_file</mat-icon>Importar OFX
-        </button>
-        <input #importarOfx type="file" accept=".ofx" hidden (change)="importarOfxHandler($event)" />
-        <button class="sh-btn-primary" type="button" (click)="abrirFormCompra()">
-            <mat-icon>add_circle</mat-icon>Nova compra
-        </button>
-    </div>
-</header>
+<section class="compras-page" *ngIf="compras$ | async as compras">
+    <header class="compras-hero">
+        <div class="compras-copy">
+            <span class="section-label">Controle mensal</span>
+            <h1 class="sh-page-title">Compras</h1>
+            <p class="sh-page-subtitle">Gerencie as compras compartilhadas da casa com filtros rápidos e ações diretas.</p>
+        </div>
 
-<div class="filter-bar" [formGroup]="filterForm">
-    <mat-form-field appearance="outline" class="filter-field">
-        <mat-label>Buscar título</mat-label>
-        <input matInput formControlName="title" placeholder="Ex: mercado" />
-        <mat-icon matSuffix>search</mat-icon>
-    </mat-form-field>
+        <div class="compras-summary">
+            <div class="summary-item">
+                <span>Total encontrado</span>
+                <strong>{{ totalElements }}</strong>
+            </div>
+            <div class="summary-item">
+                <span>Nesta página</span>
+                <strong>{{ compras.length }}</strong>
+            </div>
+            <div class="summary-item">
+                <span>Plano</span>
+                <strong>{{ isPremium ? 'Premium' : 'Grátis' }}</strong>
+            </div>
+        </div>
 
-    <mat-form-field appearance="outline" class="filter-field">
-        <mat-label>Categoria</mat-label>
-        <mat-select formControlName="category">
-            <mat-option [value]="null">Todas</mat-option>
-            <mat-option *ngFor="let cat of categories" [value]="cat">{{ cat | categoria }}</mat-option>
-        </mat-select>
-    </mat-form-field>
+        <div class="compras-actions">
+            <button mat-stroked-button type="button" (click)="importarOfx.click()" [disabled]="loadingAcao()">
+                <mat-icon aria-hidden="true">upload_file</mat-icon>
+                Importar OFX
+            </button>
+            <input #importarOfx type="file" accept=".ofx" hidden (change)="importarOfxHandler($event)" />
+            <button mat-flat-button type="button" (click)="abrirFormCompra()" [disabled]="loadingAcao()">
+                <mat-icon aria-hidden="true">add</mat-icon>
+                Nova compra
+            </button>
+        </div>
+    </header>
 
-    <mat-form-field appearance="outline" class="filter-field">
-        <mat-label>Data início</mat-label>
-        <input matInput [matDatepicker]="startPicker" formControlName="startDate" />
-        <mat-datepicker-toggle matIconSuffix [for]="startPicker"></mat-datepicker-toggle>
-        <mat-datepicker #startPicker></mat-datepicker>
-    </mat-form-field>
+    <section class="filter-panel" [formGroup]="filterForm">
+        <div class="filter-heading">
+            <div>
+                <span class="section-label">Filtros</span>
+                <h2>Refine a lista</h2>
+            </div>
+            <button mat-stroked-button type="button" (click)="limparFiltros()" [disabled]="!hasActiveFilters">
+                <mat-icon aria-hidden="true">filter_alt_off</mat-icon>
+                Limpar filtros
+            </button>
+        </div>
 
-    <mat-form-field appearance="outline" class="filter-field">
-        <mat-label>Data fim</mat-label>
-        <input matInput [matDatepicker]="endPicker" formControlName="endDate" />
-        <mat-datepicker-toggle matIconSuffix [for]="endPicker"></mat-datepicker-toggle>
-        <mat-datepicker #endPicker></mat-datepicker>
-    </mat-form-field>
+        <div class="filter-grid">
+            <mat-form-field appearance="outline" class="filter-search">
+                <mat-label>Buscar título</mat-label>
+                <input matInput formControlName="title" placeholder="Ex: mercado" />
+                <mat-icon matSuffix>search</mat-icon>
+            </mat-form-field>
 
-    <mat-form-field appearance="outline" class="filter-field" *ngIf="isPremium">
-        <mat-label>Comprador</mat-label>
-        <mat-select formControlName="purchaserId">
-            <mat-option [value]="null">Todos</mat-option>
-            <mat-option *ngFor="let p of purchasers" [value]="p.id">{{ p.name }}</mat-option>
-        </mat-select>
-    </mat-form-field>
-</div>
+            <mat-form-field appearance="outline">
+                <mat-label>Categoria</mat-label>
+                <mat-select formControlName="category">
+                    <mat-option [value]="null">Todas</mat-option>
+                    <mat-option *ngFor="let cat of categories" [value]="cat">{{ cat | categoria }}</mat-option>
+                </mat-select>
+            </mat-form-field>
 
-<div class="loading-overlay" *ngIf="loadingLista()">
-  <mat-spinner></mat-spinner>
-</div>
-<div class="table sh-data-table" *ngIf="compras$ | async as compras">
-    <table mat-table [dataSource]="compras" matSort (matSortChange)="onSortChange($event)">
-        <ng-container matColumnDef="title">
-            <th class="column-name" mat-header-cell *matHeaderCellDef mat-sort-header="title"> Título </th>
-            <td [ngClass]="{
-                'payed-style': verificarPagamento(element),
-                'payed-style-last-left': isLastCompra(element, compras)
-            }" mat-cell *matCellDef="let element">
-                {{element.title}}
-            </td>
-        </ng-container>
+            <mat-form-field appearance="outline">
+                <mat-label>Data início</mat-label>
+                <input matInput [matDatepicker]="startPicker" formControlName="startDate" />
+                <mat-datepicker-toggle matIconSuffix [for]="startPicker"></mat-datepicker-toggle>
+                <mat-datepicker #startPicker></mat-datepicker>
+            </mat-form-field>
 
-        <ng-container matColumnDef="category">
-            <th class="column-name" mat-header-cell *matHeaderCellDef mat-sort-header="category"> Categoria </th>
-            <td [ngClass]="{'payed-style': verificarPagamento(element)}" mat-cell *matCellDef="let element">
-                {{ element.category | categoria }} </td>
-        </ng-container>
+            <mat-form-field appearance="outline">
+                <mat-label>Data fim</mat-label>
+                <input matInput [matDatepicker]="endPicker" formControlName="endDate" />
+                <mat-datepicker-toggle matIconSuffix [for]="endPicker"></mat-datepicker-toggle>
+                <mat-datepicker #endPicker></mat-datepicker>
+            </mat-form-field>
 
-        <ng-container matColumnDef="purchaseDate">
-            <th class="column-name" mat-header-cell *matHeaderCellDef mat-sort-header="purchaseDate"> Data compra </th>
-            <td [ngClass]="{'payed-style': verificarPagamento(element)}" mat-cell *matCellDef="let element">
-                {{element.purchaseDate | date: "dd/MM/yyyy"}}</td>
-        </ng-container>
+            <mat-form-field appearance="outline" *ngIf="isPremium">
+                <mat-label>Comprador</mat-label>
+                <mat-select formControlName="purchaserId">
+                    <mat-option [value]="null">Todos</mat-option>
+                    <mat-option *ngFor="let p of purchasers" [value]="p.id">{{ p.name }}</mat-option>
+                </mat-select>
+            </mat-form-field>
+        </div>
+    </section>
 
-        <ng-container matColumnDef="paymentDate">
-            <th class="column-name" mat-header-cell *matHeaderCellDef mat-sort-header="paymentDate"> Data Pagamento </th>
-            <td [ngClass]="{'payed-style': verificarPagamento(element)}" mat-cell *matCellDef="let element">
-                {{element.paymentDate | date: "dd/MM/yyyy"}} </td>
-        </ng-container>
+    <section class="compras-list-panel">
+        <div class="list-toolbar">
+            <div>
+                <span class="section-label">Histórico</span>
+                <h2>Compras cadastradas</h2>
+            </div>
+            <span class="results-chip">
+                <mat-icon aria-hidden="true">receipt_long</mat-icon>
+                {{ totalElements }} resultado{{ totalElements === 1 ? '' : 's' }}
+            </span>
+        </div>
 
-        <ng-container matColumnDef="value">
-            <th class="column-name" mat-header-cell *matHeaderCellDef mat-sort-header="value"> Valor </th>
-            <td [ngClass]="{'payed-style': verificarPagamento(element)}" mat-cell *matCellDef="let element"> R${{
-                element.value }} </td>
-        </ng-container>
+        <div class="loading-overlay" *ngIf="loadingLista()">
+            <mat-spinner diameter="34"></mat-spinner>
+            <span>Carregando compras...</span>
+        </div>
 
-        <ng-container matColumnDef="payers">
-            <th class="column-name" mat-header-cell *matHeaderCellDef> Pagadores </th>
-            <td [ngClass]="{'payed-style': verificarPagamento(element)}" mat-cell *matCellDef="let element"> {{
-                element.payers | pagadores }} </td>
-        </ng-container>
+        <div class="empty-state" *ngIf="!loadingLista() && !compras.length">
+            <span class="empty-icon">
+                <mat-icon aria-hidden="true">shopping_cart_off</mat-icon>
+            </span>
+            <strong>Nenhuma compra encontrada</strong>
+            <p>Cadastre uma nova compra ou ajuste os filtros para ampliar a busca.</p>
+        </div>
 
-        <ng-container matColumnDef="unitValue">
-            <th class="column-name" mat-header-cell *matHeaderCellDef> Valor unitário </th>
-            <td [ngClass]="{'payed-style': verificarPagamento(element)}" mat-cell *matCellDef="let element"> R{{
-                element.unitValue | currency }} </td>
-        </ng-container>
+        <div class="table-shell" *ngIf="compras.length">
+            <table mat-table [dataSource]="compras" matSort (matSortChange)="onSortChange($event)">
+                <ng-container matColumnDef="title">
+                    <th mat-header-cell *matHeaderCellDef mat-sort-header="title">Compra</th>
+                    <td [ngClass]="{'payed-style': verificarPagamento(element)}" mat-cell *matCellDef="let element">
+                        <div class="purchase-cell">
+                            <span class="purchase-icon">
+                                <mat-icon aria-hidden="true">shopping_bag</mat-icon>
+                            </span>
+                            <div>
+                                <strong>{{ element.title }}</strong>
+                                <span>{{ element.purchaseDate | date: "dd/MM/yyyy" }}</span>
+                            </div>
+                        </div>
+                    </td>
+                </ng-container>
 
-        <ng-container matColumnDef="purchaserName">
-            <th class="column-name" mat-header-cell *matHeaderCellDef> Comprador </th>
-            <td [ngClass]="{'payed-style': verificarPagamento(element)}" mat-cell *matCellDef="let element">
-                {{element.purchaserName}} </td>
-        </ng-container>
+                <ng-container matColumnDef="category">
+                    <th mat-header-cell *matHeaderCellDef mat-sort-header="category">Categoria</th>
+                    <td [ngClass]="{'payed-style': verificarPagamento(element)}" mat-cell *matCellDef="let element">
+                        <span class="category-chip">{{ element.category | categoria }}</span>
+                    </td>
+                </ng-container>
 
-        <ng-container matColumnDef="payment">
-            <th class="column-name" mat-header-cell *matHeaderCellDef> Pagamento </th>
-            <td [ngClass]="{'payed-style': verificarPagamento(element)}" mat-cell *matCellDef="let element">
-                <button [ngClass]="{'payed-button': element.isPaid}" (click)="efetuarPagamento(element)" *ngIf="element.showPaymentButton ; else indisponivel"
-                    class="payment-button"> {{ element.isPaid ? 'Pago ✔' : 'Pagar' }} </button>{{ element.payment }}
-            </td>
-            <ng-template #indisponivel><span>Indisponível</span></ng-template>
-        </ng-container>
+                <ng-container matColumnDef="purchaseDate">
+                    <th mat-header-cell *matHeaderCellDef mat-sort-header="purchaseDate">Compra</th>
+                    <td [ngClass]="{'payed-style': verificarPagamento(element)}" mat-cell *matCellDef="let element">
+                        {{ element.purchaseDate | date: "dd/MM/yyyy" }}
+                    </td>
+                </ng-container>
 
-        <ng-container matColumnDef="remainingPayers">
-            <th class="column-name" mat-header-cell *matHeaderCellDef> Pagadores restantes </th>
-            <td [ngClass]="{
-                'payed-style': verificarPagamento(element),
-                'payed-style-last-right': isLastCompra(element, compras)
-            }" mat-cell *matCellDef="let element">
-                {{ element.remainingPayers | pagadores:'Todos efetuaram o pagamento.' }}
-            </td>
-        </ng-container>
+                <ng-container matColumnDef="paymentDate">
+                    <th mat-header-cell *matHeaderCellDef mat-sort-header="paymentDate">Pagamento</th>
+                    <td [ngClass]="{'payed-style': verificarPagamento(element)}" mat-cell *matCellDef="let element">
+                        {{ element.paymentDate | date: "dd/MM/yyyy" }}
+                    </td>
+                </ng-container>
 
-        <ng-container matColumnDef="actions">
-            <th class="column-name" mat-header-cell *matHeaderCellDef></th>
-            <td [ngClass]="{'payed-style': verificarPagamento(element)}" mat-cell *matCellDef="let element">
-                <button class="edit-buttom" (click)="editarCompra(element)" aria-label="Editar compra">
-                    <mat-icon>edit</mat-icon>
-                </button>
-                <button class="remove-buttom" (click)="deleteCompra(element)">
-                    <mat-icon>delete</mat-icon>
-                </button>
-            </td>
-        </ng-container>
+                <ng-container matColumnDef="value">
+                    <th mat-header-cell *matHeaderCellDef mat-sort-header="value">Valor</th>
+                    <td [ngClass]="{'payed-style': verificarPagamento(element)}" mat-cell *matCellDef="let element">
+                        <strong class="money-value">{{ element.value | currency:'BRL' }}</strong>
+                    </td>
+                </ng-container>
 
-        <tr mat-header-row *matHeaderRowDef="displayedColumns"></tr>
-        <tr mat-row *matRowDef="let row; columns: displayedColumns;"></tr>
-    </table>
+                <ng-container matColumnDef="payers">
+                    <th mat-header-cell *matHeaderCellDef>Pagadores</th>
+                    <td [ngClass]="{'payed-style': verificarPagamento(element)}" mat-cell *matCellDef="let element">
+                        <span class="people-text">{{ element.payers | pagadores }}</span>
+                    </td>
+                </ng-container>
 
-    <mat-paginator
-        [length]="totalElements"
-        [pageSize]="pageSize"
-        [pageIndex]="pageIndex"
-        [pageSizeOptions]="[5, 10, 20, 50]"
-        showFirstLastButtons
-        (page)="onPageChange($event)">
-    </mat-paginator>
-</div>
+                <ng-container matColumnDef="unitValue">
+                    <th mat-header-cell *matHeaderCellDef>Valor unitário</th>
+                    <td [ngClass]="{'payed-style': verificarPagamento(element)}" mat-cell *matCellDef="let element">
+                        {{ element.unitValue | currency:'BRL' }}
+                    </td>
+                </ng-container>
+
+                <ng-container matColumnDef="purchaserName">
+                    <th mat-header-cell *matHeaderCellDef>Comprador</th>
+                    <td [ngClass]="{'payed-style': verificarPagamento(element)}" mat-cell *matCellDef="let element">
+                        <span class="buyer-pill">{{ element.purchaserName || 'Não informado' }}</span>
+                    </td>
+                </ng-container>
+
+                <ng-container matColumnDef="payment">
+                    <th mat-header-cell *matHeaderCellDef>Pagamento</th>
+                    <td [ngClass]="{'payed-style': verificarPagamento(element)}" mat-cell *matCellDef="let element">
+                        <button
+                            mat-stroked-button
+                            type="button"
+                            [ngClass]="{'payed-button': element.isPaid}"
+                            (click)="efetuarPagamento(element)"
+                            *ngIf="element.showPaymentButton ; else indisponivel"
+                            class="payment-button">
+                            <mat-icon aria-hidden="true">{{ element.isPaid ? 'check_circle' : 'payments' }}</mat-icon>
+                            {{ element.isPaid ? 'Pago' : 'Pagar' }}
+                        </button>
+                        {{ element.payment }}
+                    </td>
+                    <ng-template #indisponivel>
+                        <span class="unavailable-chip">Indisponível</span>
+                    </ng-template>
+                </ng-container>
+
+                <ng-container matColumnDef="remainingPayers">
+                    <th mat-header-cell *matHeaderCellDef>Restantes</th>
+                    <td [ngClass]="{'payed-style': verificarPagamento(element)}" mat-cell *matCellDef="let element">
+                        <span class="people-text">
+                            {{ element.remainingPayers | pagadores:'Todos efetuaram o pagamento.' }}
+                        </span>
+                    </td>
+                </ng-container>
+
+                <ng-container matColumnDef="actions">
+                    <th mat-header-cell *matHeaderCellDef>Ações</th>
+                    <td [ngClass]="{'payed-style': verificarPagamento(element)}" mat-cell *matCellDef="let element">
+                        <div class="row-actions">
+                            <button mat-icon-button type="button" (click)="editarCompra(element)" matTooltip="Editar compra" aria-label="Editar compra">
+                                <mat-icon aria-hidden="true">edit</mat-icon>
+                            </button>
+                            <button mat-icon-button type="button" class="danger-action" (click)="deleteCompra(element)" matTooltip="Excluir compra" aria-label="Excluir compra">
+                                <mat-icon aria-hidden="true">delete</mat-icon>
+                            </button>
+                        </div>
+                    </td>
+                </ng-container>
+
+                <tr mat-header-row *matHeaderRowDef="displayedColumns"></tr>
+                <tr mat-row *matRowDef="let row; columns: displayedColumns;"></tr>
+            </table>
+        </div>
+
+        <mat-paginator
+            [length]="totalElements"
+            [pageSize]="pageSize"
+            [pageIndex]="pageIndex"
+            [pageSizeOptions]="[5, 10, 20, 50]"
+            showFirstLastButtons
+            (page)="onPageChange($event)">
+        </mat-paginator>
+    </section>
+</section>
