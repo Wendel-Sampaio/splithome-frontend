@@ -16,7 +16,7 @@
   border-radius: var(--sh-radius-lg);
   display: grid;
   gap: var(--sh-space-5);
-  grid-template-columns: minmax(260px, 1fr) minmax(260px, 0.9fr) auto;
+  grid-template-columns: minmax(260px, 1fr) auto;
   padding: var(--sh-space-6);
 }
 
@@ -30,35 +30,6 @@
 
 .compras-copy {
   align-self: center;
-}
-
-.compras-summary {
-  display: grid;
-  gap: var(--sh-space-3);
-  grid-template-columns: repeat(3, minmax(0, 1fr));
-}
-
-.summary-item {
-  background: rgba(255, 255, 255, 0.78);
-  border: 1px solid var(--sh-color-border);
-  border-radius: var(--sh-radius-md);
-  display: grid;
-  gap: 6px;
-  min-height: 76px;
-  padding: var(--sh-space-3);
-}
-
-.summary-item span {
-  color: var(--sh-color-text-muted);
-  font-size: 12px;
-  font-weight: 700;
-}
-
-.summary-item strong {
-  color: var(--sh-color-text);
-  font-size: 22px;
-  font-weight: 900;
-  line-height: 1;
 }
 
 .compras-actions {
@@ -336,7 +307,6 @@ mat-paginator {
     align-items: stretch;
   }
 
-  .compras-summary,
   .compras-actions,
   .filter-grid {
     grid-template-columns: 1fr;

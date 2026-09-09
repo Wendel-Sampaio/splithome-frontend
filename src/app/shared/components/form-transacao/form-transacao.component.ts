@@ -297,13 +297,13 @@ export class FormTransacaoComponent {
       return;
     }
 
-    if (!this.isPremium) {
+    if (!this.isPremium && this.isDespesaFixa) {
       this.notify.warning('Esta funcionalidade é exclusiva do plano Premium.');
       return;
     }
 
     const usuarioLogado = this.userService.getUser();
-    const pagadores = this.isPremium ? this.pagadores : [usuarioLogado.name];
+    const pagadores = this.isPremium ? this.pagadores : [];
     this.pagadoresRestantes = !this.isPremium
       ? []
       : this.isEdicao
@@ -325,7 +325,7 @@ export class FormTransacaoComponent {
       totalValue: Number(v.valorTotal),
       installmentsCount: Number(v.quantidadeParcelas),
       dueDay: Number(v.diaVencimento),
-      startDate: format(v.dataInicio, "yyyy-MM-dd"),
+      startDate: this.formatDateOnly(v.dataInicio),
       creditCardId: v.cartaoId || null,
       responsibleId: this.responsavel,
       payers: pagadores,
@@ -357,15 +357,15 @@ export class FormTransacaoComponent {
       category: this.formTransacao.value.categoria,
       value: Number(this.formTransacao.value.valor),
       payers: pagadores,
-      paymentDate: format(this.formTransacao.value.dataPagamento, "yyyy-MM-dd'T'HH:mm:ss"),
+      paymentDate: this.formatDateOnly(this.formTransacao.value.dataPagamento),
       remainingPayers: this.pagadoresRestantes,
       ...(this.isDespesaFixa
         ? { responsibleId: this.responsavel }
         : {
           purchaserId: this.responsavel,
           purchaseDate: this.isEdicaoCompra && this.data?.compra?.purchaseDate
-            ? format(this.data.compra.purchaseDate, "yyyy-MM-dd'T'HH:mm:ss")
-            : format(new Date(), "yyyy-MM-dd'T'HH:mm:ss")
+            ? this.formatDateOnly(this.data.compra.purchaseDate)
+            : this.formatDateOnly(new Date())
         })
     };
     const request = this.isEdicaoCompra
@@ -422,6 +422,14 @@ export class FormTransacaoComponent {
     const novosPagadores = this.pagadores.filter(p => !antiga.includes(p));
     const mantidos = antigosRestantes.filter(p => this.pagadores.includes(p));
     return [...new Set([...mantidos, ...novosPagadores])];
+  }
+
+  private formatDateOnly(value: Date | string): string {
+    if (typeof value === 'string') {
+      return value.includes('T') ? value.slice(0, 10) : value;
+    }
+
+    return format(value, 'yyyy-MM-dd');
   }
 
   private usuarioPodeSerPagador(usuario: User): boolean {

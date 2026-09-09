@@ -94,13 +94,26 @@ describe('UserService', () => {
   });
 
   describe('requisições HTTP', () => {
-    it('logar deve fazer POST para /user/auth/login', () => {
+    it('logar deve fazer POST para /user/auth/login e extrair token de resposta em texto', () => {
       const login = new Login('joao@test.com', 'Senha@123');
-      service.logar(login).subscribe();
+      let token = '';
+      service.logar(login).subscribe(response => token = response);
 
       const req = httpMock.expectOne(r => r.method === 'POST' && r.url.includes('/user/auth/login'));
       expect(req.request.body).toEqual(login);
       req.flush('jwt.token.response');
+      expect(token).toBe('jwt.token.response');
+    });
+
+    it('logar deve extrair token quando backend retorna LoginResponseDTO serializado', () => {
+      const login = new Login('joao@test.com', 'Senha@123');
+      let token = '';
+      service.logar(login).subscribe(response => token = response);
+
+      const req = httpMock.expectOne(r => r.method === 'POST' && r.url.includes('/user/auth/login'));
+      expect(req.request.body).toEqual(login);
+      req.flush('{"token":"jwt.token.response"}');
+      expect(token).toBe('jwt.token.response');
     });
 
     it('cadastrar deve fazer POST para /user/auth/register', () => {

@@ -284,6 +284,19 @@ a:hover {
 }
 
 /* ===== Modal design system ===== */
+.cdk-overlay-container {
+  z-index: var(--sh-modal-z-index);
+}
+
+.cdk-overlay-backdrop {
+  z-index: calc(var(--sh-modal-z-index) - 1);
+}
+
+.cdk-global-overlay-wrapper,
+.cdk-overlay-pane {
+  z-index: var(--sh-modal-z-index);
+}
+
 .cdk-overlay-pane.sh-modal {
   display: flex;
   max-height: var(--sh-modal-max-height);

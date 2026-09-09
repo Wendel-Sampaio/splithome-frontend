@@ -73,6 +73,17 @@ describe('meuhttpInterceptor', () => {
     expect(notify.error).not.toHaveBeenCalled();
   });
 
+  it('envia Authorization quando há token mesmo se a rota atual for /login', () => {
+    userService.getToken.and.returnValue('jwt-token');
+    Object.defineProperty(router, 'url', { get: () => '/login' });
+
+    http.post('/api/transactions/new-purchase', {}).subscribe();
+
+    const req = httpMock.expectOne('/api/transactions/new-purchase');
+    expect(req.request.headers.get('Authorization')).toBe('Bearer jwt-token');
+    req.flush({});
+  });
+
   it('status 403 notifica acesso negado', () => {
     http.get('/x').subscribe({ next: () => {}, error: () => {} });
     httpMock.expectOne('/x').flush('', { status: 403, statusText: 'Forbidden' });

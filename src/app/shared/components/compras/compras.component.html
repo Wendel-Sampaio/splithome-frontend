@@ -6,21 +6,6 @@
             <p class="sh-page-subtitle">Gerencie as compras compartilhadas da casa com filtros rápidos e ações diretas.</p>
         </div>
 
-        <div class="compras-summary">
-            <div class="summary-item">
-                <span>Total encontrado</span>
-                <strong>{{ totalElements }}</strong>
-            </div>
-            <div class="summary-item">
-                <span>Nesta página</span>
-                <strong>{{ compras.length }}</strong>
-            </div>
-            <div class="summary-item">
-                <span>Plano</span>
-                <strong>{{ isPremium ? 'Premium' : 'Grátis' }}</strong>
-            </div>
-        </div>
-
         <div class="compras-actions">
             <button mat-stroked-button type="button" (click)="importarOfx.click()" [disabled]="loadingAcao()">
                 <mat-icon aria-hidden="true">upload_file</mat-icon>

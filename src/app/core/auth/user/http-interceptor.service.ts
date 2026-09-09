@@ -13,7 +13,7 @@ export const meuhttpInterceptor: HttpInterceptorFn = (request, next) => {
   const token = userService.getToken();
   const headers: Record<string, string> = { 'ngrok-skip-browser-warning': 'true' };
 
-  if (token && !router.url.includes('/login') && !router.url.includes('/cadastro')) {
+  if (token) {
     headers['Authorization'] = 'Bearer ' + token;
   }
   request = request.clone({ setHeaders: headers });

@@ -8,6 +8,7 @@ import { User } from '../../models/user/user';
 import { environment } from '../../../../environments/environment';
 
 type JwtUserPayload = JwtPayload & Partial<User>;
+type LoginResponse = string | { token?: string };
 
 @Injectable({
   providedIn: 'root'
@@ -25,7 +26,9 @@ export class UserService {
   constructor() { }
 
   logar(login: Login): Observable<string> {
-    return this.http.post<string>(this.API+"/auth/login", login, {responseType: 'text' as 'json'});
+    return this.http.post<string>(this.API+"/auth/login", login, {responseType: 'text' as 'json'}).pipe(
+      map((response) => this.extractToken(response))
+    );
   }
 
   cadastrar(register: Register): Observable<string> {
@@ -141,6 +144,19 @@ export class UserService {
 
     console.warn('Resposta inesperada ao listar usuarios:', response);
     return [];
+  }
+
+  private extractToken(response: LoginResponse): string {
+    if (typeof response === 'string') {
+      try {
+        const parsed = JSON.parse(response) as LoginResponse;
+        return this.extractToken(parsed);
+      } catch {
+        return response;
+      }
+    }
+
+    return response.token ?? '';
   }
 
   private getStoredProfilePhoto(userId?: string): string | undefined {

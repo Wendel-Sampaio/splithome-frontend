@@ -89,6 +89,23 @@ describe('FormTransacaoComponent', () => {
     expect(component.loading()).toBe(false);
   });
 
+  it('usuário free pode cadastrar compra sem divisão de pagadores', () => {
+    compraService.cadastrarCompra.and.returnValue(of({} as any));
+    preencher();
+    component.pagadores = ['Eu'];
+    (component as any).isPremium = false;
+
+    component.cadastrarTransacao();
+
+    expect(notify.warning).not.toHaveBeenCalled();
+    expect(compraService.cadastrarCompra).toHaveBeenCalled();
+    const payload = compraService.cadastrarCompra.calls.mostRecent().args[0];
+    expect(payload.payers).toEqual([]);
+    expect(payload.remainingPayers).toEqual([]);
+    expect(payload.paymentDate).toMatch(/^\d{4}-\d{2}-\d{2}$/);
+    expect(payload.purchaseDate).toMatch(/^\d{4}-\d{2}-\d{2}$/);
+  });
+
   it('erro de compra notifica error e mantém dialog aberto', () => {
     compraService.cadastrarCompra.and.returnValue(throwError(() => ({ status: 500 })));
     preencher();
