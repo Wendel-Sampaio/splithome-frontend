@@ -8,17 +8,30 @@ import '../../../shared/formatters/currency_formatter.dart';
 import '../../../shared/widgets/premium_feature_gate.dart';
 import '../../../shared/widgets/sh_empty_state.dart';
 import '../../../shared/widgets/sh_error_state.dart';
+import '../../../shared/widgets/transaction_filter_bar.dart';
+import '../../purchases/data/purchase_repository.dart';
 import '../data/fixed_expense.dart';
 import '../data/fixed_expense_repository.dart';
 
-class FixedExpensesPage extends ConsumerWidget {
+class FixedExpensesPage extends ConsumerStatefulWidget {
   const FixedExpensesPage({super.key});
 
   @override
-  Widget build(BuildContext context, WidgetRef ref) {
+  ConsumerState<FixedExpensesPage> createState() => _FixedExpensesPageState();
+}
+
+class _FixedExpensesPageState extends ConsumerState<FixedExpensesPage> {
+  String _searchText = '';
+  String? _selectedCategory;
+
+  @override
+  Widget build(BuildContext context) {
     final user = ref.watch(authControllerProvider).asData?.value.user;
     final isFree = user?.isPremium == false;
     final expenses = ref.watch(fixedExpensesProvider);
+    final categories = ref
+        .watch(purchaseCategoriesProvider)
+        .maybeWhen(data: (items) => items, orElse: () => const <String>[]);
 
     return Scaffold(
       appBar: AppBar(
@@ -44,23 +57,48 @@ class FixedExpensesPage extends ConsumerWidget {
                   );
                 }
 
+                final filtered = page.content.where(_matchesFilters).toList();
+
                 return RefreshIndicator(
                   onRefresh: () async => ref.invalidate(fixedExpensesProvider),
                   child: ListView.separated(
                     padding: const EdgeInsets.fromLTRB(16, 8, 16, 24),
-                    itemCount: page.content.length + 1,
+                    itemCount: filtered.length + 2,
                     separatorBuilder: (context, index) =>
                         const SizedBox(height: 10),
                     itemBuilder: (context, index) {
                       if (index == 0) {
+                        return TransactionFilterBar(
+                          searchText: _searchText,
+                          selectedCategory: _selectedCategory,
+                          categories: categories,
+                          onSearchChanged: (value) {
+                            setState(() {
+                              _searchText = value;
+                            });
+                          },
+                          onCategoryChanged: (value) {
+                            setState(() {
+                              _selectedCategory = value;
+                            });
+                          },
+                          onClear: () {
+                            setState(() {
+                              _searchText = '';
+                              _selectedCategory = null;
+                            });
+                          },
+                        );
+                      }
+
+                      if (index == 1) {
                         return _FixedExpensesHeader(
+                          visibleElements: filtered.length,
                           totalElements: page.totalElements,
                         );
                       }
 
-                      return _FixedExpenseTile(
-                        expense: page.content[index - 1],
-                      );
+                      return _FixedExpenseTile(expense: filtered[index - 2]);
                     },
                   ),
                 );
@@ -113,11 +151,28 @@ class FixedExpensesPage extends ConsumerWidget {
       ),
     );
   }
+
+  bool _matchesFilters(FixedExpense expense) {
+    final query = _searchText.trim().toLowerCase();
+    final matchesSearch =
+        query.isEmpty ||
+        expense.title.toLowerCase().contains(query) ||
+        expense.category.toLowerCase().contains(query) ||
+        CategoryFormatter.label(expense.category).toLowerCase().contains(query);
+    final matchesCategory =
+        _selectedCategory == null || expense.category == _selectedCategory;
+
+    return matchesSearch && matchesCategory;
+  }
 }
 
 class _FixedExpensesHeader extends StatelessWidget {
-  const _FixedExpensesHeader({required this.totalElements});
+  const _FixedExpensesHeader({
+    required this.visibleElements,
+    required this.totalElements,
+  });
 
+  final int visibleElements;
   final int totalElements;
 
   @override
@@ -125,7 +180,9 @@ class _FixedExpensesHeader extends StatelessWidget {
     return Padding(
       padding: const EdgeInsets.only(bottom: 6),
       child: Text(
-        '$totalElements despesas encontradas',
+        visibleElements == totalElements
+            ? '$totalElements despesas encontradas'
+            : '$visibleElements de $totalElements despesas',
         style: Theme.of(
           context,
         ).textTheme.titleMedium?.copyWith(fontWeight: FontWeight.w700),

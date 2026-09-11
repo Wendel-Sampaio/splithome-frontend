@@ -6,15 +6,27 @@ import '../../../shared/formatters/category_formatter.dart';
 import '../../../shared/formatters/currency_formatter.dart';
 import '../../../shared/widgets/sh_empty_state.dart';
 import '../../../shared/widgets/sh_error_state.dart';
+import '../../../shared/widgets/transaction_filter_bar.dart';
 import '../data/purchase.dart';
 import '../data/purchase_repository.dart';
 
-class PurchasesPage extends ConsumerWidget {
+class PurchasesPage extends ConsumerStatefulWidget {
   const PurchasesPage({super.key});
 
   @override
-  Widget build(BuildContext context, WidgetRef ref) {
+  ConsumerState<PurchasesPage> createState() => _PurchasesPageState();
+}
+
+class _PurchasesPageState extends ConsumerState<PurchasesPage> {
+  String _searchText = '';
+  String? _selectedCategory;
+
+  @override
+  Widget build(BuildContext context) {
     final purchases = ref.watch(purchasesProvider);
+    final categories = ref
+        .watch(purchaseCategoriesProvider)
+        .maybeWhen(data: (items) => items, orElse: () => const <String>[]);
 
     return Scaffold(
       appBar: AppBar(
@@ -34,18 +46,47 @@ class PurchasesPage extends ConsumerWidget {
             );
           }
 
+          final filtered = page.content.where(_matchesFilters).toList();
+
           return RefreshIndicator(
             onRefresh: () async => ref.invalidate(purchasesProvider),
             child: ListView.separated(
               padding: const EdgeInsets.fromLTRB(16, 8, 16, 24),
-              itemCount: page.content.length + 1,
+              itemCount: filtered.length + 2,
               separatorBuilder: (context, index) => const SizedBox(height: 10),
               itemBuilder: (context, index) {
                 if (index == 0) {
-                  return _PurchasesHeader(totalElements: page.totalElements);
+                  return TransactionFilterBar(
+                    searchText: _searchText,
+                    selectedCategory: _selectedCategory,
+                    categories: categories,
+                    onSearchChanged: (value) {
+                      setState(() {
+                        _searchText = value;
+                      });
+                    },
+                    onCategoryChanged: (value) {
+                      setState(() {
+                        _selectedCategory = value;
+                      });
+                    },
+                    onClear: () {
+                      setState(() {
+                        _searchText = '';
+                        _selectedCategory = null;
+                      });
+                    },
+                  );
                 }
 
-                return _PurchaseTile(purchase: page.content[index - 1]);
+                if (index == 1) {
+                  return _PurchasesHeader(
+                    visibleElements: filtered.length,
+                    totalElements: page.totalElements,
+                  );
+                }
+
+                return _PurchaseTile(purchase: filtered[index - 2]);
               },
             ),
           );
@@ -96,11 +137,30 @@ class PurchasesPage extends ConsumerWidget {
       ),
     );
   }
+
+  bool _matchesFilters(Purchase purchase) {
+    final query = _searchText.trim().toLowerCase();
+    final matchesSearch =
+        query.isEmpty ||
+        purchase.title.toLowerCase().contains(query) ||
+        purchase.category.toLowerCase().contains(query) ||
+        CategoryFormatter.label(
+          purchase.category,
+        ).toLowerCase().contains(query);
+    final matchesCategory =
+        _selectedCategory == null || purchase.category == _selectedCategory;
+
+    return matchesSearch && matchesCategory;
+  }
 }
 
 class _PurchasesHeader extends StatelessWidget {
-  const _PurchasesHeader({required this.totalElements});
+  const _PurchasesHeader({
+    required this.visibleElements,
+    required this.totalElements,
+  });
 
+  final int visibleElements;
   final int totalElements;
 
   @override
@@ -108,7 +168,9 @@ class _PurchasesHeader extends StatelessWidget {
     return Padding(
       padding: const EdgeInsets.only(bottom: 6),
       child: Text(
-        '$totalElements compras encontradas',
+        visibleElements == totalElements
+            ? '$totalElements compras encontradas'
+            : '$visibleElements de $totalElements compras',
         style: Theme.of(
           context,
         ).textTheme.titleMedium?.copyWith(fontWeight: FontWeight.w700),
