@@ -35,6 +35,7 @@ void main() {
     await tester.scrollUntilVisible(find.text('Ranking de categorias'), 300);
 
     expect(find.text('Ranking de categorias'), findsOneWidget);
-    expect(find.text('MERCADO'), findsOneWidget);
+    expect(find.text('Mercado'), findsOneWidget);
+    expect(find.text('MERCADO'), findsNothing);
   });
 }

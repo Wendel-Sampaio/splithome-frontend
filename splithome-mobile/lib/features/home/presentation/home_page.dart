@@ -3,6 +3,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 
 import '../../../core/auth/auth_controller.dart';
+import '../../../shared/formatters/category_formatter.dart';
 import '../../../shared/formatters/currency_formatter.dart';
 import '../../fixed_expenses/data/fixed_expense.dart';
 import '../../fixed_expenses/data/fixed_expense_page.dart';
@@ -256,7 +257,7 @@ class _KpiSection extends StatelessWidget {
         _KpiCardData(
           Icons.category_outlined,
           'Maior categoria',
-          data?.topCategory?.label ?? '-',
+          _friendlyCategory(data?.topCategory?.label),
           color: scheme.error,
         ),
       ],
@@ -745,7 +746,8 @@ class _ActivityItem {
   factory _ActivityItem.fromPurchase(Purchase purchase) {
     return _ActivityItem(
       title: purchase.title.isEmpty ? 'Compra sem título' : purchase.title,
-      subtitle: '${purchase.category} • ${purchase.purchaserName ?? 'compra'}',
+      subtitle:
+          '${CategoryFormatter.label(purchase.category)} • ${purchase.purchaserName ?? 'compra'}',
       value: purchase.value,
       dateLabel: purchase.purchaseDate ?? '',
       icon: Icons.shopping_cart_outlined,
@@ -756,7 +758,7 @@ class _ActivityItem {
   factory _ActivityItem.fromFixedExpense(FixedExpense expense) {
     return _ActivityItem(
       title: expense.title.isEmpty ? 'Despesa sem título' : expense.title,
-      subtitle: '${expense.category} • despesa fixa',
+      subtitle: '${CategoryFormatter.label(expense.category)} • despesa fixa',
       value: expense.totalValue,
       dateLabel: expense.startDate ?? '',
       icon: Icons.receipt_long_outlined,
@@ -777,6 +779,11 @@ String _shortMonth(String label) {
     return label.substring(5, 7);
   }
   return label;
+}
+
+String _friendlyCategory(String? category) {
+  final label = CategoryFormatter.label(category);
+  return label.isEmpty ? '-' : label;
 }
 
 extension _AsyncValueX<T> on AsyncValue<T> {

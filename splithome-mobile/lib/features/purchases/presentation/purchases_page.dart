@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 
+import '../../../shared/formatters/category_formatter.dart';
 import '../../../shared/formatters/currency_formatter.dart';
 import '../data/purchase.dart';
 import '../data/purchase_repository.dart';
@@ -137,7 +138,8 @@ class _PurchaseTile extends StatelessWidget {
         ),
         subtitle: Text(
           [
-            if (purchase.category.isNotEmpty) purchase.category,
+            if (purchase.category.isNotEmpty)
+              CategoryFormatter.label(purchase.category),
             if (purchase.purchaseDate != null) purchase.purchaseDate!,
           ].join(' • '),
           maxLines: 1,

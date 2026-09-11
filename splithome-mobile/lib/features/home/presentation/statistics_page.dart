@@ -3,6 +3,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 
+import '../../../shared/formatters/category_formatter.dart';
 import '../../../shared/formatters/currency_formatter.dart';
 import '../data/home_repository.dart';
 import '../data/home_summary.dart';
@@ -291,7 +292,7 @@ class _CategoryRanking extends StatelessWidget {
                   leading: const CircleAvatar(
                     child: Icon(Icons.category_outlined),
                   ),
-                  title: Text(item.label),
+                  title: Text(CategoryFormatter.label(item.label)),
                   trailing: Text(
                     CurrencyFormatter.brl(item.total),
                     style: const TextStyle(fontWeight: FontWeight.w900),

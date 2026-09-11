@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 
+import '../../../shared/formatters/category_formatter.dart';
 import '../../../shared/formatters/currency_formatter.dart';
 import '../../../shared/widgets/detail_row.dart';
 import '../../home/data/home_repository.dart';
@@ -84,7 +85,10 @@ class PurchaseDetailPage extends ConsumerWidget {
                     ],
                   ),
                   const SizedBox(height: 16),
-                  DetailRow(label: 'Categoria', value: purchase.category),
+                  DetailRow(
+                    label: 'Categoria',
+                    value: CategoryFormatter.label(purchase.category),
+                  ),
                   DetailRow(
                     label: 'Data da compra',
                     value: purchase.purchaseDate ?? '',

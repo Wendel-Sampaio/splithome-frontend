@@ -5,6 +5,7 @@ import 'package:go_router/go_router.dart';
 import 'package:intl/intl.dart';
 
 import '../../../core/auth/auth_controller.dart';
+import '../../../shared/formatters/category_formatter.dart';
 import '../../home/data/home_repository.dart';
 import '../../purchases/data/purchase_repository.dart';
 import '../data/fixed_expense.dart';
@@ -106,7 +107,7 @@ class _NewFixedExpensePageState extends ConsumerState<NewFixedExpensePage> {
                             .map(
                               (category) => DropdownMenuItem(
                                 value: category,
-                                child: Text(category),
+                                child: Text(CategoryFormatter.label(category)),
                               ),
                             )
                             .toList(),

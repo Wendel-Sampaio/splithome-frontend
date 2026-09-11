@@ -7,7 +7,7 @@ void main() {
   testWidgets('renders purchase details', (tester) async {
     const purchase = Purchase(
       id: 'purchase-1',
-      title: 'Mercado',
+      title: 'Compras da semana',
       category: 'MERCADO',
       value: 120.5,
       payers: ['Ana', 'Bruno'],
@@ -22,8 +22,9 @@ void main() {
       const MaterialApp(home: PurchaseDetailPage(purchase: purchase)),
     );
 
+    expect(find.text('Compras da semana'), findsOneWidget);
     expect(find.text('Mercado'), findsOneWidget);
-    expect(find.text('MERCADO'), findsOneWidget);
+    expect(find.text('MERCADO'), findsNothing);
     expect(find.text('Ana'), findsAtLeastNWidgets(1));
     expect(find.text('Bruno'), findsAtLeastNWidgets(1));
     expect(find.text('Pendente'), findsOneWidget);

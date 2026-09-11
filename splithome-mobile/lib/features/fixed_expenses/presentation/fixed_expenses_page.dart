@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 
+import '../../../shared/formatters/category_formatter.dart';
 import '../../../shared/formatters/currency_formatter.dart';
 import '../data/fixed_expense.dart';
 import '../data/fixed_expense_repository.dart';
@@ -139,7 +140,8 @@ class _FixedExpenseTile extends StatelessWidget {
         ),
         subtitle: Text(
           [
-            if (expense.category.isNotEmpty) expense.category,
+            if (expense.category.isNotEmpty)
+              CategoryFormatter.label(expense.category),
             if (expense.startDate != null) 'desde ${expense.startDate}',
             if (expense.dueDay > 0) 'vence dia ${expense.dueDay}',
           ].join(' • '),

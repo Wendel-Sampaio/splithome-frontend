@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 
+import '../../../shared/formatters/category_formatter.dart';
 import '../../../shared/formatters/currency_formatter.dart';
 import '../../../shared/widgets/detail_row.dart';
 import '../../home/data/home_repository.dart';
@@ -103,7 +104,10 @@ class _FixedExpenseDetailPageState
                     ],
                   ),
                   const SizedBox(height: 16),
-                  DetailRow(label: 'Categoria', value: expense.category),
+                  DetailRow(
+                    label: 'Categoria',
+                    value: CategoryFormatter.label(expense.category),
+                  ),
                   DetailRow(label: 'Início', value: expense.startDate ?? ''),
                   DetailRow(
                     label: 'Pagamento',

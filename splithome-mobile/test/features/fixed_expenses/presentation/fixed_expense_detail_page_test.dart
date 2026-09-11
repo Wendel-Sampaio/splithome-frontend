@@ -40,7 +40,8 @@ void main() {
     );
 
     expect(find.text('Internet'), findsOneWidget);
-    expect(find.text('MORADIA'), findsOneWidget);
+    expect(find.text('Moradia'), findsOneWidget);
+    expect(find.text('MORADIA'), findsNothing);
     expect(find.text('1/2 pagas'), findsOneWidget);
     expect(find.textContaining('Parcela 1'), findsOneWidget);
     expect(find.textContaining('Parcela 2'), findsOneWidget);
