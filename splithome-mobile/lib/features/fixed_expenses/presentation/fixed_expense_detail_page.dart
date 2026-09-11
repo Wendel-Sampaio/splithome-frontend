@@ -2,9 +2,11 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 
+import '../../../core/auth/auth_controller.dart';
 import '../../../shared/formatters/category_formatter.dart';
 import '../../../shared/formatters/currency_formatter.dart';
 import '../../../shared/widgets/detail_row.dart';
+import '../../../shared/widgets/premium_feature_gate.dart';
 import '../../../shared/widgets/sh_person_chip.dart';
 import '../../../shared/widgets/sh_section_card.dart';
 import '../../home/data/home_repository.dart';
@@ -35,6 +37,8 @@ class _FixedExpenseDetailPageState
   Widget build(BuildContext context) {
     final scheme = Theme.of(context).colorScheme;
     final expense = _expense;
+    final user = ref.watch(authControllerProvider).asData?.value.user;
+    final isFree = user?.isPremium == false;
 
     return Scaffold(
       appBar: AppBar(
@@ -67,105 +71,122 @@ class _FixedExpenseDetailPageState
           ),
         ],
       ),
-      body: ListView(
-        padding: const EdgeInsets.all(16),
-        children: [
-          Card(
-            child: Padding(
+      body: isFree
+          ? const PremiumFeatureGate(
+              title: 'Detalhe da despesa é Premium',
+              message:
+                  'Assine o Premium para visualizar e gerenciar despesas fixas.',
+              actionLabel: 'Voltar para despesas',
+              actionRoute: '/fixed-expenses',
+            )
+          : ListView(
               padding: const EdgeInsets.all(16),
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  Row(
-                    children: [
-                      CircleAvatar(
-                        backgroundColor: scheme.secondaryContainer,
-                        foregroundColor: scheme.onSecondaryContainer,
-                        child: const Icon(Icons.receipt_long_outlined),
-                      ),
-                      const SizedBox(width: 12),
-                      Expanded(
-                        child: Column(
-                          crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Card(
+                  child: Padding(
+                    padding: const EdgeInsets.all(16),
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        Row(
                           children: [
-                            Text(
-                              expense.title.isEmpty
-                                  ? 'Despesa sem título'
-                                  : expense.title,
-                              style: Theme.of(context).textTheme.titleLarge
-                                  ?.copyWith(fontWeight: FontWeight.w800),
+                            CircleAvatar(
+                              backgroundColor: scheme.secondaryContainer,
+                              foregroundColor: scheme.onSecondaryContainer,
+                              child: const Icon(Icons.receipt_long_outlined),
                             ),
-                            Text(
-                              CurrencyFormatter.brl(expense.totalValue),
-                              style: Theme.of(context).textTheme.titleMedium
-                                  ?.copyWith(color: scheme.secondary),
+                            const SizedBox(width: 12),
+                            Expanded(
+                              child: Column(
+                                crossAxisAlignment: CrossAxisAlignment.start,
+                                children: [
+                                  Text(
+                                    expense.title.isEmpty
+                                        ? 'Despesa sem título'
+                                        : expense.title,
+                                    style: Theme.of(context)
+                                        .textTheme
+                                        .titleLarge
+                                        ?.copyWith(fontWeight: FontWeight.w800),
+                                  ),
+                                  Text(
+                                    CurrencyFormatter.brl(expense.totalValue),
+                                    style: Theme.of(context)
+                                        .textTheme
+                                        .titleMedium
+                                        ?.copyWith(color: scheme.secondary),
+                                  ),
+                                ],
+                              ),
                             ),
                           ],
                         ),
-                      ),
-                    ],
+                        const SizedBox(height: 16),
+                        DetailRow(
+                          label: 'Categoria',
+                          value: CategoryFormatter.label(expense.category),
+                        ),
+                        DetailRow(
+                          label: 'Início',
+                          value: expense.startDate ?? '',
+                        ),
+                        DetailRow(
+                          label: 'Pagamento',
+                          value: expense.paymentDate ?? '',
+                        ),
+                        DetailRow(
+                          label: 'Vencimento',
+                          value: expense.dueDay > 0
+                              ? 'Dia ${expense.dueDay}'
+                              : '',
+                        ),
+                        DetailRow(
+                          label: 'Parcelas',
+                          value:
+                              '${expense.paidInstallments}/${expense.installmentsCount} pagas',
+                        ),
+                      ],
+                    ),
                   ),
-                  const SizedBox(height: 16),
-                  DetailRow(
-                    label: 'Categoria',
-                    value: CategoryFormatter.label(expense.category),
+                ),
+                const SizedBox(height: 16),
+                _PeopleCard(
+                  title: 'Pagadores',
+                  emptyText: 'Sem pagadores vinculados.',
+                  people: expense.payers,
+                ),
+                const SizedBox(height: 12),
+                _PeopleCard(
+                  title: 'Pendências',
+                  emptyText: 'Nenhuma pendência.',
+                  people: expense.remainingPayers,
+                ),
+                const SizedBox(height: 16),
+                Text(
+                  'Parcelas',
+                  style: Theme.of(context).textTheme.titleMedium?.copyWith(
+                    fontWeight: FontWeight.w800,
                   ),
-                  DetailRow(label: 'Início', value: expense.startDate ?? ''),
-                  DetailRow(
-                    label: 'Pagamento',
-                    value: expense.paymentDate ?? '',
+                ),
+                const SizedBox(height: 10),
+                if (expense.installments.isEmpty)
+                  const Card(
+                    child: Padding(
+                      padding: EdgeInsets.all(16),
+                      child: Text('Nenhuma parcela encontrada.'),
+                    ),
+                  )
+                else
+                  ...expense.installments.map(
+                    (installment) => _InstallmentTile(
+                      installment,
+                      onPay: installment.paid
+                          ? null
+                          : () => _payInstallment(installment),
+                    ),
                   ),
-                  DetailRow(
-                    label: 'Vencimento',
-                    value: expense.dueDay > 0 ? 'Dia ${expense.dueDay}' : '',
-                  ),
-                  DetailRow(
-                    label: 'Parcelas',
-                    value:
-                        '${expense.paidInstallments}/${expense.installmentsCount} pagas',
-                  ),
-                ],
-              ),
+              ],
             ),
-          ),
-          const SizedBox(height: 16),
-          _PeopleCard(
-            title: 'Pagadores',
-            emptyText: 'Sem pagadores vinculados.',
-            people: expense.payers,
-          ),
-          const SizedBox(height: 12),
-          _PeopleCard(
-            title: 'Pendências',
-            emptyText: 'Nenhuma pendência.',
-            people: expense.remainingPayers,
-          ),
-          const SizedBox(height: 16),
-          Text(
-            'Parcelas',
-            style: Theme.of(
-              context,
-            ).textTheme.titleMedium?.copyWith(fontWeight: FontWeight.w800),
-          ),
-          const SizedBox(height: 10),
-          if (expense.installments.isEmpty)
-            const Card(
-              child: Padding(
-                padding: EdgeInsets.all(16),
-                child: Text('Nenhuma parcela encontrada.'),
-              ),
-            )
-          else
-            ...expense.installments.map(
-              (installment) => _InstallmentTile(
-                installment,
-                onPay: installment.paid
-                    ? null
-                    : () => _payInstallment(installment),
-              ),
-            ),
-        ],
-      ),
     );
   }
 

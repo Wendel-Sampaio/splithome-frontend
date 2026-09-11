@@ -6,6 +6,7 @@ import 'package:intl/intl.dart';
 
 import '../../../core/auth/auth_controller.dart';
 import '../../../shared/formatters/category_formatter.dart';
+import '../../../shared/widgets/premium_feature_gate.dart';
 import '../../family/presentation/family_payer_selector.dart';
 import '../../home/data/financial_summary_repository.dart';
 import '../../home/data/home_repository.dart';
@@ -169,6 +170,12 @@ class _NewPurchasePageState extends ConsumerState<NewPurchasePage> {
                             _selectedPayers = payers;
                           });
                         },
+                      ),
+                    ] else if (user?.isPremium == false) ...[
+                      const SizedBox(height: 14),
+                      const PremiumFeatureHint(
+                        message:
+                            'Pagadores familiares estão disponíveis no Premium. No plano grátis, a compra fica vinculada apenas ao responsável.',
                       ),
                     ],
                     const SizedBox(height: 22),

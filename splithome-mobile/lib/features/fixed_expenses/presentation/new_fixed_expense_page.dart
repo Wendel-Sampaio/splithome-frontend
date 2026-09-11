@@ -6,6 +6,7 @@ import 'package:intl/intl.dart';
 
 import '../../../core/auth/auth_controller.dart';
 import '../../../shared/formatters/category_formatter.dart';
+import '../../../shared/widgets/premium_feature_gate.dart';
 import '../../family/presentation/family_payer_selector.dart';
 import '../../home/data/financial_summary_repository.dart';
 import '../../home/data/home_repository.dart';
@@ -64,6 +65,7 @@ class _NewFixedExpensePageState extends ConsumerState<NewFixedExpensePage> {
   Widget build(BuildContext context) {
     final categories = ref.watch(purchaseCategoriesProvider);
     final user = ref.watch(authControllerProvider).asData?.value.user;
+    final isFree = user?.isPremium == false;
     final canChoosePayers = user?.isPremium == true;
 
     return Scaffold(
@@ -75,167 +77,185 @@ class _NewFixedExpensePageState extends ConsumerState<NewFixedExpensePage> {
           icon: const Icon(Icons.arrow_back),
         ),
       ),
-      body: SafeArea(
-        child: Center(
-          child: SingleChildScrollView(
-            padding: const EdgeInsets.all(16),
-            child: ConstrainedBox(
-              constraints: const BoxConstraints(maxWidth: 520),
-              child: Form(
-                key: _formKey,
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.stretch,
-                  children: [
-                    TextFormField(
-                      controller: _titleController,
-                      textInputAction: TextInputAction.next,
-                      decoration: const InputDecoration(
-                        labelText: 'Título',
-                        prefixIcon: Icon(Icons.edit_note_outlined),
-                      ),
-                      validator: (value) {
-                        if (value == null || value.trim().isEmpty) {
-                          return 'Informe o título da despesa.';
-                        }
+      body: isFree
+          ? const PremiumFeatureGate(
+              title: 'Despesa fixa é Premium',
+              message:
+                  'Assine o Premium para cadastrar despesas fixas e dividir com a família.',
+              actionLabel: 'Voltar para despesas',
+              actionRoute: '/fixed-expenses',
+            )
+          : SafeArea(
+              child: Center(
+                child: SingleChildScrollView(
+                  padding: const EdgeInsets.all(16),
+                  child: ConstrainedBox(
+                    constraints: const BoxConstraints(maxWidth: 520),
+                    child: Form(
+                      key: _formKey,
+                      child: Column(
+                        crossAxisAlignment: CrossAxisAlignment.stretch,
+                        children: [
+                          TextFormField(
+                            controller: _titleController,
+                            textInputAction: TextInputAction.next,
+                            decoration: const InputDecoration(
+                              labelText: 'Título',
+                              prefixIcon: Icon(Icons.edit_note_outlined),
+                            ),
+                            validator: (value) {
+                              if (value == null || value.trim().isEmpty) {
+                                return 'Informe o título da despesa.';
+                              }
 
-                        return null;
-                      },
-                    ),
-                    const SizedBox(height: 14),
-                    categories.when(
-                      data: (items) => DropdownButtonFormField<String>(
-                        initialValue: _category,
-                        decoration: const InputDecoration(
-                          labelText: 'Categoria',
-                          prefixIcon: Icon(Icons.category_outlined),
-                        ),
-                        items: items
-                            .map(
-                              (category) => DropdownMenuItem(
-                                value: category,
-                                child: Text(CategoryFormatter.label(category)),
+                              return null;
+                            },
+                          ),
+                          const SizedBox(height: 14),
+                          categories.when(
+                            data: (items) => DropdownButtonFormField<String>(
+                              initialValue: _category,
+                              decoration: const InputDecoration(
+                                labelText: 'Categoria',
+                                prefixIcon: Icon(Icons.category_outlined),
                               ),
-                            )
-                            .toList(),
-                        onChanged: (value) {
-                          setState(() {
-                            _category = value;
-                          });
-                        },
-                        validator: (value) {
-                          if (value == null || value.isEmpty) {
-                            return 'Selecione uma categoria.';
-                          }
+                              items: items
+                                  .map(
+                                    (category) => DropdownMenuItem(
+                                      value: category,
+                                      child: Text(
+                                        CategoryFormatter.label(category),
+                                      ),
+                                    ),
+                                  )
+                                  .toList(),
+                              onChanged: (value) {
+                                setState(() {
+                                  _category = value;
+                                });
+                              },
+                              validator: (value) {
+                                if (value == null || value.isEmpty) {
+                                  return 'Selecione uma categoria.';
+                                }
 
-                          return null;
-                        },
-                      ),
-                      error: (error, stackTrace) => _InlineError(
-                        message: error.toString(),
-                        onRetry: () =>
-                            ref.invalidate(purchaseCategoriesProvider),
-                      ),
-                      loading: () => const LinearProgressIndicator(),
-                    ),
-                    const SizedBox(height: 14),
-                    TextFormField(
-                      controller: _totalValueController,
-                      keyboardType: const TextInputType.numberWithOptions(
-                        decimal: true,
-                      ),
-                      inputFormatters: [
-                        FilteringTextInputFormatter.allow(RegExp(r'[0-9,.]')),
-                      ],
-                      decoration: const InputDecoration(
-                        labelText: 'Valor total',
-                        prefixIcon: Icon(Icons.payments_outlined),
-                      ),
-                      validator: (value) {
-                        final number = _parseMoney(value);
-                        if (number == null || number <= 0) {
-                          return 'Informe um valor maior que zero.';
-                        }
-
-                        return null;
-                      },
-                    ),
-                    const SizedBox(height: 14),
-                    Row(
-                      children: [
-                        Expanded(
-                          child: TextFormField(
-                            controller: _installmentsController,
-                            keyboardType: TextInputType.number,
+                                return null;
+                              },
+                            ),
+                            error: (error, stackTrace) => _InlineError(
+                              message: error.toString(),
+                              onRetry: () =>
+                                  ref.invalidate(purchaseCategoriesProvider),
+                            ),
+                            loading: () => const LinearProgressIndicator(),
+                          ),
+                          const SizedBox(height: 14),
+                          TextFormField(
+                            controller: _totalValueController,
+                            keyboardType: const TextInputType.numberWithOptions(
+                              decimal: true,
+                            ),
                             inputFormatters: [
-                              FilteringTextInputFormatter.digitsOnly,
+                              FilteringTextInputFormatter.allow(
+                                RegExp(r'[0-9,.]'),
+                              ),
                             ],
                             decoration: const InputDecoration(
-                              labelText: 'Parcelas',
-                              prefixIcon: Icon(Icons.format_list_numbered),
+                              labelText: 'Valor total',
+                              prefixIcon: Icon(Icons.payments_outlined),
                             ),
-                            validator: (value) =>
-                                _validateIntRange(value, 1, 240),
+                            validator: (value) {
+                              final number = _parseMoney(value);
+                              if (number == null || number <= 0) {
+                                return 'Informe um valor maior que zero.';
+                              }
+
+                              return null;
+                            },
                           ),
-                        ),
-                        const SizedBox(width: 12),
-                        Expanded(
-                          child: TextFormField(
-                            controller: _dueDayController,
-                            keyboardType: TextInputType.number,
-                            inputFormatters: [
-                              FilteringTextInputFormatter.digitsOnly,
+                          const SizedBox(height: 14),
+                          Row(
+                            children: [
+                              Expanded(
+                                child: TextFormField(
+                                  controller: _installmentsController,
+                                  keyboardType: TextInputType.number,
+                                  inputFormatters: [
+                                    FilteringTextInputFormatter.digitsOnly,
+                                  ],
+                                  decoration: const InputDecoration(
+                                    labelText: 'Parcelas',
+                                    prefixIcon: Icon(
+                                      Icons.format_list_numbered,
+                                    ),
+                                  ),
+                                  validator: (value) =>
+                                      _validateIntRange(value, 1, 240),
+                                ),
+                              ),
+                              const SizedBox(width: 12),
+                              Expanded(
+                                child: TextFormField(
+                                  controller: _dueDayController,
+                                  keyboardType: TextInputType.number,
+                                  inputFormatters: [
+                                    FilteringTextInputFormatter.digitsOnly,
+                                  ],
+                                  decoration: const InputDecoration(
+                                    labelText: 'Vencimento',
+                                    prefixIcon: Icon(
+                                      Icons.event_available_outlined,
+                                    ),
+                                  ),
+                                  validator: (value) =>
+                                      _validateIntRange(value, 1, 31),
+                                ),
+                              ),
                             ],
-                            decoration: const InputDecoration(
-                              labelText: 'Vencimento',
-                              prefixIcon: Icon(Icons.event_available_outlined),
-                            ),
-                            validator: (value) =>
-                                _validateIntRange(value, 1, 31),
                           ),
-                        ),
-                      ],
-                    ),
-                    const SizedBox(height: 14),
-                    OutlinedButton.icon(
-                      onPressed: _pickStartDate,
-                      icon: const Icon(Icons.event_outlined),
-                      label: Text(
-                        'Início: ${DateFormat('dd/MM/yyyy').format(_startDate)}',
+                          const SizedBox(height: 14),
+                          OutlinedButton.icon(
+                            onPressed: _pickStartDate,
+                            icon: const Icon(Icons.event_outlined),
+                            label: Text(
+                              'Início: ${DateFormat('dd/MM/yyyy').format(_startDate)}',
+                            ),
+                          ),
+                          if (canChoosePayers) ...[
+                            const SizedBox(height: 14),
+                            FamilyPayerSelector(
+                              selectedPayers: _selectedPayers,
+                              onChanged: (payers) {
+                                setState(() {
+                                  _selectedPayers = payers;
+                                });
+                              },
+                            ),
+                          ],
+                          const SizedBox(height: 22),
+                          FilledButton.icon(
+                            onPressed: _isSubmitting ? null : _submit,
+                            icon: _isSubmitting
+                                ? const SizedBox.square(
+                                    dimension: 18,
+                                    child: CircularProgressIndicator(
+                                      strokeWidth: 2,
+                                    ),
+                                  )
+                                : const Icon(Icons.check),
+                            label: Text(
+                              _isEditing
+                                  ? 'Salvar alterações'
+                                  : 'Cadastrar despesa fixa',
+                            ),
+                          ),
+                        ],
                       ),
                     ),
-                    if (canChoosePayers) ...[
-                      const SizedBox(height: 14),
-                      FamilyPayerSelector(
-                        selectedPayers: _selectedPayers,
-                        onChanged: (payers) {
-                          setState(() {
-                            _selectedPayers = payers;
-                          });
-                        },
-                      ),
-                    ],
-                    const SizedBox(height: 22),
-                    FilledButton.icon(
-                      onPressed: _isSubmitting ? null : _submit,
-                      icon: _isSubmitting
-                          ? const SizedBox.square(
-                              dimension: 18,
-                              child: CircularProgressIndicator(strokeWidth: 2),
-                            )
-                          : const Icon(Icons.check),
-                      label: Text(
-                        _isEditing
-                            ? 'Salvar alterações'
-                            : 'Cadastrar despesa fixa',
-                      ),
-                    ),
-                  ],
+                  ),
                 ),
               ),
             ),
-          ),
-        ),
-      ),
     );
   }
 

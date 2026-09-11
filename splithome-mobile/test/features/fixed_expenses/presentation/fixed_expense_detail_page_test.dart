@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:splithome_mobile/features/fixed_expenses/data/fixed_expense.dart';
 import 'package:splithome_mobile/features/fixed_expenses/presentation/fixed_expense_detail_page.dart';
@@ -38,7 +39,9 @@ void main() {
     );
 
     await tester.pumpWidget(
-      const MaterialApp(home: FixedExpenseDetailPage(expense: expense)),
+      const ProviderScope(
+        child: MaterialApp(home: FixedExpenseDetailPage(expense: expense)),
+      ),
     );
 
     expect(find.text('Internet'), findsOneWidget);

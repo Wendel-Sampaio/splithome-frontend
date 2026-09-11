@@ -2,7 +2,9 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 
+import '../../../core/auth/auth_controller.dart';
 import '../../../shared/formatters/currency_formatter.dart';
+import '../../../shared/widgets/premium_feature_gate.dart';
 import '../data/financial_summary.dart';
 import '../data/financial_summary_repository.dart';
 
@@ -11,6 +13,8 @@ class FinancialSummaryPage extends ConsumerWidget {
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
+    final user = ref.watch(authControllerProvider).asData?.value.user;
+    final isFree = user?.isPremium == false;
     final summary = ref.watch(financialSummaryProvider);
 
     return Scaffold(
@@ -22,36 +26,42 @@ class FinancialSummaryPage extends ConsumerWidget {
           icon: const Icon(Icons.arrow_back),
         ),
       ),
-      body: summary.when(
-        data: (data) => RefreshIndicator(
-          onRefresh: () async => ref.invalidate(financialSummaryProvider),
-          child: ListView(
-            padding: const EdgeInsets.fromLTRB(16, 8, 16, 24),
-            children: [
-              _TotalOutstandingCard(total: data.totalOutstanding),
-              const SizedBox(height: 16),
-              _BalancesSection(balances: data.balances),
-              const SizedBox(height: 16),
-              _DebtsSection(
-                title: 'Quem deve para quem',
-                emptyText: 'Nenhuma dívida registrada.',
-                debts: data.debts,
+      body: isFree
+          ? const PremiumFeatureGate(
+              title: 'Resumo financeiro é Premium',
+              message:
+                  'Assine o Premium para acompanhar saldos, dívidas e sugestões de liquidação da família.',
+            )
+          : summary.when(
+              data: (data) => RefreshIndicator(
+                onRefresh: () async => ref.invalidate(financialSummaryProvider),
+                child: ListView(
+                  padding: const EdgeInsets.fromLTRB(16, 8, 16, 24),
+                  children: [
+                    _TotalOutstandingCard(total: data.totalOutstanding),
+                    const SizedBox(height: 16),
+                    _BalancesSection(balances: data.balances),
+                    const SizedBox(height: 16),
+                    _DebtsSection(
+                      title: 'Quem deve para quem',
+                      emptyText: 'Nenhuma dívida registrada.',
+                      debts: data.debts,
+                    ),
+                    const SizedBox(height: 16),
+                    _DebtsSection(
+                      title: 'Sugestões de liquidação',
+                      emptyText: 'Nada para liquidar no momento.',
+                      debts: data.settlements,
+                    ),
+                  ],
+                ),
               ),
-              const SizedBox(height: 16),
-              _DebtsSection(
-                title: 'Sugestões de liquidação',
-                emptyText: 'Nada para liquidar no momento.',
-                debts: data.settlements,
+              error: (error, stackTrace) => _ErrorState(
+                message: error.toString(),
+                onRetry: () => ref.invalidate(financialSummaryProvider),
               ),
-            ],
-          ),
-        ),
-        error: (error, stackTrace) => _ErrorState(
-          message: error.toString(),
-          onRetry: () => ref.invalidate(financialSummaryProvider),
-        ),
-        loading: () => const Center(child: CircularProgressIndicator()),
-      ),
+              loading: () => const Center(child: CircularProgressIndicator()),
+            ),
       bottomNavigationBar: NavigationBar(
         selectedIndex: 3,
         onDestinationSelected: (index) {

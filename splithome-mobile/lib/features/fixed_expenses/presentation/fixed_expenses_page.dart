@@ -2,8 +2,10 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 
+import '../../../core/auth/auth_controller.dart';
 import '../../../shared/formatters/category_formatter.dart';
 import '../../../shared/formatters/currency_formatter.dart';
+import '../../../shared/widgets/premium_feature_gate.dart';
 import '../../../shared/widgets/sh_empty_state.dart';
 import '../../../shared/widgets/sh_error_state.dart';
 import '../data/fixed_expense.dart';
@@ -14,6 +16,8 @@ class FixedExpensesPage extends ConsumerWidget {
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
+    final user = ref.watch(authControllerProvider).asData?.value.user;
+    final isFree = user?.isPremium == false;
     final expenses = ref.watch(fixedExpensesProvider);
 
     return Scaffold(
@@ -25,44 +29,55 @@ class FixedExpensesPage extends ConsumerWidget {
           icon: const Icon(Icons.arrow_back),
         ),
       ),
-      body: expenses.when(
-        data: (page) {
-          if (page.content.isEmpty) {
-            return const ShEmptyState(
-              message: 'Nenhuma despesa fixa encontrada.',
-              icon: Icons.receipt_long_outlined,
-            );
-          }
-
-          return RefreshIndicator(
-            onRefresh: () async => ref.invalidate(fixedExpensesProvider),
-            child: ListView.separated(
-              padding: const EdgeInsets.fromLTRB(16, 8, 16, 24),
-              itemCount: page.content.length + 1,
-              separatorBuilder: (context, index) => const SizedBox(height: 10),
-              itemBuilder: (context, index) {
-                if (index == 0) {
-                  return _FixedExpensesHeader(
-                    totalElements: page.totalElements,
+      body: isFree
+          ? const PremiumFeatureGate(
+              title: 'Despesas fixas são Premium',
+              message:
+                  'Assine o Premium para parcelar despesas recorrentes e acompanhar pagamentos da família.',
+            )
+          : expenses.when(
+              data: (page) {
+                if (page.content.isEmpty) {
+                  return const ShEmptyState(
+                    message: 'Nenhuma despesa fixa encontrada.',
+                    icon: Icons.receipt_long_outlined,
                   );
                 }
 
-                return _FixedExpenseTile(expense: page.content[index - 1]);
+                return RefreshIndicator(
+                  onRefresh: () async => ref.invalidate(fixedExpensesProvider),
+                  child: ListView.separated(
+                    padding: const EdgeInsets.fromLTRB(16, 8, 16, 24),
+                    itemCount: page.content.length + 1,
+                    separatorBuilder: (context, index) =>
+                        const SizedBox(height: 10),
+                    itemBuilder: (context, index) {
+                      if (index == 0) {
+                        return _FixedExpensesHeader(
+                          totalElements: page.totalElements,
+                        );
+                      }
+
+                      return _FixedExpenseTile(
+                        expense: page.content[index - 1],
+                      );
+                    },
+                  ),
+                );
               },
+              error: (error, stackTrace) => ShErrorState(
+                message: error.toString(),
+                onRetry: () => ref.invalidate(fixedExpensesProvider),
+              ),
+              loading: () => const Center(child: CircularProgressIndicator()),
             ),
-          );
-        },
-        error: (error, stackTrace) => ShErrorState(
-          message: error.toString(),
-          onRetry: () => ref.invalidate(fixedExpensesProvider),
-        ),
-        loading: () => const Center(child: CircularProgressIndicator()),
-      ),
-      floatingActionButton: FloatingActionButton.extended(
-        onPressed: () => context.go('/fixed-expenses/new'),
-        icon: const Icon(Icons.add),
-        label: const Text('Despesa'),
-      ),
+      floatingActionButton: isFree
+          ? null
+          : FloatingActionButton.extended(
+              onPressed: () => context.go('/fixed-expenses/new'),
+              icon: const Icon(Icons.add),
+              label: const Text('Despesa'),
+            ),
       bottomNavigationBar: NavigationBar(
         selectedIndex: 2,
         onDestinationSelected: (index) {
