@@ -60,6 +60,51 @@ class FixedExpenseRepository {
       );
     }
   }
+
+  Future<FixedExpense> updateFixedExpense(
+    String id,
+    CreateFixedExpenseRequest request,
+  ) async {
+    try {
+      final response = await dio.put<Object?>(
+        '/transactions/update-fixed-expense/$id',
+        data: request.toJson(),
+      );
+
+      return FixedExpense.fromJson(response.data);
+    } on DioException catch (error) {
+      throw ApiException(
+        'Não foi possível atualizar a despesa fixa.',
+        statusCode: error.response?.statusCode,
+      );
+    }
+  }
+
+  Future<void> deleteFixedExpense(String id) async {
+    try {
+      await dio.delete<Object?>('/transactions/delete-fixed-expense/$id');
+    } on DioException catch (error) {
+      throw ApiException(
+        'Não foi possível excluir a despesa fixa.',
+        statusCode: error.response?.statusCode,
+      );
+    }
+  }
+
+  Future<Installment> payInstallment(String id) async {
+    try {
+      final response = await dio.post<Object?>(
+        '/transactions/installments/$id/pay',
+      );
+
+      return Installment.fromJson(response.data);
+    } on DioException catch (error) {
+      throw ApiException(
+        'Não foi possível marcar a parcela como paga.',
+        statusCode: error.response?.statusCode,
+      );
+    }
+  }
 }
 
 class CreateFixedExpenseRequest {

@@ -42,9 +42,9 @@ void main() {
     expect(find.text('Internet'), findsOneWidget);
     expect(find.text('MORADIA'), findsOneWidget);
     expect(find.text('1/2 pagas'), findsOneWidget);
-    expect(find.text('Parcela 1'), findsOneWidget);
-    expect(find.text('Parcela 2'), findsOneWidget);
+    expect(find.textContaining('Parcela 1'), findsOneWidget);
+    expect(find.textContaining('Parcela 2'), findsOneWidget);
     expect(find.text('Paga'), findsOneWidget);
-    expect(find.text('Pendente'), findsOneWidget);
+    expect(find.text('Pagar'), findsOneWidget);
   });
 }

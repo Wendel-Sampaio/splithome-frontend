@@ -82,6 +82,33 @@ class PurchaseRepository {
       );
     }
   }
+
+  Future<Purchase> updatePurchase(UpdatePurchaseRequest request) async {
+    try {
+      final response = await dio.put<Object?>(
+        '/transactions/update-purchase',
+        data: request.toJson(),
+      );
+
+      return Purchase.fromJson(response.data);
+    } on DioException catch (error) {
+      throw ApiException(
+        'Não foi possível atualizar a compra.',
+        statusCode: error.response?.statusCode,
+      );
+    }
+  }
+
+  Future<void> deletePurchase(String id) async {
+    try {
+      await dio.delete<Object?>('/transactions/delete/$id');
+    } on DioException catch (error) {
+      throw ApiException(
+        'Não foi possível excluir a compra.',
+        statusCode: error.response?.statusCode,
+      );
+    }
+  }
 }
 
 class CreatePurchaseRequest {
@@ -107,6 +134,44 @@ class CreatePurchaseRequest {
 
   Map<String, Object?> toJson() {
     return {
+      'title': title,
+      'category': category,
+      'value': value,
+      'payers': payers,
+      'paymentDate': paymentDate,
+      'remainingPayers': remainingPayers,
+      'purchaserId': purchaserId,
+      'purchaseDate': purchaseDate,
+    };
+  }
+}
+
+class UpdatePurchaseRequest {
+  const UpdatePurchaseRequest({
+    required this.id,
+    required this.title,
+    required this.category,
+    required this.value,
+    required this.paymentDate,
+    required this.purchaserId,
+    required this.purchaseDate,
+    required this.payers,
+    required this.remainingPayers,
+  });
+
+  final String id;
+  final String title;
+  final String category;
+  final double value;
+  final String paymentDate;
+  final String purchaserId;
+  final String purchaseDate;
+  final List<String> payers;
+  final List<String> remainingPayers;
+
+  Map<String, Object?> toJson() {
+    return {
+      'id': id,
       'title': title,
       'category': category,
       'value': value,

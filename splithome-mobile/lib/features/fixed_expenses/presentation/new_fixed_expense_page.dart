@@ -7,10 +7,13 @@ import 'package:intl/intl.dart';
 import '../../../core/auth/auth_controller.dart';
 import '../../home/data/home_repository.dart';
 import '../../purchases/data/purchase_repository.dart';
+import '../data/fixed_expense.dart';
 import '../data/fixed_expense_repository.dart';
 
 class NewFixedExpensePage extends ConsumerStatefulWidget {
-  const NewFixedExpensePage({super.key});
+  const NewFixedExpensePage({super.key, this.expense});
+
+  final FixedExpense? expense;
 
   @override
   ConsumerState<NewFixedExpensePage> createState() =>
@@ -27,6 +30,22 @@ class _NewFixedExpensePageState extends ConsumerState<NewFixedExpensePage> {
   String? _category;
   bool _isSubmitting = false;
 
+  bool get _isEditing => widget.expense != null;
+
+  @override
+  void initState() {
+    super.initState();
+    final expense = widget.expense;
+    if (expense != null) {
+      _titleController.text = expense.title;
+      _totalValueController.text = expense.totalValue.toStringAsFixed(2);
+      _installmentsController.text = expense.installmentsCount.toString();
+      _dueDayController.text = expense.dueDay.toString();
+      _category = expense.category.isEmpty ? null : expense.category;
+      _startDate = DateTime.tryParse(expense.startDate ?? '') ?? _startDate;
+    }
+  }
+
   @override
   void dispose() {
     _titleController.dispose();
@@ -42,7 +61,7 @@ class _NewFixedExpensePageState extends ConsumerState<NewFixedExpensePage> {
 
     return Scaffold(
       appBar: AppBar(
-        title: const Text('Nova despesa fixa'),
+        title: Text(_isEditing ? 'Editar despesa fixa' : 'Nova despesa fixa'),
         leading: IconButton(
           tooltip: 'Voltar',
           onPressed: () => context.go('/fixed-expenses'),
@@ -186,7 +205,11 @@ class _NewFixedExpensePageState extends ConsumerState<NewFixedExpensePage> {
                               child: CircularProgressIndicator(strokeWidth: 2),
                             )
                           : const Icon(Icons.check),
-                      label: const Text('Cadastrar despesa fixa'),
+                      label: Text(
+                        _isEditing
+                            ? 'Salvar alterações'
+                            : 'Cadastrar despesa fixa',
+                      ),
                     ),
                   ],
                 ),
@@ -233,19 +256,24 @@ class _NewFixedExpensePageState extends ConsumerState<NewFixedExpensePage> {
     });
 
     try {
-      await ref
-          .read(fixedExpenseRepositoryProvider)
-          .createFixedExpense(
-            CreateFixedExpenseRequest(
-              title: _titleController.text.trim(),
-              category: _category!,
-              totalValue: _parseMoney(_totalValueController.text)!,
-              installmentsCount: int.parse(_installmentsController.text),
-              dueDay: int.parse(_dueDayController.text),
-              startDate: DateFormat('yyyy-MM-dd').format(_startDate),
-              responsibleId: user.id,
-            ),
-          );
+      final request = CreateFixedExpenseRequest(
+        title: _titleController.text.trim(),
+        category: _category!,
+        totalValue: _parseMoney(_totalValueController.text)!,
+        installmentsCount: int.parse(_installmentsController.text),
+        dueDay: int.parse(_dueDayController.text),
+        startDate: DateFormat('yyyy-MM-dd').format(_startDate),
+        responsibleId: widget.expense?.responsibleId ?? user.id,
+        creditCardId: widget.expense?.creditCardId,
+      );
+
+      final repository = ref.read(fixedExpenseRepositoryProvider);
+      final existing = widget.expense;
+      if (existing == null) {
+        await repository.createFixedExpense(request);
+      } else {
+        await repository.updateFixedExpense(existing.id, request);
+      }
 
       ref.invalidate(fixedExpensesProvider);
       ref.invalidate(homeSummaryProvider);
@@ -255,7 +283,13 @@ class _NewFixedExpensePageState extends ConsumerState<NewFixedExpensePage> {
       }
 
       ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(content: Text('Despesa fixa cadastrada com sucesso.')),
+        SnackBar(
+          content: Text(
+            _isEditing
+                ? 'Despesa fixa atualizada com sucesso.'
+                : 'Despesa fixa cadastrada com sucesso.',
+          ),
+        ),
       );
       context.go('/fixed-expenses');
     } catch (error) {

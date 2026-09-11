@@ -66,6 +66,21 @@ final appRouterProvider = Provider<GoRouter>((ref) {
         builder: (context, state) => const NewPurchasePage(),
       ),
       GoRoute(
+        path: '/purchases/edit',
+        builder: (context, state) {
+          final purchase = state.extra;
+          if (purchase is Purchase) {
+            return NewPurchasePage(purchase: purchase);
+          }
+
+          return const _MissingRoutePayloadPage(
+            title: 'Editar compra',
+            message: 'Abra a compra pela lista para editar.',
+            fallbackLocation: '/purchases',
+          );
+        },
+      ),
+      GoRoute(
         path: '/purchases/detail',
         builder: (context, state) {
           final purchase = state.extra;
@@ -89,6 +104,21 @@ final appRouterProvider = Provider<GoRouter>((ref) {
       GoRoute(
         path: '/fixed-expenses/new',
         builder: (context, state) => const NewFixedExpensePage(),
+      ),
+      GoRoute(
+        path: '/fixed-expenses/edit',
+        builder: (context, state) {
+          final expense = state.extra;
+          if (expense is FixedExpense) {
+            return NewFixedExpensePage(expense: expense);
+          }
+
+          return const _MissingRoutePayloadPage(
+            title: 'Editar despesa fixa',
+            message: 'Abra a despesa pela lista para editar.',
+            fallbackLocation: '/fixed-expenses',
+          );
+        },
       ),
       GoRoute(
         path: '/fixed-expenses/detail',

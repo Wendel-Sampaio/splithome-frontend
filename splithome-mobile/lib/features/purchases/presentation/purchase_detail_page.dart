@@ -1,17 +1,20 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 
 import '../../../shared/formatters/currency_formatter.dart';
 import '../../../shared/widgets/detail_row.dart';
+import '../../home/data/home_repository.dart';
 import '../data/purchase.dart';
+import '../data/purchase_repository.dart';
 
-class PurchaseDetailPage extends StatelessWidget {
+class PurchaseDetailPage extends ConsumerWidget {
   const PurchaseDetailPage({required this.purchase, super.key});
 
   final Purchase purchase;
 
   @override
-  Widget build(BuildContext context) {
+  Widget build(BuildContext context, WidgetRef ref) {
     final scheme = Theme.of(context).colorScheme;
 
     return Scaffold(
@@ -22,6 +25,25 @@ class PurchaseDetailPage extends StatelessWidget {
           onPressed: () => context.pop(),
           icon: const Icon(Icons.arrow_back),
         ),
+        actions: [
+          PopupMenuButton<_PurchaseAction>(
+            onSelected: (action) {
+              switch (action) {
+                case _PurchaseAction.edit:
+                  context.push('/purchases/edit', extra: purchase);
+                case _PurchaseAction.delete:
+                  _confirmDelete(context, ref);
+              }
+            },
+            itemBuilder: (context) => const [
+              PopupMenuItem(value: _PurchaseAction.edit, child: Text('Editar')),
+              PopupMenuItem(
+                value: _PurchaseAction.delete,
+                child: Text('Excluir'),
+              ),
+            ],
+          ),
+        ],
       ),
       body: ListView(
         padding: const EdgeInsets.all(16),
@@ -99,7 +121,56 @@ class PurchaseDetailPage extends StatelessWidget {
       ),
     );
   }
+
+  Future<void> _confirmDelete(BuildContext context, WidgetRef ref) async {
+    final confirmed = await showDialog<bool>(
+      context: context,
+      builder: (context) {
+        return AlertDialog(
+          title: const Text('Excluir compra?'),
+          content: const Text('Esta ação não pode ser desfeita.'),
+          actions: [
+            TextButton(
+              onPressed: () => Navigator.of(context).pop(false),
+              child: const Text('Cancelar'),
+            ),
+            FilledButton(
+              onPressed: () => Navigator.of(context).pop(true),
+              child: const Text('Excluir'),
+            ),
+          ],
+        );
+      },
+    );
+
+    if (confirmed != true || !context.mounted) {
+      return;
+    }
+
+    try {
+      await ref.read(purchaseRepositoryProvider).deletePurchase(purchase.id);
+      ref.invalidate(purchasesProvider);
+      ref.invalidate(homeSummaryProvider);
+
+      if (!context.mounted) {
+        return;
+      }
+
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(content: Text('Compra excluída com sucesso.')),
+      );
+      context.go('/purchases');
+    } catch (error) {
+      if (context.mounted) {
+        ScaffoldMessenger.of(
+          context,
+        ).showSnackBar(SnackBar(content: Text(error.toString())));
+      }
+    }
+  }
 }
+
+enum _PurchaseAction { edit, delete }
 
 class _PeopleCard extends StatelessWidget {
   const _PeopleCard({

@@ -6,10 +6,13 @@ import 'package:intl/intl.dart';
 
 import '../../../core/auth/auth_controller.dart';
 import '../../home/data/home_repository.dart';
+import '../data/purchase.dart';
 import '../data/purchase_repository.dart';
 
 class NewPurchasePage extends ConsumerStatefulWidget {
-  const NewPurchasePage({super.key});
+  const NewPurchasePage({super.key, this.purchase});
+
+  final Purchase? purchase;
 
   @override
   ConsumerState<NewPurchasePage> createState() => _NewPurchasePageState();
@@ -22,6 +25,21 @@ class _NewPurchasePageState extends ConsumerState<NewPurchasePage> {
   DateTime _paymentDate = DateTime.now();
   String? _category;
   bool _isSubmitting = false;
+
+  bool get _isEditing => widget.purchase != null;
+
+  @override
+  void initState() {
+    super.initState();
+    final purchase = widget.purchase;
+    if (purchase != null) {
+      _titleController.text = purchase.title;
+      _valueController.text = purchase.value.toStringAsFixed(2);
+      _category = purchase.category.isEmpty ? null : purchase.category;
+      _paymentDate =
+          DateTime.tryParse(purchase.paymentDate ?? '') ?? _paymentDate;
+    }
+  }
 
   @override
   void dispose() {
@@ -36,7 +54,7 @@ class _NewPurchasePageState extends ConsumerState<NewPurchasePage> {
 
     return Scaffold(
       appBar: AppBar(
-        title: const Text('Nova compra'),
+        title: Text(_isEditing ? 'Editar compra' : 'Nova compra'),
         leading: IconButton(
           tooltip: 'Voltar',
           onPressed: () => context.go('/purchases'),
@@ -144,7 +162,9 @@ class _NewPurchasePageState extends ConsumerState<NewPurchasePage> {
                               child: CircularProgressIndicator(strokeWidth: 2),
                             )
                           : const Icon(Icons.check),
-                      label: const Text('Cadastrar compra'),
+                      label: Text(
+                        _isEditing ? 'Salvar alterações' : 'Cadastrar compra',
+                      ),
                     ),
                   ],
                 ),
@@ -192,18 +212,35 @@ class _NewPurchasePageState extends ConsumerState<NewPurchasePage> {
 
     try {
       final dateFormatter = DateFormat('yyyy-MM-dd');
-      await ref
-          .read(purchaseRepositoryProvider)
-          .createPurchase(
-            CreatePurchaseRequest(
-              title: _titleController.text.trim(),
-              category: _category!,
-              value: _parseMoney(_valueController.text)!,
-              paymentDate: dateFormatter.format(_paymentDate),
-              purchaserId: user.id,
-              purchaseDate: dateFormatter.format(DateTime.now()),
-            ),
-          );
+      final repository = ref.read(purchaseRepositoryProvider);
+      final existing = widget.purchase;
+      if (existing == null) {
+        await repository.createPurchase(
+          CreatePurchaseRequest(
+            title: _titleController.text.trim(),
+            category: _category!,
+            value: _parseMoney(_valueController.text)!,
+            paymentDate: dateFormatter.format(_paymentDate),
+            purchaserId: user.id,
+            purchaseDate: dateFormatter.format(DateTime.now()),
+          ),
+        );
+      } else {
+        await repository.updatePurchase(
+          UpdatePurchaseRequest(
+            id: existing.id,
+            title: _titleController.text.trim(),
+            category: _category!,
+            value: _parseMoney(_valueController.text)!,
+            paymentDate: dateFormatter.format(_paymentDate),
+            purchaserId: existing.purchaserId ?? user.id,
+            purchaseDate:
+                existing.purchaseDate ?? dateFormatter.format(DateTime.now()),
+            payers: existing.payers,
+            remainingPayers: existing.remainingPayers,
+          ),
+        );
+      }
 
       ref.invalidate(purchasesProvider);
       ref.invalidate(homeSummaryProvider);
@@ -213,7 +250,13 @@ class _NewPurchasePageState extends ConsumerState<NewPurchasePage> {
       }
 
       ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(content: Text('Compra cadastrada com sucesso.')),
+        SnackBar(
+          content: Text(
+            _isEditing
+                ? 'Compra atualizada com sucesso.'
+                : 'Compra cadastrada com sucesso.',
+          ),
+        ),
       );
       context.go('/purchases');
     } catch (error) {

@@ -65,4 +65,30 @@ void main() {
       'purchaseDate': '2026-09-11',
     });
   });
+
+  test('serializes update purchase request for backend contract', () {
+    const request = UpdatePurchaseRequest(
+      id: 'purchase-1',
+      title: 'Mercado atualizado',
+      category: 'MERCADO',
+      value: 150,
+      paymentDate: '2026-09-20',
+      purchaserId: 'user-1',
+      purchaseDate: '2026-09-11',
+      payers: ['Ana'],
+      remainingPayers: ['Ana'],
+    );
+
+    expect(request.toJson(), {
+      'id': 'purchase-1',
+      'title': 'Mercado atualizado',
+      'category': 'MERCADO',
+      'value': 150.0,
+      'payers': ['Ana'],
+      'paymentDate': '2026-09-20',
+      'remainingPayers': ['Ana'],
+      'purchaserId': 'user-1',
+      'purchaseDate': '2026-09-11',
+    });
+  });
 }
