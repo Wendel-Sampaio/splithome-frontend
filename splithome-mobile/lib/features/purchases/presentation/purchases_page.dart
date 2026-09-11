@@ -119,6 +119,7 @@ class _PurchaseTile extends StatelessWidget {
 
     return Card(
       child: ListTile(
+        onTap: () => context.push('/purchases/detail', extra: purchase),
         contentPadding: const EdgeInsets.symmetric(horizontal: 14, vertical: 8),
         leading: CircleAvatar(
           backgroundColor: scheme.primaryContainer,

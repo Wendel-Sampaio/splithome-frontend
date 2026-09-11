@@ -121,6 +121,7 @@ class _FixedExpenseTile extends StatelessWidget {
 
     return Card(
       child: ListTile(
+        onTap: () => context.push('/fixed-expenses/detail', extra: expense),
         contentPadding: const EdgeInsets.symmetric(horizontal: 14, vertical: 8),
         leading: CircleAvatar(
           backgroundColor: scheme.secondaryContainer,
