@@ -38,11 +38,9 @@ class HomePage extends ConsumerWidget {
         title: const Text('SplitHome'),
         actions: [
           IconButton(
-            tooltip: 'Sair',
-            onPressed: () {
-              ref.read(authControllerProvider.notifier).logout();
-            },
-            icon: const Icon(Icons.logout),
+            tooltip: 'Meu perfil',
+            onPressed: () => context.go('/profile'),
+            icon: const Icon(Icons.account_circle_outlined),
           ),
         ],
       ),
@@ -603,6 +601,12 @@ class _ShortcutGrid extends StatelessWidget {
           title: 'Família',
           metric: 'Membros e código',
           onTap: () => context.go('/family'),
+        ),
+        _ShortcutCard(
+          icon: Icons.account_circle_outlined,
+          title: 'Perfil',
+          metric: 'Conta e plano',
+          onTap: () => context.go('/profile'),
         ),
       ],
     );

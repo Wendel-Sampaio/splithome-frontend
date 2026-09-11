@@ -17,6 +17,7 @@ import '../../features/purchases/presentation/new_purchase_page.dart';
 import '../../features/purchases/data/purchase.dart';
 import '../../features/purchases/presentation/purchase_detail_page.dart';
 import '../../features/purchases/presentation/purchases_page.dart';
+import '../../features/profile/presentation/profile_page.dart';
 import '../auth/auth_controller.dart';
 
 final appRouterProvider = Provider<GoRouter>((ref) {
@@ -74,6 +75,12 @@ final appRouterProvider = Provider<GoRouter>((ref) {
         path: '/family',
         pageBuilder: (context, state) {
           return const NoTransitionPage(child: FamilyPage());
+        },
+      ),
+      GoRoute(
+        path: '/profile',
+        pageBuilder: (context, state) {
+          return const NoTransitionPage(child: ProfilePage());
         },
       ),
       GoRoute(
