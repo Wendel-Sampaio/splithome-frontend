@@ -31,4 +31,33 @@ void main() {
     expect(find.text('Ana'), findsOneWidget);
     expect(find.text('bruno@email.com'), findsOneWidget);
   });
+
+  testWidgets('submits create and join family actions', (tester) async {
+    final actions = <String>[];
+
+    await tester.pumpWidget(
+      MaterialApp(
+        home: Scaffold(
+          body: FamilyOnboardingCard(
+            onCreateFamily: (name) async {
+              actions.add('create:$name');
+            },
+            onJoinFamily: (code) async {
+              actions.add('join:$code');
+            },
+          ),
+        ),
+      ),
+    );
+
+    await tester.enterText(find.byType(TextFormField).first, 'Casa Silva');
+    await tester.tap(find.text('Criar família'));
+    await tester.pumpAndSettle();
+
+    await tester.enterText(find.byType(TextFormField).last, 'silva123');
+    await tester.tap(find.text('Entrar na família'));
+    await tester.pumpAndSettle();
+
+    expect(actions, ['create:Casa Silva', 'join:SILVA123']);
+  });
 }

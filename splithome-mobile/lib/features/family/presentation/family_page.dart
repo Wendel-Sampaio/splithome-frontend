@@ -2,8 +2,9 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 
+import '../../../core/auth/auth_controller.dart';
+import '../../../core/auth/auth_session.dart';
 import '../../../core/theme/app_tokens.dart';
-import '../../../shared/widgets/sh_empty_state.dart';
 import '../../../shared/widgets/sh_error_state.dart';
 import '../../../shared/widgets/sh_section_card.dart';
 import '../data/family.dart';
@@ -28,9 +29,14 @@ class FamilyPage extends ConsumerWidget {
       body: family.when(
         data: (data) {
           if (data.isEmpty) {
-            return const ShEmptyState(
-              message: 'Você ainda não está em uma família.',
-              icon: Icons.groups_outlined,
+            return ListView(
+              padding: ShInsets.screen,
+              children: [
+                FamilyOnboardingCard(
+                  onCreateFamily: (name) => _createFamily(context, ref, name),
+                  onJoinFamily: (code) => _joinFamily(context, ref, code),
+                ),
+              ],
             );
           }
 
@@ -53,6 +59,200 @@ class FamilyPage extends ConsumerWidget {
         loading: () => const Center(child: CircularProgressIndicator()),
       ),
     );
+  }
+
+  Future<void> _createFamily(
+    BuildContext context,
+    WidgetRef ref,
+    String name,
+  ) async {
+    await _runFamilyAction(
+      context,
+      ref,
+      action: () => ref.read(familyRepositoryProvider).createFamily(name),
+      successMessage: 'Família criada com sucesso.',
+    );
+  }
+
+  Future<void> _joinFamily(
+    BuildContext context,
+    WidgetRef ref,
+    String code,
+  ) async {
+    await _runFamilyAction(
+      context,
+      ref,
+      action: () => ref.read(familyRepositoryProvider).joinFamily(code),
+      successMessage: 'Você entrou na família com sucesso.',
+    );
+  }
+
+  Future<void> _runFamilyAction(
+    BuildContext context,
+    WidgetRef ref, {
+    required Future<AuthSession> Function() action,
+    required String successMessage,
+  }) async {
+    try {
+      final session = await action();
+      ref.read(authControllerProvider.notifier).setSession(session);
+      ref.invalidate(myFamilyProvider);
+
+      if (!context.mounted) {
+        return;
+      }
+
+      ScaffoldMessenger.of(
+        context,
+      ).showSnackBar(SnackBar(content: Text(successMessage)));
+    } catch (error) {
+      if (context.mounted) {
+        ScaffoldMessenger.of(
+          context,
+        ).showSnackBar(SnackBar(content: Text(error.toString())));
+      }
+    }
+  }
+}
+
+class FamilyOnboardingCard extends StatefulWidget {
+  const FamilyOnboardingCard({
+    required this.onCreateFamily,
+    required this.onJoinFamily,
+    super.key,
+  });
+
+  final Future<void> Function(String name) onCreateFamily;
+  final Future<void> Function(String code) onJoinFamily;
+
+  @override
+  State<FamilyOnboardingCard> createState() => _FamilyOnboardingCardState();
+}
+
+class _FamilyOnboardingCardState extends State<FamilyOnboardingCard> {
+  final _familyNameController = TextEditingController();
+  final _familyCodeController = TextEditingController();
+  bool _isCreating = false;
+  bool _isJoining = false;
+
+  @override
+  void dispose() {
+    _familyNameController.dispose();
+    _familyCodeController.dispose();
+    super.dispose();
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return ShSectionCard(
+      title: 'Comece sua família',
+      children: [
+        Text(
+          'Crie uma família para compartilhar compras, despesas e pagadores da casa.',
+          style: Theme.of(context).textTheme.bodyMedium?.copyWith(
+            color: Theme.of(context).colorScheme.onSurfaceVariant,
+          ),
+        ),
+        const SizedBox(height: ShSpacing.md),
+        TextFormField(
+          controller: _familyNameController,
+          textInputAction: TextInputAction.done,
+          decoration: const InputDecoration(
+            labelText: 'Nome da família',
+            prefixIcon: Icon(Icons.home_outlined),
+          ),
+        ),
+        const SizedBox(height: ShSpacing.sm),
+        FilledButton.icon(
+          onPressed: _isCreating ? null : _createFamily,
+          icon: _isCreating
+              ? const SizedBox.square(
+                  dimension: 18,
+                  child: CircularProgressIndicator(strokeWidth: 2),
+                )
+              : const Icon(Icons.add_home_outlined),
+          label: const Text('Criar família'),
+        ),
+        const SizedBox(height: ShSpacing.xl),
+        Text(
+          'Já recebeu um código?',
+          style: Theme.of(
+            context,
+          ).textTheme.titleSmall?.copyWith(fontWeight: FontWeight.w800),
+        ),
+        const SizedBox(height: ShSpacing.sm),
+        TextFormField(
+          controller: _familyCodeController,
+          textCapitalization: TextCapitalization.characters,
+          textInputAction: TextInputAction.done,
+          decoration: const InputDecoration(
+            labelText: 'Código da família',
+            prefixIcon: Icon(Icons.key_outlined),
+          ),
+        ),
+        const SizedBox(height: ShSpacing.sm),
+        OutlinedButton.icon(
+          onPressed: _isJoining ? null : _joinFamily,
+          icon: _isJoining
+              ? const SizedBox.square(
+                  dimension: 18,
+                  child: CircularProgressIndicator(strokeWidth: 2),
+                )
+              : const Icon(Icons.login),
+          label: const Text('Entrar na família'),
+        ),
+      ],
+    );
+  }
+
+  Future<void> _createFamily() async {
+    final name = _familyNameController.text.trim();
+    if (name.isEmpty) {
+      _showMessage('Informe o nome da família.');
+      return;
+    }
+
+    setState(() {
+      _isCreating = true;
+    });
+
+    try {
+      await widget.onCreateFamily(name);
+    } finally {
+      if (mounted) {
+        setState(() {
+          _isCreating = false;
+        });
+      }
+    }
+  }
+
+  Future<void> _joinFamily() async {
+    final code = _familyCodeController.text.trim().toUpperCase();
+    if (code.isEmpty) {
+      _showMessage('Informe o código da família.');
+      return;
+    }
+
+    setState(() {
+      _isJoining = true;
+    });
+
+    try {
+      await widget.onJoinFamily(code);
+    } finally {
+      if (mounted) {
+        setState(() {
+          _isJoining = false;
+        });
+      }
+    }
+  }
+
+  void _showMessage(String message) {
+    ScaffoldMessenger.of(
+      context,
+    ).showSnackBar(SnackBar(content: Text(message)));
   }
 }
 

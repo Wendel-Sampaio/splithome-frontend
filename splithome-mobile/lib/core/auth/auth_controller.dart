@@ -26,4 +26,8 @@ class AuthController extends AsyncNotifier<AuthSession> {
     await ref.read(authRepositoryProvider).logout();
     state = const AsyncData(AuthSession.unauthenticated());
   }
+
+  void setSession(AuthSession session) {
+    state = AsyncData(session);
+  }
 }
