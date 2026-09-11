@@ -5,6 +5,8 @@ import 'package:go_router/go_router.dart';
 import '../../../shared/formatters/category_formatter.dart';
 import '../../../shared/formatters/currency_formatter.dart';
 import '../../../shared/widgets/detail_row.dart';
+import '../../../shared/widgets/sh_person_chip.dart';
+import '../../../shared/widgets/sh_section_card.dart';
 import '../../home/data/home_repository.dart';
 import '../data/purchase.dart';
 import '../data/purchase_repository.dart';
@@ -189,32 +191,20 @@ class _PeopleCard extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return Card(
-      child: Padding(
-        padding: const EdgeInsets.all(16),
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            Text(
-              title,
-              style: Theme.of(
-                context,
-              ).textTheme.titleMedium?.copyWith(fontWeight: FontWeight.w700),
-            ),
-            const SizedBox(height: 10),
-            if (people.isEmpty)
-              Text(emptyText)
-            else
-              Wrap(
-                spacing: 8,
-                runSpacing: 8,
-                children: people
-                    .map((person) => Chip(label: Text(person)))
-                    .toList(),
-              ),
-          ],
-        ),
-      ),
+    return ShSectionCard(
+      title: title,
+      children: [
+        if (people.isEmpty)
+          Text(emptyText)
+        else
+          Wrap(
+            spacing: 8,
+            runSpacing: 8,
+            children: people
+                .map((person) => ShPersonChip(name: person))
+                .toList(),
+          ),
+      ],
     );
   }
 }

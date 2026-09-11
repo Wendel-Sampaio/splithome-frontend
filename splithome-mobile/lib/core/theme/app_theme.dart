@@ -1,9 +1,11 @@
 import 'package:flutter/material.dart';
 
+import 'app_tokens.dart';
+
 class AppTheme {
   const AppTheme._();
 
-  static const _seed = Color(0xFF2E7D52);
+  static const _seed = Color(0xFF2F9E44);
 
   static ThemeData light() {
     final scheme = ColorScheme.fromSeed(
@@ -30,24 +32,30 @@ class AppTheme {
         color: scheme.surfaceContainerLowest,
         margin: EdgeInsets.zero,
         shape: RoundedRectangleBorder(
-          borderRadius: BorderRadius.circular(8),
+          borderRadius: BorderRadius.circular(ShRadii.lg),
           side: BorderSide(color: scheme.outlineVariant),
         ),
       ),
       inputDecorationTheme: InputDecorationTheme(
-        border: OutlineInputBorder(borderRadius: BorderRadius.circular(8)),
+        border: OutlineInputBorder(
+          borderRadius: BorderRadius.circular(ShRadii.md),
+        ),
         filled: true,
         fillColor: scheme.surfaceContainerLowest,
       ),
       filledButtonTheme: FilledButtonThemeData(
         style: FilledButton.styleFrom(
-          shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(8)),
+          shape: RoundedRectangleBorder(
+            borderRadius: BorderRadius.circular(ShRadii.md),
+          ),
           minimumSize: const Size.fromHeight(48),
         ),
       ),
       outlinedButtonTheme: OutlinedButtonThemeData(
         style: OutlinedButton.styleFrom(
-          shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(8)),
+          shape: RoundedRectangleBorder(
+            borderRadius: BorderRadius.circular(ShRadii.md),
+          ),
           minimumSize: const Size.fromHeight(48),
         ),
       ),

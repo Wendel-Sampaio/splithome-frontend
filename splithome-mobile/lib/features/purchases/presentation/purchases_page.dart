@@ -4,6 +4,8 @@ import 'package:go_router/go_router.dart';
 
 import '../../../shared/formatters/category_formatter.dart';
 import '../../../shared/formatters/currency_formatter.dart';
+import '../../../shared/widgets/sh_empty_state.dart';
+import '../../../shared/widgets/sh_error_state.dart';
 import '../data/purchase.dart';
 import '../data/purchase_repository.dart';
 
@@ -26,7 +28,10 @@ class PurchasesPage extends ConsumerWidget {
       body: purchases.when(
         data: (page) {
           if (page.content.isEmpty) {
-            return const _EmptyPurchases();
+            return const ShEmptyState(
+              message: 'Nenhuma compra encontrada.',
+              icon: Icons.shopping_cart_outlined,
+            );
           }
 
           return RefreshIndicator(
@@ -45,7 +50,7 @@ class PurchasesPage extends ConsumerWidget {
             ),
           );
         },
-        error: (error, stackTrace) => _ErrorState(
+        error: (error, stackTrace) => ShErrorState(
           message: error.toString(),
           onRetry: () => ref.invalidate(purchasesProvider),
         ),
@@ -163,50 +168,6 @@ class _PurchaseTile extends StatelessWidget {
               style: Theme.of(context).textTheme.bodySmall?.copyWith(
                 color: purchase.isPaid ? scheme.primary : scheme.error,
               ),
-            ),
-          ],
-        ),
-      ),
-    );
-  }
-}
-
-class _EmptyPurchases extends StatelessWidget {
-  const _EmptyPurchases();
-
-  @override
-  Widget build(BuildContext context) {
-    return const Center(
-      child: Padding(
-        padding: EdgeInsets.all(24),
-        child: Text('Nenhuma compra encontrada.'),
-      ),
-    );
-  }
-}
-
-class _ErrorState extends StatelessWidget {
-  const _ErrorState({required this.message, required this.onRetry});
-
-  final String message;
-  final VoidCallback onRetry;
-
-  @override
-  Widget build(BuildContext context) {
-    return Center(
-      child: Padding(
-        padding: const EdgeInsets.all(24),
-        child: Column(
-          mainAxisSize: MainAxisSize.min,
-          children: [
-            const Icon(Icons.wifi_off_outlined, size: 42),
-            const SizedBox(height: 12),
-            Text(message, textAlign: TextAlign.center),
-            const SizedBox(height: 16),
-            OutlinedButton.icon(
-              onPressed: onRetry,
-              icon: const Icon(Icons.refresh),
-              label: const Text('Tentar novamente'),
             ),
           ],
         ),
