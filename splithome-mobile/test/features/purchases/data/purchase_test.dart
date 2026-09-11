@@ -1,6 +1,7 @@
 import 'package:flutter_test/flutter_test.dart';
 import 'package:splithome_mobile/features/purchases/data/purchase.dart';
 import 'package:splithome_mobile/features/purchases/data/purchase_page.dart';
+import 'package:splithome_mobile/features/purchases/data/purchase_repository.dart';
 
 void main() {
   test('parses purchase payload', () {
@@ -41,5 +42,27 @@ void main() {
     expect(page.totalElements, 1);
     expect(page.isFirst, isTrue);
     expect(page.isLast, isTrue);
+  });
+
+  test('serializes create purchase request for backend contract', () {
+    const request = CreatePurchaseRequest(
+      title: 'Mercado',
+      category: 'MERCADO',
+      value: 120.5,
+      paymentDate: '2026-09-20',
+      purchaserId: 'user-1',
+      purchaseDate: '2026-09-11',
+    );
+
+    expect(request.toJson(), {
+      'title': 'Mercado',
+      'category': 'MERCADO',
+      'value': 120.5,
+      'payers': <String>[],
+      'paymentDate': '2026-09-20',
+      'remainingPayers': <String>[],
+      'purchaserId': 'user-1',
+      'purchaseDate': '2026-09-11',
+    });
   });
 }

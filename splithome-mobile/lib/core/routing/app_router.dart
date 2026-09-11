@@ -6,6 +6,7 @@ import '../../features/auth/presentation/login_page.dart';
 import '../../features/auth/presentation/register_page.dart';
 import '../../features/home/presentation/home_page.dart';
 import '../../features/home/presentation/splash_page.dart';
+import '../../features/purchases/presentation/new_purchase_page.dart';
 import '../../features/purchases/presentation/purchases_page.dart';
 import '../auth/auth_controller.dart';
 
@@ -53,6 +54,10 @@ final appRouterProvider = Provider<GoRouter>((ref) {
         pageBuilder: (context, state) {
           return const NoTransitionPage(child: PurchasesPage());
         },
+      ),
+      GoRoute(
+        path: '/purchases/new',
+        builder: (context, state) => const NewPurchasePage(),
       ),
     ],
     errorBuilder: (context, state) {

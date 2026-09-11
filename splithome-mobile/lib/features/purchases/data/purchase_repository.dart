@@ -14,6 +14,10 @@ final purchasesProvider = FutureProvider<PurchasePage<Purchase>>((ref) {
   return ref.read(purchaseRepositoryProvider).fetchPurchases();
 });
 
+final purchaseCategoriesProvider = FutureProvider<List<String>>((ref) {
+  return ref.read(purchaseRepositoryProvider).fetchCategories();
+});
+
 class PurchaseRepository {
   const PurchaseRepository({required this.dio});
 
@@ -43,5 +47,74 @@ class PurchaseRepository {
         statusCode: error.response?.statusCode,
       );
     }
+  }
+
+  Future<List<String>> fetchCategories() async {
+    try {
+      final response = await dio.get<Object?>('/transactions/categories');
+      final data = response.data;
+
+      if (data is! List) {
+        return const [];
+      }
+
+      return data.map((item) => item.toString()).toList();
+    } on DioException catch (error) {
+      throw ApiException(
+        'Não foi possível carregar as categorias.',
+        statusCode: error.response?.statusCode,
+      );
+    }
+  }
+
+  Future<Purchase> createPurchase(CreatePurchaseRequest request) async {
+    try {
+      final response = await dio.post<Object?>(
+        '/transactions/new-purchase',
+        data: request.toJson(),
+      );
+
+      return Purchase.fromJson(response.data);
+    } on DioException catch (error) {
+      throw ApiException(
+        'Não foi possível cadastrar a compra.',
+        statusCode: error.response?.statusCode,
+      );
+    }
+  }
+}
+
+class CreatePurchaseRequest {
+  const CreatePurchaseRequest({
+    required this.title,
+    required this.category,
+    required this.value,
+    required this.paymentDate,
+    required this.purchaserId,
+    required this.purchaseDate,
+    this.payers = const [],
+    this.remainingPayers = const [],
+  });
+
+  final String title;
+  final String category;
+  final double value;
+  final String paymentDate;
+  final String purchaserId;
+  final String purchaseDate;
+  final List<String> payers;
+  final List<String> remainingPayers;
+
+  Map<String, Object?> toJson() {
+    return {
+      'title': title,
+      'category': category,
+      'value': value,
+      'payers': payers,
+      'paymentDate': paymentDate,
+      'remainingPayers': remainingPayers,
+      'purchaserId': purchaserId,
+      'purchaseDate': purchaseDate,
+    };
   }
 }

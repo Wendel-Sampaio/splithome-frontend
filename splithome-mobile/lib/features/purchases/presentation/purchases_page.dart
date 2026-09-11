@@ -51,7 +51,7 @@ class PurchasesPage extends ConsumerWidget {
         loading: () => const Center(child: CircularProgressIndicator()),
       ),
       floatingActionButton: FloatingActionButton.extended(
-        onPressed: () {},
+        onPressed: () => context.go('/purchases/new'),
         icon: const Icon(Icons.add),
         label: const Text('Compra'),
       ),
