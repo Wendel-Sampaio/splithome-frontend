@@ -1,6 +1,7 @@
 import 'package:flutter_test/flutter_test.dart';
 import 'package:splithome_mobile/features/fixed_expenses/data/fixed_expense.dart';
 import 'package:splithome_mobile/features/fixed_expenses/data/fixed_expense_page.dart';
+import 'package:splithome_mobile/features/fixed_expenses/data/fixed_expense_repository.dart';
 
 void main() {
   test('parses fixed expense response payload', () {
@@ -58,5 +59,30 @@ void main() {
     expect(page.totalElements, 1);
     expect(page.isFirst, isTrue);
     expect(page.isLast, isTrue);
+  });
+
+  test('serializes create fixed expense request for backend contract', () {
+    const request = CreateFixedExpenseRequest(
+      title: 'Internet',
+      category: 'MORADIA',
+      totalValue: 120,
+      installmentsCount: 12,
+      dueDay: 10,
+      startDate: '2026-09-01',
+      responsibleId: 'user-1',
+    );
+
+    expect(request.toJson(), {
+      'title': 'Internet',
+      'category': 'MORADIA',
+      'totalValue': 120.0,
+      'installmentsCount': 12,
+      'dueDay': 10,
+      'startDate': '2026-09-01',
+      'creditCardId': null,
+      'responsibleId': 'user-1',
+      'payers': <String>[],
+      'remainingPayers': <String>[],
+    });
   });
 }

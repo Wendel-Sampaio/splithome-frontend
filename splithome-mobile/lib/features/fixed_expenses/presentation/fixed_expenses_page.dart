@@ -52,6 +52,11 @@ class FixedExpensesPage extends ConsumerWidget {
         ),
         loading: () => const Center(child: CircularProgressIndicator()),
       ),
+      floatingActionButton: FloatingActionButton.extended(
+        onPressed: () => context.go('/fixed-expenses/new'),
+        icon: const Icon(Icons.add),
+        label: const Text('Despesa'),
+      ),
       bottomNavigationBar: NavigationBar(
         selectedIndex: 2,
         onDestinationSelected: (index) {

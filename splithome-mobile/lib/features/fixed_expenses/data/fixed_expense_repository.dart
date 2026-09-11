@@ -42,4 +42,63 @@ class FixedExpenseRepository {
       );
     }
   }
+
+  Future<FixedExpense> createFixedExpense(
+    CreateFixedExpenseRequest request,
+  ) async {
+    try {
+      final response = await dio.post<Object?>(
+        '/transactions/new-fixed-expense',
+        data: request.toJson(),
+      );
+
+      return FixedExpense.fromJson(response.data);
+    } on DioException catch (error) {
+      throw ApiException(
+        'Não foi possível cadastrar a despesa fixa.',
+        statusCode: error.response?.statusCode,
+      );
+    }
+  }
+}
+
+class CreateFixedExpenseRequest {
+  const CreateFixedExpenseRequest({
+    required this.title,
+    required this.category,
+    required this.totalValue,
+    required this.installmentsCount,
+    required this.dueDay,
+    required this.startDate,
+    required this.responsibleId,
+    this.creditCardId,
+    this.payers = const [],
+    this.remainingPayers = const [],
+  });
+
+  final String title;
+  final String category;
+  final double totalValue;
+  final int installmentsCount;
+  final int dueDay;
+  final String startDate;
+  final String responsibleId;
+  final String? creditCardId;
+  final List<String> payers;
+  final List<String> remainingPayers;
+
+  Map<String, Object?> toJson() {
+    return {
+      'title': title,
+      'category': category,
+      'totalValue': totalValue,
+      'installmentsCount': installmentsCount,
+      'dueDay': dueDay,
+      'startDate': startDate,
+      'creditCardId': creditCardId,
+      'responsibleId': responsibleId,
+      'payers': payers,
+      'remainingPayers': remainingPayers,
+    };
+  }
 }
