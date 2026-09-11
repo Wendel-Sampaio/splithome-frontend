@@ -5,6 +5,7 @@ import 'package:go_router/go_router.dart';
 import '../../../core/auth/auth_controller.dart';
 import '../../../shared/formatters/category_formatter.dart';
 import '../../../shared/formatters/currency_formatter.dart';
+import '../../../shared/widgets/brand_mark.dart';
 import '../../fixed_expenses/data/fixed_expense.dart';
 import '../../fixed_expenses/data/fixed_expense_page.dart';
 import '../../fixed_expenses/data/fixed_expense_repository.dart';
@@ -35,7 +36,7 @@ class HomePage extends ConsumerWidget {
 
     return Scaffold(
       appBar: AppBar(
-        title: const Text('SplitHome'),
+        title: const BrandMark(logoSize: 34),
         actions: [
           IconButton(
             tooltip: 'Meu perfil',

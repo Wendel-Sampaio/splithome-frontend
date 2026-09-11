@@ -3,6 +3,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 
 import '../../../core/auth/auth_controller.dart';
+import '../../../shared/widgets/brand_auth_header.dart';
 
 class LoginPage extends ConsumerStatefulWidget {
   const LoginPage({super.key});
@@ -27,8 +28,6 @@ class _LoginPageState extends ConsumerState<LoginPage> {
 
   @override
   Widget build(BuildContext context) {
-    final scheme = Theme.of(context).colorScheme;
-
     ref.listen(authControllerProvider, (previous, next) {
       if (!mounted || !next.hasError) {
         return;
@@ -51,25 +50,9 @@ class _LoginPageState extends ConsumerState<LoginPage> {
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.stretch,
                   children: [
-                    Icon(
-                      Icons.home_work_outlined,
-                      size: 52,
-                      color: scheme.primary,
-                    ),
-                    const SizedBox(height: 18),
-                    Text(
-                      'SplitHome',
-                      textAlign: TextAlign.center,
-                      style: Theme.of(context).textTheme.headlineMedium
-                          ?.copyWith(fontWeight: FontWeight.w800),
-                    ),
-                    const SizedBox(height: 8),
-                    Text(
-                      'Entre para acompanhar compras e despesas da casa.',
-                      textAlign: TextAlign.center,
-                      style: Theme.of(context).textTheme.bodyLarge?.copyWith(
-                        color: scheme.onSurfaceVariant,
-                      ),
+                    const BrandAuthHeader(
+                      subtitle:
+                          'Entre para acompanhar compras e despesas da casa.',
                     ),
                     const SizedBox(height: 32),
                     TextFormField(

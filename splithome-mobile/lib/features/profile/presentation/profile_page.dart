@@ -4,6 +4,7 @@ import 'package:go_router/go_router.dart';
 
 import '../../../core/auth/auth_controller.dart';
 import '../../../core/auth/auth_user.dart';
+import '../../../core/brand/brand_assets.dart';
 import '../../../core/theme/app_tokens.dart';
 import '../../../shared/widgets/detail_row.dart';
 import '../../../shared/widgets/sh_section_card.dart';
@@ -90,11 +91,22 @@ class _ProfileHeader extends StatelessWidget {
           children: [
             CircleAvatar(
               radius: 30,
+              backgroundImage: const AssetImage(BrandAssets.profilePlaceholder),
               backgroundColor: scheme.primaryContainer,
-              foregroundColor: scheme.onPrimaryContainer,
-              child: Text(
-                initials,
-                style: const TextStyle(fontWeight: FontWeight.w900),
+              child: DecoratedBox(
+                decoration: BoxDecoration(
+                  color: scheme.primary.withValues(alpha: 0.72),
+                  shape: BoxShape.circle,
+                ),
+                child: Center(
+                  child: Text(
+                    initials,
+                    style: TextStyle(
+                      color: scheme.onPrimary,
+                      fontWeight: FontWeight.w900,
+                    ),
+                  ),
+                ),
               ),
             ),
             const SizedBox(width: ShSpacing.md),

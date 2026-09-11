@@ -5,16 +5,16 @@ import 'app_tokens.dart';
 class AppTheme {
   const AppTheme._();
 
-  static const _seed = Color(0xFF2F9E44);
+  static const _seed = Color(0xFF0C9F2A);
 
   static ThemeData light() {
     final scheme = ColorScheme.fromSeed(
       seedColor: _seed,
       brightness: Brightness.light,
       primary: _seed,
-      secondary: const Color(0xFF276FBF),
-      tertiary: const Color(0xFFE5A100),
-      surface: const Color(0xFFF7F8F6),
+      secondary: const Color(0xFF2563EB),
+      tertiary: const Color(0xFF63DD74),
+      surface: const Color(0xFFF5F7F6),
     );
 
     return ThemeData(
@@ -26,6 +26,12 @@ class AppTheme {
         elevation: 0,
         backgroundColor: scheme.surface,
         foregroundColor: scheme.onSurface,
+      ),
+      navigationBarTheme: NavigationBarThemeData(
+        indicatorColor: scheme.primaryContainer,
+        labelTextStyle: WidgetStatePropertyAll(
+          TextStyle(fontWeight: FontWeight.w700, color: scheme.onSurface),
+        ),
       ),
       cardTheme: CardThemeData(
         elevation: 0,

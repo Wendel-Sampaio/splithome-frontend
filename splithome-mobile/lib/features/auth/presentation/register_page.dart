@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 
+import '../../../shared/widgets/brand_auth_header.dart';
 import '../data/auth_repository.dart';
 
 class RegisterPage extends ConsumerStatefulWidget {
@@ -41,6 +42,11 @@ class _RegisterPageState extends ConsumerState<RegisterPage> {
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.stretch,
                   children: [
+                    const BrandAuthHeader(
+                      subtitle:
+                          'Crie sua conta para organizar os gastos da casa.',
+                    ),
+                    const SizedBox(height: 32),
                     TextFormField(
                       controller: _nameController,
                       textInputAction: TextInputAction.next,
