@@ -8,8 +8,10 @@ import '../../features/fixed_expenses/presentation/fixed_expense_detail_page.dar
 import '../../features/auth/presentation/register_page.dart';
 import '../../features/fixed_expenses/presentation/fixed_expenses_page.dart';
 import '../../features/fixed_expenses/presentation/new_fixed_expense_page.dart';
+import '../../features/home/presentation/financial_summary_page.dart';
 import '../../features/home/presentation/home_page.dart';
 import '../../features/home/presentation/splash_page.dart';
+import '../../features/home/presentation/statistics_page.dart';
 import '../../features/purchases/presentation/new_purchase_page.dart';
 import '../../features/purchases/data/purchase.dart';
 import '../../features/purchases/presentation/purchase_detail_page.dart';
@@ -53,6 +55,18 @@ final appRouterProvider = Provider<GoRouter>((ref) {
         path: '/home',
         pageBuilder: (context, state) {
           return const NoTransitionPage(child: HomePage());
+        },
+      ),
+      GoRoute(
+        path: '/financial-summary',
+        pageBuilder: (context, state) {
+          return const NoTransitionPage(child: FinancialSummaryPage());
+        },
+      ),
+      GoRoute(
+        path: '/statistics',
+        pageBuilder: (context, state) {
+          return const NoTransitionPage(child: StatisticsPage());
         },
       ),
       GoRoute(

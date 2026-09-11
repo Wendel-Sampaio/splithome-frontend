@@ -92,6 +92,9 @@ class HomePage extends ConsumerWidget {
           if (index == 2) {
             context.go('/fixed-expenses');
           }
+          if (index == 3) {
+            context.go('/financial-summary');
+          }
         },
         destinations: const [
           NavigationDestination(
@@ -586,13 +589,13 @@ class _ShortcutGrid extends StatelessWidget {
           icon: Icons.account_balance_wallet_outlined,
           title: 'Resumo',
           metric: '${CurrencyFormatter.brl(totalOutstanding)} em aberto',
-          onTap: () {},
+          onTap: () => context.go('/financial-summary'),
         ),
         _ShortcutCard(
           icon: Icons.bar_chart_outlined,
           title: 'Gráficos',
           metric: 'Maior: $topCategory',
-          onTap: () {},
+          onTap: () => context.go('/statistics'),
         ),
       ],
     );

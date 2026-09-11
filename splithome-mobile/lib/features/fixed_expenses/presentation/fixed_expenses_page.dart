@@ -66,6 +66,9 @@ class FixedExpensesPage extends ConsumerWidget {
           if (index == 1) {
             context.go('/purchases');
           }
+          if (index == 3) {
+            context.go('/financial-summary');
+          }
         },
         destinations: const [
           NavigationDestination(
