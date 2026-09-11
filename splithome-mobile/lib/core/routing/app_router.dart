@@ -4,6 +4,7 @@ import 'package:go_router/go_router.dart';
 
 import '../../features/auth/presentation/login_page.dart';
 import '../../features/auth/presentation/register_page.dart';
+import '../../features/fixed_expenses/presentation/fixed_expenses_page.dart';
 import '../../features/home/presentation/home_page.dart';
 import '../../features/home/presentation/splash_page.dart';
 import '../../features/purchases/presentation/new_purchase_page.dart';
@@ -58,6 +59,12 @@ final appRouterProvider = Provider<GoRouter>((ref) {
       GoRoute(
         path: '/purchases/new',
         builder: (context, state) => const NewPurchasePage(),
+      ),
+      GoRoute(
+        path: '/fixed-expenses',
+        pageBuilder: (context, state) {
+          return const NoTransitionPage(child: FixedExpensesPage());
+        },
       ),
     ],
     errorBuilder: (context, state) {

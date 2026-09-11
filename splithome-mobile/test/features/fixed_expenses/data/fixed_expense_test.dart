@@ -1,0 +1,62 @@
+import 'package:flutter_test/flutter_test.dart';
+import 'package:splithome_mobile/features/fixed_expenses/data/fixed_expense.dart';
+import 'package:splithome_mobile/features/fixed_expenses/data/fixed_expense_page.dart';
+
+void main() {
+  test('parses fixed expense response payload', () {
+    final expense = FixedExpense.fromJson({
+      'id': 'expense-1',
+      'title': 'Internet',
+      'category': 'MORADIA',
+      'responsibleId': 'user-1',
+      'valorTotal': 120.0,
+      'quantidadeParcelas': 12,
+      'diaVencimento': 10,
+      'dataInicio': '2026-09-01',
+      'paymentDate': '2026-09-10',
+      'parcelas': [
+        {
+          'id': 'installment-1',
+          'expenseId': 'expense-1',
+          'installmentNumber': 1,
+          'value': 10,
+          'dueDate': '2026-09-10',
+          'paid': true,
+        },
+        {
+          'id': 'installment-2',
+          'expenseId': 'expense-1',
+          'installmentNumber': 2,
+          'value': 10,
+          'dueDate': '2026-10-10',
+          'paid': false,
+        },
+      ],
+    });
+
+    expect(expense.title, 'Internet');
+    expect(expense.totalValue, 120);
+    expect(expense.installmentsCount, 12);
+    expect(expense.paidInstallments, 1);
+    expect(expense.isPaid, isFalse);
+  });
+
+  test('parses Spring page payload', () {
+    final page = FixedExpensePage.fromJson({
+      'content': [
+        {'id': 'expense-1', 'title': 'Internet', 'valorTotal': 120},
+      ],
+      'totalElements': 1,
+      'totalPages': 1,
+      'number': 0,
+      'size': 20,
+      'first': true,
+      'last': true,
+    }, itemBuilder: FixedExpense.fromJson);
+
+    expect(page.content, hasLength(1));
+    expect(page.totalElements, 1);
+    expect(page.isFirst, isTrue);
+    expect(page.isLast, isTrue);
+  });
+}

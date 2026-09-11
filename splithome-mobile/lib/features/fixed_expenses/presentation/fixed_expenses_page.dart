@@ -3,66 +3,63 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 
 import '../../../shared/formatters/currency_formatter.dart';
-import '../data/purchase.dart';
-import '../data/purchase_repository.dart';
+import '../data/fixed_expense.dart';
+import '../data/fixed_expense_repository.dart';
 
-class PurchasesPage extends ConsumerWidget {
-  const PurchasesPage({super.key});
+class FixedExpensesPage extends ConsumerWidget {
+  const FixedExpensesPage({super.key});
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
-    final purchases = ref.watch(purchasesProvider);
+    final expenses = ref.watch(fixedExpensesProvider);
 
     return Scaffold(
       appBar: AppBar(
-        title: const Text('Compras'),
+        title: const Text('Despesas fixas'),
         leading: IconButton(
           tooltip: 'Voltar',
           onPressed: () => context.go('/home'),
           icon: const Icon(Icons.arrow_back),
         ),
       ),
-      body: purchases.when(
+      body: expenses.when(
         data: (page) {
           if (page.content.isEmpty) {
-            return const _EmptyPurchases();
+            return const _EmptyFixedExpenses();
           }
 
           return RefreshIndicator(
-            onRefresh: () async => ref.invalidate(purchasesProvider),
+            onRefresh: () async => ref.invalidate(fixedExpensesProvider),
             child: ListView.separated(
               padding: const EdgeInsets.fromLTRB(16, 8, 16, 24),
               itemCount: page.content.length + 1,
               separatorBuilder: (context, index) => const SizedBox(height: 10),
               itemBuilder: (context, index) {
                 if (index == 0) {
-                  return _PurchasesHeader(totalElements: page.totalElements);
+                  return _FixedExpensesHeader(
+                    totalElements: page.totalElements,
+                  );
                 }
 
-                return _PurchaseTile(purchase: page.content[index - 1]);
+                return _FixedExpenseTile(expense: page.content[index - 1]);
               },
             ),
           );
         },
         error: (error, stackTrace) => _ErrorState(
           message: error.toString(),
-          onRetry: () => ref.invalidate(purchasesProvider),
+          onRetry: () => ref.invalidate(fixedExpensesProvider),
         ),
         loading: () => const Center(child: CircularProgressIndicator()),
       ),
-      floatingActionButton: FloatingActionButton.extended(
-        onPressed: () => context.go('/purchases/new'),
-        icon: const Icon(Icons.add),
-        label: const Text('Compra'),
-      ),
       bottomNavigationBar: NavigationBar(
-        selectedIndex: 1,
+        selectedIndex: 2,
         onDestinationSelected: (index) {
           if (index == 0) {
             context.go('/home');
           }
-          if (index == 2) {
-            context.go('/fixed-expenses');
+          if (index == 1) {
+            context.go('/purchases');
           }
         },
         destinations: const [
@@ -72,11 +69,11 @@ class PurchasesPage extends ConsumerWidget {
           ),
           NavigationDestination(
             icon: Icon(Icons.shopping_cart_outlined),
-            selectedIcon: Icon(Icons.shopping_cart),
             label: 'Compras',
           ),
           NavigationDestination(
             icon: Icon(Icons.receipt_long_outlined),
+            selectedIcon: Icon(Icons.receipt_long),
             label: 'Despesas',
           ),
           NavigationDestination(
@@ -89,8 +86,8 @@ class PurchasesPage extends ConsumerWidget {
   }
 }
 
-class _PurchasesHeader extends StatelessWidget {
-  const _PurchasesHeader({required this.totalElements});
+class _FixedExpensesHeader extends StatelessWidget {
+  const _FixedExpensesHeader({required this.totalElements});
 
   final int totalElements;
 
@@ -99,7 +96,7 @@ class _PurchasesHeader extends StatelessWidget {
     return Padding(
       padding: const EdgeInsets.only(bottom: 6),
       child: Text(
-        '$totalElements compras encontradas',
+        '$totalElements despesas encontradas',
         style: Theme.of(
           context,
         ).textTheme.titleMedium?.copyWith(fontWeight: FontWeight.w700),
@@ -108,10 +105,10 @@ class _PurchasesHeader extends StatelessWidget {
   }
 }
 
-class _PurchaseTile extends StatelessWidget {
-  const _PurchaseTile({required this.purchase});
+class _FixedExpenseTile extends StatelessWidget {
+  const _FixedExpenseTile({required this.expense});
 
-  final Purchase purchase;
+  final FixedExpense expense;
 
   @override
   Widget build(BuildContext context) {
@@ -121,20 +118,21 @@ class _PurchaseTile extends StatelessWidget {
       child: ListTile(
         contentPadding: const EdgeInsets.symmetric(horizontal: 14, vertical: 8),
         leading: CircleAvatar(
-          backgroundColor: scheme.primaryContainer,
-          foregroundColor: scheme.onPrimaryContainer,
-          child: const Icon(Icons.shopping_cart_outlined),
+          backgroundColor: scheme.secondaryContainer,
+          foregroundColor: scheme.onSecondaryContainer,
+          child: const Icon(Icons.receipt_long_outlined),
         ),
         title: Text(
-          purchase.title.isEmpty ? 'Compra sem título' : purchase.title,
+          expense.title.isEmpty ? 'Despesa sem título' : expense.title,
           maxLines: 1,
           overflow: TextOverflow.ellipsis,
           style: const TextStyle(fontWeight: FontWeight.w700),
         ),
         subtitle: Text(
           [
-            if (purchase.category.isNotEmpty) purchase.category,
-            if (purchase.purchaseDate != null) purchase.purchaseDate!,
+            if (expense.category.isNotEmpty) expense.category,
+            if (expense.startDate != null) 'desde ${expense.startDate}',
+            if (expense.dueDay > 0) 'vence dia ${expense.dueDay}',
           ].join(' • '),
           maxLines: 1,
           overflow: TextOverflow.ellipsis,
@@ -144,18 +142,20 @@ class _PurchaseTile extends StatelessWidget {
           crossAxisAlignment: CrossAxisAlignment.end,
           children: [
             Text(
-              CurrencyFormatter.brl(purchase.value),
+              CurrencyFormatter.brl(expense.totalValue),
               style: Theme.of(
                 context,
               ).textTheme.titleSmall?.copyWith(fontWeight: FontWeight.w800),
             ),
             const SizedBox(height: 4),
             Text(
-              purchase.isPaid
-                  ? 'Pago'
-                  : '${purchase.remainingPayers.length} pend.',
+              expense.installments.isEmpty
+                  ? '${expense.installmentsCount} parc.'
+                  : '${expense.paidInstallments}/${expense.installments.length} pagas',
               style: Theme.of(context).textTheme.bodySmall?.copyWith(
-                color: purchase.isPaid ? scheme.primary : scheme.error,
+                color: expense.isPaid
+                    ? scheme.primary
+                    : scheme.onSurfaceVariant,
               ),
             ),
           ],
@@ -165,15 +165,15 @@ class _PurchaseTile extends StatelessWidget {
   }
 }
 
-class _EmptyPurchases extends StatelessWidget {
-  const _EmptyPurchases();
+class _EmptyFixedExpenses extends StatelessWidget {
+  const _EmptyFixedExpenses();
 
   @override
   Widget build(BuildContext context) {
     return const Center(
       child: Padding(
         padding: EdgeInsets.all(24),
-        child: Text('Nenhuma compra encontrada.'),
+        child: Text('Nenhuma despesa fixa encontrada.'),
       ),
     );
   }

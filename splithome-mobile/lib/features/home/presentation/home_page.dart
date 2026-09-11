@@ -119,6 +119,9 @@ class HomePage extends ConsumerWidget {
           if (index == 1) {
             context.go('/purchases');
           }
+          if (index == 2) {
+            context.go('/fixed-expenses');
+          }
         },
         destinations: const [
           NavigationDestination(
