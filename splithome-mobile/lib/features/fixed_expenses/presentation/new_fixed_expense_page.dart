@@ -6,6 +6,8 @@ import 'package:intl/intl.dart';
 
 import '../../../core/auth/auth_controller.dart';
 import '../../../shared/formatters/category_formatter.dart';
+import '../../family/presentation/family_payer_selector.dart';
+import '../../home/data/financial_summary_repository.dart';
 import '../../home/data/home_repository.dart';
 import '../../purchases/data/purchase_repository.dart';
 import '../data/fixed_expense.dart';
@@ -29,6 +31,7 @@ class _NewFixedExpensePageState extends ConsumerState<NewFixedExpensePage> {
   final _dueDayController = TextEditingController(text: '10');
   DateTime _startDate = DateTime.now();
   String? _category;
+  List<String> _selectedPayers = [];
   bool _isSubmitting = false;
 
   bool get _isEditing => widget.expense != null;
@@ -43,6 +46,7 @@ class _NewFixedExpensePageState extends ConsumerState<NewFixedExpensePage> {
       _installmentsController.text = expense.installmentsCount.toString();
       _dueDayController.text = expense.dueDay.toString();
       _category = expense.category.isEmpty ? null : expense.category;
+      _selectedPayers = [...expense.payers];
       _startDate = DateTime.tryParse(expense.startDate ?? '') ?? _startDate;
     }
   }
@@ -59,6 +63,8 @@ class _NewFixedExpensePageState extends ConsumerState<NewFixedExpensePage> {
   @override
   Widget build(BuildContext context) {
     final categories = ref.watch(purchaseCategoriesProvider);
+    final user = ref.watch(authControllerProvider).asData?.value.user;
+    final canChoosePayers = user?.isPremium == true;
 
     return Scaffold(
       appBar: AppBar(
@@ -197,6 +203,17 @@ class _NewFixedExpensePageState extends ConsumerState<NewFixedExpensePage> {
                         'Início: ${DateFormat('dd/MM/yyyy').format(_startDate)}',
                       ),
                     ),
+                    if (canChoosePayers) ...[
+                      const SizedBox(height: 14),
+                      FamilyPayerSelector(
+                        selectedPayers: _selectedPayers,
+                        onChanged: (payers) {
+                          setState(() {
+                            _selectedPayers = payers;
+                          });
+                        },
+                      ),
+                    ],
                     const SizedBox(height: 22),
                     FilledButton.icon(
                       onPressed: _isSubmitting ? null : _submit,
@@ -257,6 +274,7 @@ class _NewFixedExpensePageState extends ConsumerState<NewFixedExpensePage> {
     });
 
     try {
+      final existing = widget.expense;
       final request = CreateFixedExpenseRequest(
         title: _titleController.text.trim(),
         category: _category!,
@@ -264,12 +282,19 @@ class _NewFixedExpensePageState extends ConsumerState<NewFixedExpensePage> {
         installmentsCount: int.parse(_installmentsController.text),
         dueDay: int.parse(_dueDayController.text),
         startDate: DateFormat('yyyy-MM-dd').format(_startDate),
-        responsibleId: widget.expense?.responsibleId ?? user.id,
-        creditCardId: widget.expense?.creditCardId,
+        responsibleId: existing?.responsibleId ?? user.id,
+        creditCardId: existing?.creditCardId,
+        payers: _selectedPayers,
+        remainingPayers: existing == null
+            ? _selectedPayers
+            : _remainingPayersForUpdate(
+                oldPayers: existing.payers,
+                oldRemainingPayers: existing.remainingPayers,
+                nextPayers: _selectedPayers,
+              ),
       );
 
       final repository = ref.read(fixedExpenseRepositoryProvider);
-      final existing = widget.expense;
       if (existing == null) {
         await repository.createFixedExpense(request);
       } else {
@@ -278,6 +303,7 @@ class _NewFixedExpensePageState extends ConsumerState<NewFixedExpensePage> {
 
       ref.invalidate(fixedExpensesProvider);
       ref.invalidate(homeSummaryProvider);
+      ref.invalidate(financialSummaryProvider);
 
       if (!mounted) {
         return;
@@ -323,6 +349,16 @@ class _NewFixedExpensePageState extends ConsumerState<NewFixedExpensePage> {
     }
 
     return double.tryParse(value.trim().replaceAll(',', '.'));
+  }
+
+  List<String> _remainingPayersForUpdate({
+    required List<String> oldPayers,
+    required List<String> oldRemainingPayers,
+    required List<String> nextPayers,
+  }) {
+    final newPayers = nextPayers.where((payer) => !oldPayers.contains(payer));
+    final keptPending = oldRemainingPayers.where(nextPayers.contains);
+    return {...keptPending, ...newPayers}.toList();
   }
 }
 

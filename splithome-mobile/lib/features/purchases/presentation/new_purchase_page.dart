@@ -6,6 +6,8 @@ import 'package:intl/intl.dart';
 
 import '../../../core/auth/auth_controller.dart';
 import '../../../shared/formatters/category_formatter.dart';
+import '../../family/presentation/family_payer_selector.dart';
+import '../../home/data/financial_summary_repository.dart';
 import '../../home/data/home_repository.dart';
 import '../data/purchase.dart';
 import '../data/purchase_repository.dart';
@@ -25,6 +27,7 @@ class _NewPurchasePageState extends ConsumerState<NewPurchasePage> {
   final _valueController = TextEditingController();
   DateTime _paymentDate = DateTime.now();
   String? _category;
+  List<String> _selectedPayers = [];
   bool _isSubmitting = false;
 
   bool get _isEditing => widget.purchase != null;
@@ -37,6 +40,7 @@ class _NewPurchasePageState extends ConsumerState<NewPurchasePage> {
       _titleController.text = purchase.title;
       _valueController.text = purchase.value.toStringAsFixed(2);
       _category = purchase.category.isEmpty ? null : purchase.category;
+      _selectedPayers = [...purchase.payers];
       _paymentDate =
           DateTime.tryParse(purchase.paymentDate ?? '') ?? _paymentDate;
     }
@@ -52,6 +56,8 @@ class _NewPurchasePageState extends ConsumerState<NewPurchasePage> {
   @override
   Widget build(BuildContext context) {
     final categories = ref.watch(purchaseCategoriesProvider);
+    final user = ref.watch(authControllerProvider).asData?.value.user;
+    final canChoosePayers = user?.isPremium == true;
 
     return Scaffold(
       appBar: AppBar(
@@ -154,6 +160,17 @@ class _NewPurchasePageState extends ConsumerState<NewPurchasePage> {
                         'Pagamento: ${DateFormat('dd/MM/yyyy').format(_paymentDate)}',
                       ),
                     ),
+                    if (canChoosePayers) ...[
+                      const SizedBox(height: 14),
+                      FamilyPayerSelector(
+                        selectedPayers: _selectedPayers,
+                        onChanged: (payers) {
+                          setState(() {
+                            _selectedPayers = payers;
+                          });
+                        },
+                      ),
+                    ],
                     const SizedBox(height: 22),
                     FilledButton.icon(
                       onPressed: _isSubmitting ? null : _submit,
@@ -224,6 +241,8 @@ class _NewPurchasePageState extends ConsumerState<NewPurchasePage> {
             paymentDate: dateFormatter.format(_paymentDate),
             purchaserId: user.id,
             purchaseDate: dateFormatter.format(DateTime.now()),
+            payers: _selectedPayers,
+            remainingPayers: _selectedPayers,
           ),
         );
       } else {
@@ -237,14 +256,19 @@ class _NewPurchasePageState extends ConsumerState<NewPurchasePage> {
             purchaserId: existing.purchaserId ?? user.id,
             purchaseDate:
                 existing.purchaseDate ?? dateFormatter.format(DateTime.now()),
-            payers: existing.payers,
-            remainingPayers: existing.remainingPayers,
+            payers: _selectedPayers,
+            remainingPayers: _remainingPayersForUpdate(
+              oldPayers: existing.payers,
+              oldRemainingPayers: existing.remainingPayers,
+              nextPayers: _selectedPayers,
+            ),
           ),
         );
       }
 
       ref.invalidate(purchasesProvider);
       ref.invalidate(homeSummaryProvider);
+      ref.invalidate(financialSummaryProvider);
 
       if (!mounted) {
         return;
@@ -281,6 +305,16 @@ class _NewPurchasePageState extends ConsumerState<NewPurchasePage> {
     }
 
     return double.tryParse(value.trim().replaceAll(',', '.'));
+  }
+
+  List<String> _remainingPayersForUpdate({
+    required List<String> oldPayers,
+    required List<String> oldRemainingPayers,
+    required List<String> nextPayers,
+  }) {
+    final newPayers = nextPayers.where((payer) => !oldPayers.contains(payer));
+    final keptPending = oldRemainingPayers.where(nextPayers.contains);
+    return {...keptPending, ...newPayers}.toList();
   }
 }
 

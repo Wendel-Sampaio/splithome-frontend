@@ -3,6 +3,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 
 import '../../features/auth/presentation/login_page.dart';
+import '../../features/family/presentation/family_page.dart';
 import '../../features/fixed_expenses/data/fixed_expense.dart';
 import '../../features/fixed_expenses/presentation/fixed_expense_detail_page.dart';
 import '../../features/auth/presentation/register_page.dart';
@@ -67,6 +68,12 @@ final appRouterProvider = Provider<GoRouter>((ref) {
         path: '/statistics',
         pageBuilder: (context, state) {
           return const NoTransitionPage(child: StatisticsPage());
+        },
+      ),
+      GoRoute(
+        path: '/family',
+        pageBuilder: (context, state) {
+          return const NoTransitionPage(child: FamilyPage());
         },
       ),
       GoRoute(

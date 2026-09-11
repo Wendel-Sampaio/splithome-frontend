@@ -598,6 +598,12 @@ class _ShortcutGrid extends StatelessWidget {
           metric: 'Maior: $topCategory',
           onTap: () => context.go('/statistics'),
         ),
+        _ShortcutCard(
+          icon: Icons.groups_outlined,
+          title: 'Família',
+          metric: 'Membros e código',
+          onTap: () => context.go('/family'),
+        ),
       ],
     );
   }

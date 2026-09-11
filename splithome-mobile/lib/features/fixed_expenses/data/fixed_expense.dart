@@ -7,6 +7,8 @@ class FixedExpense {
     required this.installmentsCount,
     required this.dueDay,
     required this.installments,
+    this.payers = const [],
+    this.remainingPayers = const [],
     this.startDate,
     this.paymentDate,
     this.responsibleId,
@@ -31,6 +33,8 @@ class FixedExpense {
       responsibleId: payload['responsibleId']?.toString(),
       creditCardId: payload['creditCardId']?.toString(),
       installments: installments.map(Installment.fromJson).toList(),
+      payers: _readStringList(payload['payers']),
+      remainingPayers: _readStringList(payload['remainingPayers']),
     );
   }
 
@@ -45,6 +49,8 @@ class FixedExpense {
   final String? responsibleId;
   final String? creditCardId;
   final List<Installment> installments;
+  final List<String> payers;
+  final List<String> remainingPayers;
 
   int get paidInstallments {
     return installments.where((installment) => installment.paid).length;
@@ -69,6 +75,14 @@ class FixedExpense {
       String text => int.tryParse(text) ?? 0,
       _ => 0,
     };
+  }
+
+  static List<String> _readStringList(Object? value) {
+    if (value is! List) {
+      return const [];
+    }
+
+    return value.map((item) => item.toString()).toList();
   }
 }
 

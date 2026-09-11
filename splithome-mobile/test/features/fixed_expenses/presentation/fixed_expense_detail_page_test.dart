@@ -15,6 +15,8 @@ void main() {
       startDate: '2026-09-01',
       paymentDate: '2026-09-10',
       responsibleId: 'user-1',
+      payers: ['Ana', 'Bruno'],
+      remainingPayers: ['Bruno'],
       installments: [
         Installment(
           id: 'installment-1',
@@ -42,7 +44,14 @@ void main() {
     expect(find.text('Internet'), findsOneWidget);
     expect(find.text('Moradia'), findsOneWidget);
     expect(find.text('MORADIA'), findsNothing);
+    expect(find.text('Pagadores'), findsOneWidget);
+    expect(find.text('Pendências'), findsOneWidget);
+    expect(find.text('Ana'), findsOneWidget);
+    expect(find.text('Bruno'), findsAtLeastNWidgets(1));
     expect(find.text('1/2 pagas'), findsOneWidget);
+
+    await tester.scrollUntilVisible(find.textContaining('Parcela 1'), 300);
+
     expect(find.textContaining('Parcela 1'), findsOneWidget);
     expect(find.textContaining('Parcela 2'), findsOneWidget);
     expect(find.text('Paga'), findsOneWidget);

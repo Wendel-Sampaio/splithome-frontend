@@ -5,6 +5,8 @@ import 'package:go_router/go_router.dart';
 import '../../../shared/formatters/category_formatter.dart';
 import '../../../shared/formatters/currency_formatter.dart';
 import '../../../shared/widgets/detail_row.dart';
+import '../../../shared/widgets/sh_person_chip.dart';
+import '../../../shared/widgets/sh_section_card.dart';
 import '../../home/data/home_repository.dart';
 import '../data/fixed_expense.dart';
 import '../data/fixed_expense_repository.dart';
@@ -127,6 +129,18 @@ class _FixedExpenseDetailPageState
             ),
           ),
           const SizedBox(height: 16),
+          _PeopleCard(
+            title: 'Pagadores',
+            emptyText: 'Sem pagadores vinculados.',
+            people: expense.payers,
+          ),
+          const SizedBox(height: 12),
+          _PeopleCard(
+            title: 'Pendências',
+            emptyText: 'Nenhuma pendência.',
+            people: expense.remainingPayers,
+          ),
+          const SizedBox(height: 16),
           Text(
             'Parcelas',
             style: Theme.of(
@@ -244,6 +258,37 @@ class _FixedExpenseDetailPageState
         ).showSnackBar(SnackBar(content: Text(error.toString())));
       }
     }
+  }
+}
+
+class _PeopleCard extends StatelessWidget {
+  const _PeopleCard({
+    required this.title,
+    required this.emptyText,
+    required this.people,
+  });
+
+  final String title;
+  final String emptyText;
+  final List<String> people;
+
+  @override
+  Widget build(BuildContext context) {
+    return ShSectionCard(
+      title: title,
+      children: [
+        if (people.isEmpty)
+          Text(emptyText)
+        else
+          Wrap(
+            spacing: 8,
+            runSpacing: 8,
+            children: people
+                .map((person) => ShPersonChip(name: person))
+                .toList(),
+          ),
+      ],
+    );
   }
 }
 

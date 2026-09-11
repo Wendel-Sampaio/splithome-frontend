@@ -15,6 +15,8 @@ void main() {
       'diaVencimento': 10,
       'dataInicio': '2026-09-01',
       'paymentDate': '2026-09-10',
+      'payers': ['Ana', 'Bruno'],
+      'remainingPayers': ['Bruno'],
       'parcelas': [
         {
           'id': 'installment-1',
@@ -38,6 +40,8 @@ void main() {
     expect(expense.title, 'Internet');
     expect(expense.totalValue, 120);
     expect(expense.installmentsCount, 12);
+    expect(expense.payers, ['Ana', 'Bruno']);
+    expect(expense.remainingPayers, ['Bruno']);
     expect(expense.paidInstallments, 1);
     expect(expense.isPaid, isFalse);
   });
@@ -70,6 +74,8 @@ void main() {
       dueDay: 10,
       startDate: '2026-09-01',
       responsibleId: 'user-1',
+      payers: ['Ana'],
+      remainingPayers: ['Ana'],
     );
 
     expect(request.toJson(), {
@@ -81,8 +87,8 @@ void main() {
       'startDate': '2026-09-01',
       'creditCardId': null,
       'responsibleId': 'user-1',
-      'payers': <String>[],
-      'remainingPayers': <String>[],
+      'payers': ['Ana'],
+      'remainingPayers': ['Ana'],
     });
   });
 }
