@@ -19,7 +19,7 @@ void main() {
     );
 
     expect(find.byType(Image), findsOneWidget);
-    expect(find.text('SplitHome'), findsOneWidget);
+    expect(find.text('SplitHome'), findsNothing);
     expect(find.text('Organize os gastos da casa.'), findsOneWidget);
   });
 }

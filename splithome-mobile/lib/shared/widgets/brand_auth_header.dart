@@ -32,15 +32,6 @@ class BrandAuthHeader extends StatelessWidget {
         ),
         const SizedBox(height: ShSpacing.md),
         Text(
-          'SplitHome',
-          textAlign: TextAlign.center,
-          style: Theme.of(context).textTheme.headlineMedium?.copyWith(
-            color: scheme.primary,
-            fontWeight: FontWeight.w900,
-          ),
-        ),
-        const SizedBox(height: ShSpacing.xs),
-        Text(
           subtitle,
           textAlign: TextAlign.center,
           style: Theme.of(
