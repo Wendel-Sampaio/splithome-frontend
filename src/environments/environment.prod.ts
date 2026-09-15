@@ -1,4 +1,4 @@
 export const environment = {
   production: true,
-  apiUrl: '/api'
+  apiUrl: 'https://splithome-backend-splithome.up.railway.app/api'
 };
