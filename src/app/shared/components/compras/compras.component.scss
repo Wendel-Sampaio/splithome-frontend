@@ -110,7 +110,6 @@
   padding: var(--sh-space-5);
 }
 
-.results-chip,
 .category-chip,
 .buyer-pill,
 .unavailable-chip {
@@ -121,19 +120,6 @@
   font-weight: 800;
   min-height: 28px;
   padding: 5px 10px;
-}
-
-.results-chip {
-  background: var(--sh-color-primary-soft);
-  border: 1px solid var(--sh-color-primary-muted);
-  color: var(--sh-color-primary-strong);
-  gap: 6px;
-}
-
-.results-chip mat-icon {
-  font-size: 17px;
-  height: 17px;
-  width: 17px;
 }
 
 .table-shell {

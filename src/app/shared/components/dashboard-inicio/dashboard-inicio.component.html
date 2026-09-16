@@ -51,7 +51,7 @@
             <div class="kpi-card">
                 <div class="kpi-icon violet"><mat-icon>category</mat-icon></div>
                 <span class="kpi-label">Maior categoria</span>
-                <strong class="kpi-value texto">{{ maiorCategoria() }}</strong>
+                <strong class="kpi-value texto">{{ maiorCategoria() | categoria }}</strong>
             </div>
         </ng-template>
     </section>
@@ -107,7 +107,7 @@
                         </span>
                         <div class="ativ-info">
                             <strong>{{ a.title }}</strong>
-                            <span class="ativ-meta">{{ a.category }} &middot; {{ a.autor }}</span>
+                            <span class="ativ-meta">{{ a.category | categoria }} &middot; {{ a.autor }}</span>
                         </div>
                         <span class="ativ-valor">{{ moeda(a.value) }}</span>
                     </li>
@@ -142,7 +142,7 @@
         <button class="shortcut-card" type="button" (click)="ir('graficos')">
             <span class="shortcut-icon"><mat-icon>bar_chart</mat-icon></span>
             <strong>Gr&aacute;ficos</strong>
-            <span class="shortcut-metric">Maior: {{ maiorCategoria() }}</span>
+            <span class="shortcut-metric">Maior: {{ maiorCategoria() | categoria }}</span>
         </button>
     </section>
 </section>

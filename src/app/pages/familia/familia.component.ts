@@ -82,7 +82,7 @@ export class FamiliaComponent implements OnInit {
     return this.user.plan === 'PREMIUM';
   }
 
-  get podeCriarFamilia(): boolean {
+  get podeAlterarFamilia(): boolean {
     return !this.criandoFamilia && !this.entrandoFamilia;
   }
 
@@ -100,7 +100,7 @@ export class FamiliaComponent implements OnInit {
   }
 
   criarMinhaFamilia(): void {
-    if (!this.podeCriarFamilia) {
+    if (!this.podeAlterarFamilia) {
       return;
     }
 
@@ -125,7 +125,7 @@ export class FamiliaComponent implements OnInit {
   }
 
   entrarComCodigo(): void {
-    if (!this.podeCriarFamilia) {
+    if (!this.podeAlterarFamilia) {
       return;
     }
 

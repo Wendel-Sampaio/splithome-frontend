@@ -42,7 +42,9 @@ export class CompraService {
     if (filter.page !== undefined) params = params.set('page', filter.page.toString());
     if (filter.size !== undefined) params = params.set('size', filter.size.toString());
     if (filter.sort) params = params.set('sort', filter.sort);
-    return this.http.get<Page<Compra>>(`${this.API}/purchases`, { params });
+    return this.http.get<unknown>(`${this.API}/purchases`, { params }).pipe(
+      map(response => this.normalizarPagina<Compra>(response))
+    );
   }
 
   cadastrarCompra(data: any): Observable<any> {
@@ -63,7 +65,9 @@ export class CompraService {
     if (filter.page !== undefined) params = params.set('page', filter.page.toString());
     if (filter.size !== undefined) params = params.set('size', filter.size.toString());
     if (filter.sort) params = params.set('sort', filter.sort);
-    return this.http.get<Page<DespesaFixa>>(`${this.API}/fixed-expenses`, { params });
+    return this.http.get<unknown>(`${this.API}/fixed-expenses`, { params }).pipe(
+      map(response => this.normalizarPagina<DespesaFixa>(response))
+    );
   }
 
   listarDespesas(): Observable<any[]> {
@@ -117,5 +121,71 @@ export class CompraService {
 
   excluirCartao(id: string): Observable<string> {
     return this.http.delete<string>(`${this.API}/credit-cards/${id}`, { responseType: 'text' as 'json' });
+  }
+
+  private normalizarPagina<T>(response: unknown): Page<T> {
+    if (Array.isArray(response)) {
+      return this.criarPagina(response as T[], response.length);
+    }
+
+    if (!response || typeof response !== 'object') {
+      return this.criarPagina<T>([], 0);
+    }
+
+    const payload = response as Record<string, unknown>;
+    const content = this.lerLista<T>(payload, ['content', 'items', 'results', 'data']);
+    const totalElements = Math.max(
+      this.lerNumero(payload, ['totalElements', 'total_elements', 'total', 'count']) ?? content.length,
+      content.length
+    );
+    const totalPages = this.lerNumero(payload, ['totalPages', 'total_pages'])
+      ?? (content.length ? 1 : 0);
+    const size = this.lerNumero(payload, ['size', 'pageSize', 'page_size'])
+      ?? content.length;
+    const number = this.lerNumero(payload, ['number', 'page', 'pageNumber', 'page_number'])
+      ?? 0;
+
+    return {
+      content,
+      totalElements,
+      totalPages,
+      size,
+      number,
+      first: typeof payload['first'] === 'boolean' ? payload['first'] : number === 0,
+      last: typeof payload['last'] === 'boolean' ? payload['last'] : totalPages <= number + 1
+    };
+  }
+
+  private criarPagina<T>(content: T[], totalElements: number): Page<T> {
+    return {
+      content,
+      totalElements,
+      totalPages: content.length ? 1 : 0,
+      size: content.length,
+      number: 0,
+      first: true,
+      last: true
+    };
+  }
+
+  private lerLista<T>(payload: Record<string, unknown>, chaves: string[]): T[] {
+    const chave = chaves.find(key => Array.isArray(payload[key]));
+    return chave ? payload[chave] as T[] : [];
+  }
+
+  private lerNumero(payload: Record<string, unknown>, chaves: string[]): number | null {
+    const chave = chaves.find(key => payload[key] !== undefined);
+    const valor = chave ? payload[chave] : null;
+
+    if (typeof valor === 'number') {
+      return Number.isFinite(valor) ? valor : null;
+    }
+
+    if (typeof valor === 'string') {
+      const numero = Number(valor.replace(',', '.'));
+      return Number.isFinite(numero) ? numero : null;
+    }
+
+    return null;
   }
 }

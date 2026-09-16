@@ -50,6 +50,8 @@ body {
   --sh-modal-footer-padding: var(--sh-space-4) var(--sh-space-6);
   --sh-modal-max-height: calc(100vh - 64px);
   --sh-modal-z-index: 1100;
+  --sh-floating-control-z-index: calc(var(--sh-modal-z-index) + 20);
+  --sh-floating-control-backdrop-z-index: calc(var(--sh-modal-z-index) + 10);
 }
 
 * {
@@ -292,14 +294,30 @@ a:hover {
   z-index: calc(var(--sh-modal-z-index) - 1);
 }
 
-.cdk-global-overlay-wrapper,
-.cdk-overlay-pane {
+.cdk-overlay-backdrop.cdk-overlay-transparent-backdrop {
+  z-index: var(--sh-floating-control-backdrop-z-index);
+}
+
+.cdk-global-overlay-wrapper {
   z-index: var(--sh-modal-z-index);
 }
 
 .cdk-overlay-pane.sh-modal {
   display: flex;
   max-height: var(--sh-modal-max-height);
+  z-index: var(--sh-modal-z-index);
+}
+
+.cdk-overlay-pane:not(.sh-modal) {
+  z-index: var(--sh-floating-control-z-index);
+}
+
+.cdk-overlay-connected-position-bounding-box {
+  z-index: var(--sh-floating-control-z-index);
+}
+
+.cdk-overlay-pane:not(.sh-modal) .mat-mdc-select-panel {
+  max-height: min(320px, calc(100vh - 32px));
 }
 
 .cdk-overlay-pane.sh-modal .mat-mdc-dialog-container {
@@ -356,5 +374,13 @@ a:hover {
     border-bottom-left-radius: 0;
     border-bottom-right-radius: 0;
     max-height: var(--sh-modal-max-height);
+  }
+
+  .cdk-overlay-pane:not(.sh-modal) {
+    max-width: calc(100vw - 24px) !important;
+  }
+
+  .cdk-overlay-pane:not(.sh-modal) .mat-mdc-select-panel {
+    max-height: min(60vh, calc(100vh - 32px));
   }
 }
