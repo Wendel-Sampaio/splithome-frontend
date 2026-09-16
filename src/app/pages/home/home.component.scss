@@ -6,14 +6,17 @@
     --home-on-dark: rgba(255, 255, 255, 0.86);
     --home-on-dark-muted: rgba(255, 255, 255, 0.55);
 
-    background: var(--sh-color-bg);
+    background:
+        linear-gradient(180deg, var(--home-sidebar-top) 0%, var(--home-sidebar-bottom) 100%) left top / var(--sh-sidebar-width) 100% no-repeat,
+        var(--sh-color-bg);
     display: grid;
     grid-template-columns: var(--sh-sidebar-width) minmax(0, 1fr);
-    min-height: 100vh;
-    transition: grid-template-columns 0.3s ease;
+    min-height: 100dvh;
+    transition: background-size 0.3s ease, grid-template-columns 0.3s ease;
 }
 
 .app-shell.menu-minimizado {
+    background-size: var(--sh-sidebar-collapsed-width) 100%, auto;
     grid-template-columns: var(--sh-sidebar-collapsed-width) minmax(0, 1fr);
 }
 
@@ -26,7 +29,7 @@
     color: var(--home-on-dark);
     display: flex;
     flex-direction: column;
-    height: 100vh;
+    height: 100dvh;
     overflow-y: auto;
     padding: 16px 14px;
     position: sticky;
@@ -414,6 +417,7 @@
 @media (max-width: 760px) {
     .app-shell,
     .app-shell.menu-minimizado {
+        background: var(--sh-color-bg);
         grid-template-columns: 1fr;
     }
 

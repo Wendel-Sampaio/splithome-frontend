@@ -68,9 +68,14 @@ export class ResumoFinanceiroService {
     const balances = this.normalizarLista<SaldoMembro>(payload['balances']);
     const debts = this.normalizarLista<DividaMembro>(payload['debts']);
     const settlements = this.normalizarLista<SugestaoLiquidacao>(payload['settlements']);
-    const totalOutstanding = typeof payload['totalOutstanding'] === 'number'
-      ? payload['totalOutstanding']
-      : 0;
+    const totalOutstanding = this.lerNumero(payload, [
+      'totalOutstanding',
+      'total_outstanding',
+      'totalOpenAmount',
+      'total_open_amount',
+      'totalEmAberto',
+      'emAberto'
+    ]) ?? this.somarValores(settlements);
 
     return {
       balances,
@@ -82,5 +87,25 @@ export class ResumoFinanceiroService {
 
   private normalizarLista<T>(value: unknown): T[] {
     return Array.isArray(value) ? value as T[] : [];
+  }
+
+  private lerNumero(payload: Record<string, unknown>, chaves: string[]): number | null {
+    const chave = chaves.find(key => payload[key] !== undefined);
+    const valor = chave ? payload[chave] : null;
+
+    if (typeof valor === 'number') {
+      return Number.isFinite(valor) ? valor : null;
+    }
+
+    if (typeof valor === 'string') {
+      const numero = Number(valor.replace(',', '.'));
+      return Number.isFinite(numero) ? numero : null;
+    }
+
+    return null;
+  }
+
+  private somarValores(items: Array<{ amount?: number }>): number {
+    return items.reduce((total, item) => total + (item.amount ?? 0), 0);
   }
 }

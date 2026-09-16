@@ -12,6 +12,7 @@ import { UserService } from '../../../core/auth/user/user.service';
 import { CompraService } from '../../services/compra/compra.service';
 import { EstatisticasResumo, EstatisticasService } from '../../services/estatisticas/estatisticas.service';
 import { ResumoFinanceiro, ResumoFinanceiroService } from '../../services/resumo-financeiro/resumo-financeiro.service';
+import { CategoriaPipe } from '../../pipes/categoria.pipe';
 import { FormTransacaoComponent } from '../form-transacao/form-transacao.component';
 import { ModalService } from '../ui/modal';
 
@@ -32,10 +33,18 @@ interface BarraMes {
   altura: number;
 }
 
+interface ParcelaResumo {
+  valor?: number;
+  value?: number;
+  pagadores?: string[];
+  payers?: string[];
+  remainingPayers?: string[];
+}
+
 @Component({
   selector: 'app-dashboard-inicio',
   standalone: true,
-  imports: [CommonModule, MatIcon, MatButtonModule],
+  imports: [CommonModule, MatIcon, MatButtonModule, CategoriaPipe],
   templateUrl: './dashboard-inicio.component.html',
   styleUrl: './dashboard-inicio.component.scss'
 })
@@ -76,9 +85,9 @@ export class DashboardInicioComponent implements OnInit {
         ? this.resumoService.buscarResumo().pipe(catchError(() => of(null)))
         : of(null),
       compras: this.compraService
-        .listarCompras({ size: 5, sort: 'purchaseDate,desc' })
+        .listarCompras({ size: 1000, sort: 'purchaseDate,desc' })
         .pipe(catchError(() => of(null))),
-      despesas: this.compraService.listarDespesasFixas({ size: 5, sort: 'createdAt,desc' }).pipe(
+      despesas: this.compraService.listarDespesasFixas({ size: 1000, sort: 'createdAt,desc' }).pipe(
         map(page => page?.content ?? []),
         catchError(() => of([] as DespesaFixa[]))
       )
@@ -88,10 +97,14 @@ export class DashboardInicioComponent implements OnInit {
         takeUntilDestroyed(this.destroyRef)
       )
       .subscribe(({ estatisticas, resumo, compras, despesas }) => {
+        const comprasCarregadas = compras?.content ?? [];
+        const totalCompras = Math.max(compras?.totalElements ?? 0, comprasCarregadas.length);
+        const totalEmAbertoLocal = this.calcularTotalEmAberto(comprasCarregadas, despesas);
+
         this.aplicarEstatisticas(estatisticas);
-        this.aplicarResumo(resumo);
-        this.totalCompras.set(compras?.totalElements ?? 0);
-        this.montarAtividades(compras?.content ?? [], despesas);
+        this.aplicarResumo(resumo, totalEmAbertoLocal);
+        this.totalCompras.set(totalCompras);
+        this.montarAtividades(comprasCarregadas, despesas);
       });
   }
 
@@ -114,11 +127,9 @@ export class DashboardInicioComponent implements OnInit {
     );
   }
 
-  private aplicarResumo(resumo: ResumoFinanceiro | null): void {
-    if (!resumo) {
-      return;
-    }
-    this.totalEmAberto.set(resumo.totalOutstanding ?? 0);
+  private aplicarResumo(resumo: ResumoFinanceiro | null, totalEmAbertoLocal: number): void {
+    const totalResumo = resumo?.totalOutstanding ?? 0;
+    this.totalEmAberto.set(Math.max(totalResumo, totalEmAbertoLocal));
   }
 
   private montarAtividades(compras: Compra[], despesas: DespesaFixa[]): void {
@@ -146,6 +157,61 @@ export class DashboardInicioComponent implements OnInit {
       .slice(0, 6);
 
     this.atividades.set(todas);
+  }
+
+  private calcularTotalEmAberto(compras: Compra[], despesas: DespesaFixa[]): number {
+    const totalCompras = compras.reduce((total, compra) => {
+      return total + this.calcularValorPendente(
+        compra.value,
+        compra.payers,
+        compra.remainingPayers,
+        compra.purchaserName
+      );
+    }, 0);
+
+    const totalDespesas = despesas.reduce((total, despesa) => {
+      const parcelas = this.lerParcelas(despesa);
+
+      if (parcelas.length) {
+        return total + parcelas.reduce((subtotal, parcela) => {
+          return subtotal + this.calcularValorPendente(
+            parcela.value ?? parcela.valor ?? 0,
+            parcela.payers ?? parcela.pagadores ?? [],
+            parcela.remainingPayers ?? [],
+            despesa.responsibleName
+          );
+        }, 0);
+      }
+
+      return total + this.calcularValorPendente(
+        despesa.valorTotal,
+        despesa.payers,
+        despesa.remainingPayers,
+        despesa.responsibleName
+      );
+    }, 0);
+
+    return totalCompras + totalDespesas;
+  }
+
+  private calcularValorPendente(
+    valor: number,
+    pagadores: string[] = [],
+    pagadoresRestantes: string[] = [],
+    responsavel?: string
+  ): number {
+    if (!valor || !pagadores.length || !pagadoresRestantes.length) {
+      return 0;
+    }
+
+    const cota = valor / pagadores.length;
+    const pendentes = pagadoresRestantes.filter((pagador) => pagador && pagador !== responsavel);
+
+    return pendentes.length * cota;
+  }
+
+  private lerParcelas(despesa: DespesaFixa): ParcelaResumo[] {
+    return Array.isArray(despesa.parcelas) ? despesa.parcelas as ParcelaResumo[] : [];
   }
 
   novaCompra(): void {

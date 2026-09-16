@@ -19,7 +19,7 @@
         {{ isPremiumWithFamily ? 'Família ativa' : 'Família indisponível' }}
       </span>
       @if (!isPremiumWithFamily) {
-        <button mat-flat-button color="primary" type="button" (click)="criarMinhaFamilia()" [disabled]="!podeCriarFamilia">
+        <button mat-flat-button color="primary" type="button" (click)="criarMinhaFamilia()" [disabled]="!podeAlterarFamilia">
           <mat-icon aria-hidden="true">add_home</mat-icon>
           {{ criandoFamilia ? 'Criando família...' : 'Criar família' }}
         </button>
@@ -47,7 +47,7 @@
               <input matInput maxlength="20" [(ngModel)]="codigoEntrada" placeholder="Ex: ABCD1234">
             </mat-form-field>
 
-            <button mat-stroked-button color="primary" (click)="entrarComCodigo()" [disabled]="!podeCriarFamilia">
+            <button mat-stroked-button color="primary" (click)="entrarComCodigo()" [disabled]="!podeAlterarFamilia">
               <mat-icon aria-hidden="true">login</mat-icon>
               {{ entrandoFamilia ? 'Entrando...' : 'Entrar com código' }}
             </button>
@@ -104,6 +104,30 @@
               <button mat-flat-button color="primary" (click)="compartilharCodigo()">
                 <mat-icon aria-hidden="true">share</mat-icon>
                 Compartilhar link
+              </button>
+            </div>
+          </section>
+
+          <section class="family-switch sh-panel">
+            <div class="panel-heading">
+              <span class="panel-icon">
+                <mat-icon aria-hidden="true">sync_alt</mat-icon>
+              </span>
+              <div>
+                <h2>Entrar em outra família</h2>
+                <p>Use o código recebido para trocar a família vinculada à sua conta.</p>
+              </div>
+            </div>
+
+            <div class="join-box">
+              <mat-form-field appearance="outline">
+                <mat-label>Código da família</mat-label>
+                <input matInput maxlength="20" [(ngModel)]="codigoEntrada" placeholder="Ex: ABCD1234">
+              </mat-form-field>
+
+              <button mat-stroked-button color="primary" (click)="entrarComCodigo()" [disabled]="!podeAlterarFamilia">
+                <mat-icon aria-hidden="true">login</mat-icon>
+                {{ entrandoFamilia ? 'Entrando...' : 'Entrar com código' }}
               </button>
             </div>
           </section>
