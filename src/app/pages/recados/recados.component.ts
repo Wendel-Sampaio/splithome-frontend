@@ -2,7 +2,6 @@ import { CommonModule } from '@angular/common';
 import { Component, DestroyRef, OnInit, inject } from '@angular/core';
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { FormControl, FormGroup, ReactiveFormsModule, Validators } from '@angular/forms';
-import { Router } from '@angular/router';
 import { MatButtonModule } from '@angular/material/button';
 import { MatCardModule } from '@angular/material/card';
 import { MatFormFieldModule } from '@angular/material/form-field';
@@ -28,7 +27,6 @@ import { Recado, RecadosService } from '../../shared/services/recados/recados.se
 export class RecadosComponent implements OnInit {
   private readonly recadosService = inject(RecadosService);
   private readonly userService = inject(UserService);
-  private readonly router = inject(Router);
   private readonly destroyRef = inject(DestroyRef);
 
   readonly recadoForm = new FormGroup({
@@ -60,11 +58,11 @@ export class RecadosComponent implements OnInit {
     this.recadoForm.reset();
   }
 
-  voltarParaHome(): void {
-    this.router.navigate(['/home']);
-  }
-
   get tamanhoAtual(): number {
     return this.recadoForm.controls.content.value?.length ?? 0;
+  }
+
+  getAuthorInitial(authorName: string): string {
+    return authorName.trim().charAt(0).toUpperCase() || '?';
   }
 }

@@ -1,70 +1,128 @@
 <section class="recados-page sh-page">
-  <header class="sh-page-header">
-    <div>
+  <header class="recados-hero">
+    <div class="recados-hero-copy">
+      <span class="recados-kicker">
+        <mat-icon aria-hidden="true">forum</mat-icon>
+        Mural da família
+      </span>
       <h1 class="sh-page-title">Recados</h1>
-      <p class="sh-page-subtitle">Compartilhe avisos rápidos com todos da casa.</p>
+      <p class="sh-page-subtitle">
+        Publique avisos rápidos para manter a casa alinhada sem perder nada importante.
+      </p>
     </div>
-    <div class="sh-page-actions">
-      <button mat-stroked-button color="primary" type="button" (click)="voltarParaHome()">
-        <mat-icon>arrow_back</mat-icon>
-        Voltar
-      </button>
+
+    <div class="recados-summary">
+      <span class="summary-label">Recados ativos</span>
+      <strong>{{ recados.length }}</strong>
+      <span class="summary-chip">
+        <mat-icon aria-hidden="true">home</mat-icon>
+        Compartilhado
+      </span>
     </div>
   </header>
 
-  <mat-card class="novo-recado-card sh-panel" appearance="outlined">
-    <mat-card-header>
-      <mat-card-title>Novo recado</mat-card-title>
-      <mat-card-subtitle>Até 280 caracteres</mat-card-subtitle>
-    </mat-card-header>
+  <div class="recados-grid">
+    <mat-card class="novo-recado-card sh-panel" appearance="outlined">
+      <mat-card-header>
+        <span class="panel-icon" mat-card-avatar>
+          <mat-icon aria-hidden="true">edit_note</mat-icon>
+        </span>
+        <mat-card-title>Novo recado</mat-card-title>
+        <mat-card-subtitle>Até 280 caracteres</mat-card-subtitle>
+      </mat-card-header>
 
-    <mat-card-content>
-      <form class="recado-form" [formGroup]="recadoForm" (ngSubmit)="salvarRecado()">
-        <mat-form-field appearance="outline" class="field-full">
-          <mat-label>Digite o recado</mat-label>
-          <textarea
-            formControlName="content"
-            matInput
-            rows="4"
-            maxlength="280"
-            placeholder="Ex.: Comprar itens de limpeza para a semana">
-          </textarea>
-          <mat-hint align="end">{{ tamanhoAtual }}/280</mat-hint>
-          <mat-error *ngIf="recadoForm.controls.content.hasError('required')">
-            Escreva um recado para continuar.
-          </mat-error>
-          <mat-error *ngIf="recadoForm.controls.content.hasError('maxlength')">
-            O recado deve ter no máximo 280 caracteres.
-          </mat-error>
-        </mat-form-field>
-
-        <div class="form-actions">
-          <button mat-flat-button color="primary" type="submit">
-            <mat-icon>send</mat-icon>
-            Publicar recado
-          </button>
-        </div>
-      </form>
-    </mat-card-content>
-  </mat-card>
-
-  <section class="recados-lista">
-    <h2 class="sh-page-title">Últimos recados</h2>
-
-    <div class="sh-empty-state" *ngIf="!recados.length">
-      Nenhum recado ainda. Seja o primeiro a escrever.
-    </div>
-
-    <mat-card class="recado-item sh-panel" appearance="outlined" *ngFor="let recado of recados">
       <mat-card-content>
-        <p class="recado-conteudo">{{ recado.content }}</p>
-        <div class="recado-meta">
-          <span>{{ recado.authorName }}</span>
-          <time [attr.datetime]="recado.createdAt">
-            {{ recado.createdAt | date:'dd/MM/yyyy HH:mm' }}
-          </time>
-        </div>
+        <form class="recado-form" [formGroup]="recadoForm" (ngSubmit)="salvarRecado()">
+          <mat-form-field appearance="outline" class="field-full">
+            <mat-label>Digite o recado</mat-label>
+            <textarea
+              formControlName="content"
+              matInput
+              rows="5"
+              maxlength="280"
+              placeholder="Ex.: Comprar itens de limpeza para a semana">
+            </textarea>
+            <mat-hint align="end">{{ tamanhoAtual }}/280</mat-hint>
+            <mat-error *ngIf="recadoForm.controls.content.hasError('required')">
+              Escreva um recado para continuar.
+            </mat-error>
+            <mat-error *ngIf="recadoForm.controls.content.hasError('maxlength')">
+              O recado deve ter no máximo 280 caracteres.
+            </mat-error>
+          </mat-form-field>
+
+          <div class="form-actions">
+            <span class="form-helper">
+              <mat-icon aria-hidden="true">visibility</mat-icon>
+              Visível para todos da família
+            </span>
+            <button mat-flat-button color="primary" type="submit">
+              <mat-icon aria-hidden="true">send</mat-icon>
+              Publicar
+            </button>
+          </div>
+        </form>
       </mat-card-content>
     </mat-card>
+
+    <aside class="recados-tips sh-panel" aria-label="Sugestões de recados">
+      <div class="tips-heading">
+        <span class="panel-icon">
+          <mat-icon aria-hidden="true">tips_and_updates</mat-icon>
+        </span>
+        <div>
+          <h2>Boas ideias de recado</h2>
+          <p>Use para compras, avisos de pagamento, visitas ou combinados da rotina.</p>
+        </div>
+      </div>
+
+      <div class="tip-item">
+        <mat-icon aria-hidden="true">shopping_basket</mat-icon>
+        <span>Lista rápida do mercado</span>
+      </div>
+      <div class="tip-item">
+        <mat-icon aria-hidden="true">event_available</mat-icon>
+        <span>Horários e compromissos</span>
+      </div>
+      <div class="tip-item">
+        <mat-icon aria-hidden="true">payments</mat-icon>
+        <span>Lembretes de contas da casa</span>
+      </div>
+    </aside>
+  </div>
+
+  <section class="recados-lista">
+    <div class="section-heading">
+      <div>
+        <span class="section-label">Atualizações recentes</span>
+        <h2>Últimos recados</h2>
+      </div>
+    </div>
+
+    <div class="empty-recados sh-empty-state" *ngIf="!recados.length">
+      <span class="panel-icon">
+        <mat-icon aria-hidden="true">mark_chat_unread</mat-icon>
+      </span>
+      <div>
+        <strong>Nenhum recado ainda</strong>
+        <span>Quando alguém publicar, o aviso aparecerá aqui para todos acompanharem.</span>
+      </div>
+    </div>
+
+    <div class="recados-stack" *ngIf="recados.length">
+      <article class="recado-item sh-panel" *ngFor="let recado of recados">
+        <div class="recado-avatar" aria-hidden="true">{{ getAuthorInitial(recado.authorName) }}</div>
+
+        <div class="recado-body">
+          <div class="recado-meta">
+            <strong>{{ recado.authorName }}</strong>
+            <time [attr.datetime]="recado.createdAt">
+              {{ recado.createdAt | date:'dd/MM/yyyy HH:mm' }}
+            </time>
+          </div>
+          <p class="recado-conteudo">{{ recado.content }}</p>
+        </div>
+      </article>
+    </div>
   </section>
 </section>

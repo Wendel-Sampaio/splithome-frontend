@@ -1,7 +1,7 @@
 import { ChangeDetectorRef, Component, DestroyRef, inject } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
-import { ActivatedRoute, Router } from '@angular/router';
+import { ActivatedRoute } from '@angular/router';
 import { MatButtonModule } from '@angular/material/button';
 import { MatCardModule } from '@angular/material/card';
 import { MatDialog } from '@angular/material/dialog';
@@ -21,16 +21,16 @@ import { UserStateService } from '../../core/auth/user/user-state.service';
 import { ResumoFinanceiroComponent } from '../resumo-financeiro/resumo-financeiro.component';
 import { ModalService } from '../../shared/components/ui/modal';
 import { FamiliaComponent } from '../familia/familia.component';
+import { RecadosComponent } from '../recados/recados.component';
 
 @Component({
   selector: 'app-home',
-  imports: [MatCardModule, MatIcon, MatButtonModule, MatMenuModule, ComprasComponent, DespesasFixasComponent, MeuPerfilComponent, EstatisticasComponent, ResumoFinanceiroComponent, DashboardInicioComponent, FamiliaComponent, CommonModule, MatToolbarModule],
+  imports: [MatCardModule, MatIcon, MatButtonModule, MatMenuModule, ComprasComponent, DespesasFixasComponent, MeuPerfilComponent, EstatisticasComponent, ResumoFinanceiroComponent, DashboardInicioComponent, FamiliaComponent, RecadosComponent, CommonModule, MatToolbarModule],
   templateUrl: './home.component.html',
   styleUrl: './home.component.scss'
 })
 export class HomeComponent {
   loginService = inject(UserService);
-  router = inject(Router);
   route = inject(ActivatedRoute);
   planService = inject(PlanService);
   userStateService = inject(UserStateService);
@@ -58,8 +58,12 @@ export class HomeComponent {
       this.userStateService.getFamilyUsers().pipe(takeUntilDestroyed(this.destroyRef)).subscribe();
     }
 
-    if (this.route.snapshot.data['initialView'] === 'familia') {
+    const initialView = this.route.snapshot.data['initialView'];
+
+    if (initialView === 'familia') {
       this.abrirFamilia();
+    } else if (initialView === 'recados') {
+      this.abrirRecados();
     }
   }
 
@@ -142,7 +146,8 @@ export class HomeComponent {
       return;
     }
 
-    this.router.navigate(['/recados']);
+    this.currentView = 'recados';
+    this.currentViewTitle = 'Recados';
   }
 
   abrirMeuPerfil(): void {

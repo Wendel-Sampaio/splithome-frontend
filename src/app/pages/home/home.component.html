@@ -64,7 +64,7 @@
                     </button>
                     <button (click)="abrirRecados()"
                             class="botoes-menu-lateral"
-                            [ngClass]="{'premium-locked': !isPremium}">
+                            [ngClass]="{'selected': currentView === 'recados', 'premium-locked': !isPremium}">
                         <mat-icon class="icones-botao">forum</mat-icon>
                         <span class="menu-label">Recados</span>
                         <span *ngIf="!isPremium" class="premium-lock">
@@ -151,6 +151,8 @@
             </mat-card>
 
             <app-familia *ngIf="currentView === 'familia'" (voltarInicio)="abrirInicio()"></app-familia>
+
+            <app-recados *ngIf="currentView === 'recados'"></app-recados>
 
             <meu-perfil class="meu-perfil" *ngIf="currentView === 'meuPerfil'" (profilePhotoUpdated)="atualizarFotoPerfil($event)"></meu-perfil>
         </section>

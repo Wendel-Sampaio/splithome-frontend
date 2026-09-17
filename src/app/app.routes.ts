@@ -2,7 +2,6 @@ import { Routes } from '@angular/router';
 import { LoginComponent } from './pages/login/login.component';
 import { CadastroComponent } from './pages/cadastro/cadastro.component';
 import { HomeComponent } from './pages/home/home.component';
-import { RecadosComponent } from './pages/recados/recados.component';
 import { loginGuard } from './core/auth/guards/login.guard';
 import { homeGuard } from './core/auth/guards/home.guard';
 
@@ -13,5 +12,5 @@ export const routes: Routes = [
     {path: "cadastro", component: CadastroComponent, canActivate: [homeGuard]},
     {path: "home", component: HomeComponent, canActivate: [loginGuard]},
     {path: "familia", component: HomeComponent, canActivate: [loginGuard], data: {initialView: 'familia'}},
-    {path: "recados", component: RecadosComponent, canActivate: [loginGuard]}
+    {path: "recados", component: HomeComponent, canActivate: [loginGuard], data: {initialView: 'recados'}}
 ];
