@@ -83,7 +83,7 @@ export class ComprasComponent implements OnInit {
   loadingLista = signal(true);
   loadingAcao = signal(false);
 
-  pageSize = 10;
+  pageSize = 20;
   pageIndex = 0;
   totalElements = 0;
   sortField = 'purchaseDate';

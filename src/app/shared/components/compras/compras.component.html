@@ -21,14 +21,12 @@
     <section class="filter-panel" [formGroup]="filterForm">
         <div class="filter-grid">
             <mat-form-field appearance="outline" class="filter-search">
-                <mat-label>Buscar título</mat-label>
-                <input matInput formControlName="title" placeholder="Ex: mercado" />
+                <input matInput formControlName="title" placeholder="Buscar título" aria-label="Buscar título" />
                 <mat-icon matSuffix>search</mat-icon>
             </mat-form-field>
 
             <mat-form-field appearance="outline">
-                <mat-label>Categoria</mat-label>
-                <mat-select formControlName="category">
+                <mat-select formControlName="category" placeholder="Categoria" aria-label="Categoria">
                     <mat-option [value]="null">Todas</mat-option>
                     <mat-option *ngFor="let cat of categories" [value]="cat">
                         <span class="category-option">
@@ -40,22 +38,19 @@
             </mat-form-field>
 
             <mat-form-field appearance="outline">
-                <mat-label>Data início</mat-label>
-                <input matInput [matDatepicker]="startPicker" formControlName="startDate" />
+                <input matInput [matDatepicker]="startPicker" formControlName="startDate" placeholder="Data início" aria-label="Data início" />
                 <mat-datepicker-toggle matIconSuffix [for]="startPicker"></mat-datepicker-toggle>
                 <mat-datepicker #startPicker></mat-datepicker>
             </mat-form-field>
 
             <mat-form-field appearance="outline">
-                <mat-label>Data fim</mat-label>
-                <input matInput [matDatepicker]="endPicker" formControlName="endDate" />
+                <input matInput [matDatepicker]="endPicker" formControlName="endDate" placeholder="Data fim" aria-label="Data fim" />
                 <mat-datepicker-toggle matIconSuffix [for]="endPicker"></mat-datepicker-toggle>
                 <mat-datepicker #endPicker></mat-datepicker>
             </mat-form-field>
 
             <mat-form-field appearance="outline" *ngIf="isPremium">
-                <mat-label>Comprador</mat-label>
-                <mat-select formControlName="purchaserId">
+                <mat-select formControlName="purchaserId" placeholder="Comprador" aria-label="Comprador">
                     <mat-option [value]="null">Todos</mat-option>
                     <mat-option *ngFor="let p of purchasers" [value]="p.id">{{ p.name }}</mat-option>
                 </mat-select>

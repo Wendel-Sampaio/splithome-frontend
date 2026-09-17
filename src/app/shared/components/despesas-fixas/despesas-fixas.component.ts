@@ -52,7 +52,7 @@ export class DespesasFixasComponent implements OnInit {
 
   loadingLista = signal(true);
   loadingAcao = signal(false);
-  pageSize = 10;
+  pageSize = 20;
   pageIndex = 0;
   totalElements = 0;
   despesas: DespesaFixa[] = [];
@@ -79,10 +79,12 @@ export class DespesasFixasComponent implements OnInit {
           size: this.pageSize,
           sort: 'createdAt,desc'
         }).pipe(
+          tap(page => {
+            this.totalElements = page.totalElements;
+          }),
           switchMap(page => this.tratamentoLista(page.content)),
           tap(despesas => {
             this.despesas = despesas;
-            this.totalElements = despesas.length;
             this.loadingLista.set(false);
           }),
           catchError(() => {

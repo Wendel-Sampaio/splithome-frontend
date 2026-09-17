@@ -46,6 +46,10 @@ describe('ComprasComponent', () => {
     expect(component).toBeTruthy();
   });
 
+  it('inicia a listagem com 20 compras por página', () => {
+    expect(component.pageSize).toBe(20);
+  });
+
   describe('verificaUserRemainingPayers', () => {
     it('true quando o usuário está em remainingPayers', () => {
       spyOn(userService, 'getUser').and.returnValue(makeUser({ name: 'Maria' }));
