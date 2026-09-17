@@ -73,5 +73,11 @@ form {
   }
 }
 
+.sh-payer-error {
+  color: #b3261e;
+  font-size: 12px;
+  margin: var(--sh-space-2) 0 0;
+}
+
 .sh-btn-cancel { order: 1; }
 .sh-btn-primary { order: 2; }

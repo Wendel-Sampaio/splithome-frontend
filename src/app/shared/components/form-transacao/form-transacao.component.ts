@@ -275,6 +275,10 @@ export class FormTransacaoComponent {
     return this.formTransacao.valid;
   }
 
+  get pagadoresObrigatoriosInvalidos(): boolean {
+    return this.isPremium && this.pagadores.length === 0;
+  }
+
   controlInvalido(controlName: string): boolean {
     if (!this.formTransacao) {
       return false;
@@ -313,6 +317,11 @@ export class FormTransacaoComponent {
 
     const usuarioLogado = this.userService.getUser();
     const pagadores = this.isPremium ? this.pagadores : [];
+    if (this.isPremium && pagadores.length === 0) {
+      this.notify.warning('Selecione pelo menos um pagador para a conta.');
+      return;
+    }
+
     this.pagadoresRestantes = !this.isPremium
       ? []
       : this.isEdicao

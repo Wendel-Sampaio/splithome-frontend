@@ -70,14 +70,13 @@ describe('FormTransacaoComponent', () => {
     expect(component.loading()).toBe(false);
   });
 
-  it('sem pagador não bloqueia mais o envio (pagadores são opcionais)', () => {
+  it('sem pagador bloqueia o envio com mensagem clara', () => {
     compraService.cadastrarCompra.and.returnValue(of({} as any));
     preencher();
     component.pagadores = [];
     component.cadastrarTransacao();
-    expect(notify.warning).not.toHaveBeenCalledWith('Selecione pelo menos um pagador.');
-    expect(notify.warning).not.toHaveBeenCalled();
-    expect(compraService.cadastrarCompra).toHaveBeenCalled();
+    expect(notify.warning).toHaveBeenCalledWith('Selecione pelo menos um pagador para a conta.');
+    expect(compraService.cadastrarCompra).not.toHaveBeenCalled();
   });
 
   it('sucesso de compra notifica success e fecha dialog', () => {

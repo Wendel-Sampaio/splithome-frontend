@@ -124,9 +124,8 @@
 
       <app-form-section
         title="Pagadores"
-        [optional]="true"
         [description]="pagadores.length === 0
-          ? 'Nenhum pagador selecionado — você será o único responsável.'
+          ? 'Selecione pelo menos um pagador para a conta.'
           : (pagadores.length === 1
               ? '1 pagador selecionado.'
               : pagadores.length + ' pagadores selecionados.')">
@@ -142,6 +141,9 @@
             </mat-chip-option>
           }
         </mat-chip-listbox>
+        <p class="sh-payer-error" *ngIf="tentouEnviar && pagadoresObrigatoriosInvalidos">
+          Selecione pelo menos um pagador para a conta.
+        </p>
       </app-form-section>
     }
   </form>
