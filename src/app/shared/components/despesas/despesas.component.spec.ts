@@ -5,20 +5,28 @@ import { DespesasComponent } from './despesas.component';
 import { CompraService } from '../../services/compra/compra.service';
 import { UserService } from '../../../core/auth/user/user.service';
 import { NotificationService } from '../../services/notification/notification.service';
+import { UserStateService } from '../../../core/auth/user/user-state.service';
 
 describe('DespesasComponent', () => {
   let component: DespesasComponent;
   let fixture: ComponentFixture<DespesasComponent>;
   let despesaService: jasmine.SpyObj<CompraService>;
   let notify: jasmine.SpyObj<NotificationService>;
+  let userStateService: jasmine.SpyObj<UserStateService>;
 
   beforeEach(async () => {
     despesaService = jasmine.createSpyObj<CompraService>('CompraService',
       ['listarDespesas', 'atualizarDespesa', 'deleteDespesa', 'cadastrarDespesa']);
     despesaService.listarDespesas.and.returnValue(of([]));
     const userService = jasmine.createSpyObj<UserService>('UserService', ['getUser', 'getUserById']);
-    userService.getUser.and.returnValue({ id: 'u1', name: 'Eu' } as any);
+    userService.getUser.and.returnValue({ id: 'u1', name: 'Eu', plan: 'PREMIUM' } as any);
     userService.getUserById.and.returnValue(of({ id: 'u1', name: 'Eu' } as any));
+    userStateService = jasmine.createSpyObj<UserStateService>('UserStateService', ['getFamilyUsers']);
+    userStateService.getFamilyUsers.and.returnValue(of([
+      { id: 'u1', name: 'Eu' },
+      { id: 'u2', name: 'Maria' },
+      { id: 'u3', name: 'Bruno' }
+    ] as any));
     notify = jasmine.createSpyObj<NotificationService>('NotificationService',
       ['success', 'error', 'info', 'warning']);
 
@@ -28,6 +36,7 @@ describe('DespesasComponent', () => {
         provideHttpClient(),
         { provide: CompraService, useValue: despesaService },
         { provide: UserService, useValue: userService },
+        { provide: UserStateService, useValue: userStateService },
         { provide: NotificationService, useValue: notify }
       ]
     }).compileComponents();
@@ -85,10 +94,30 @@ describe('DespesasComponent', () => {
       value: 25.9,
       paymentDate: '2026-07-01',
       responsibleId: 'u1',
-      payers: ['Eu'],
-      remainingPayers: ['Eu']
+      payers: ['u1'],
+      remainingPayers: ['u1']
     });
     expect(notify.success).toHaveBeenCalledWith('1 despesa(s) importada(s) com sucesso!');
+  });
+
+  it('resolve nomes de pagadores usando os membros da familia', (done) => {
+    component.tratamentoLista([{
+      id: 'd1',
+      title: 'Conta de luz',
+      category: 'HOME',
+      value: 90,
+      paymentDate: '',
+      responsibleId: 'u2',
+      responsibleName: '',
+      payers: ['u1', 'u2', 'u3'],
+      remainingPayers: ['u3'],
+      isPaid: false
+    } as any]).subscribe((despesas) => {
+      expect(despesas[0].responsibleName).toBe('Maria');
+      expect(despesas[0].payerNames).toEqual(['Eu', 'Maria', 'Bruno']);
+      expect(despesas[0].remainingPayerNames).toEqual(['Bruno']);
+      done();
+    });
   });
 
   it('não importa arquivo que não seja OFX', () => {

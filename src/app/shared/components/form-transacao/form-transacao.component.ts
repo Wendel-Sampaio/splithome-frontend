@@ -447,9 +447,13 @@ export class FormTransacaoComponent {
 
   private usuarioPodeSerPagador(usuario: User): boolean {
     const usuarioLogado = this.userService.getUser();
+    if (usuario.id === usuarioLogado.id) {
+      return true;
+    }
+
     const familyCodeLogado = usuarioLogado.familyId ?? usuarioLogado.familyCode;
     const familyCodeUsuario = usuario.familyId ?? usuario.familyCode;
-    return usuario.plan === 'PREMIUM' && familyCodeUsuario === familyCodeLogado;
+    return !!familyCodeLogado && familyCodeUsuario === familyCodeLogado;
   }
 
   private isMesmoUsuario(reference: string, usuario: User): boolean {

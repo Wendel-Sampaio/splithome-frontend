@@ -106,6 +106,21 @@ describe('FormTransacaoComponent', () => {
     expect(payload.purchaseDate).toMatch(/^\d{4}-\d{2}-\d{2}$/);
   });
 
+  it('permite selecionar membros da mesma familia independentemente do plano do membro', () => {
+    const membroFamilia = {
+      id: 'u2',
+      name: 'Outro',
+      email: '',
+      phoneNumber: '',
+      pixKey: '',
+      familyCode: 'F1',
+      plan: 'FREE',
+      profilePhoto: ''
+    };
+
+    expect((component as any).usuarioPodeSerPagador(membroFamilia)).toBeTrue();
+  });
+
   it('erro de compra notifica error e mantém dialog aberto', () => {
     compraService.cadastrarCompra.and.returnValue(throwError(() => ({ status: 500 })));
     preencher();

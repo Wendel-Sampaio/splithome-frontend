@@ -1,14 +1,16 @@
 import { Injectable, inject } from '@angular/core';
-import { catchError, Observable, of, shareReplay, tap } from 'rxjs';
+import { catchError, map, Observable, of, shareReplay, tap } from 'rxjs';
 import { PlanService } from '../../plan/plan.service';
 import { User } from '../../models/user/user';
 import { UserService } from './user.service';
+import { FamiliaMember, FamiliaService } from '../../../shared/services/familia/familia.service';
 
 @Injectable({
   providedIn: 'root'
 })
 export class UserStateService {
   private readonly userService = inject(UserService);
+  private readonly familiaService = inject(FamiliaService);
   private readonly planService = inject(PlanService);
 
   private familyUsersCache$: Observable<User[]> | null = null;
@@ -21,7 +23,8 @@ export class UserStateService {
     }
 
     if (!this.familyUsersCache$) {
-      this.familyUsersCache$ = this.userService.getAllUsers().pipe(
+      this.familyUsersCache$ = this.familiaService.obterMinhaFamilia().pipe(
+        map((family) => this.mapFamilyMembers(family?.members ?? [], family?.familyCode ?? '')),
         tap((users) => this.updateUsersLookup(users)),
         catchError(() => {
           this.clearCache();
@@ -37,6 +40,19 @@ export class UserStateService {
   clearCache(): void {
     this.familyUsersCache$ = null;
     this.usersById.clear();
+  }
+
+  private mapFamilyMembers(members: FamiliaMember[], familyCode: string): User[] {
+    return members.map((member) => ({
+      id: member.id,
+      name: member.name,
+      email: member.email,
+      phoneNumber: '',
+      pixKey: '',
+      familyCode,
+      plan: 'PREMIUM',
+      profilePhoto: this.userService.getProfilePhoto({ id: member.id })
+    }));
   }
 
   private updateUsersLookup(users: User[]): void {

@@ -18,6 +18,7 @@ import { DialogPagamentoComponent } from "../dialog-pagamento/dialog-pagamento.c
 import { FormTransacaoComponent } from "../form-transacao/form-transacao.component";
 import { parseOfxExpenses } from "../../services/ofx/ofx-parser";
 import { ModalService } from "../ui/modal";
+import { UserStateService } from "../../../core/auth/user/user-state.service";
 
 @Component({
   selector: 'tabela-despesas',
@@ -41,6 +42,7 @@ export class DespesasComponent {
   private notify = inject(NotificationService);
   despesaService = inject(CompraService);
   userService = inject(UserService);
+  private userStateService = inject(UserStateService);
   loadingLista = signal(true);
   loadingAcao = signal(false);
   private readonly recarregarDespesasSubject = new BehaviorSubject<void>(undefined);
@@ -195,7 +197,23 @@ export class DespesasComponent {
       return of([]);
     }
 
-    return forkJoin(despesas.map(despesa => this.prepararDespesa(despesa)));
+    const currentUser = this.userService.getUser();
+    if (currentUser.plan !== 'PREMIUM') {
+      const usersById = new Map([[currentUser.id, currentUser.name]]);
+      return of(despesas.map(despesa => this.prepararDespesa(despesa, usersById)));
+    }
+
+    return this.userStateService.getFamilyUsers().pipe(
+      map(users => {
+        const usersById = new Map(users.map(user => [user.id, user.name]));
+        usersById.set(currentUser.id, currentUser.name);
+        return despesas.map(despesa => this.prepararDespesa(despesa, usersById));
+      }),
+      catchError(() => {
+        const usersById = new Map([[currentUser.id, currentUser.name]]);
+        return of(despesas.map(despesa => this.prepararDespesa(despesa, usersById)));
+      })
+    );
   }
 
   isLastDespesa(despesa: Despesa, despesas: Despesa[]): boolean {
@@ -253,34 +271,25 @@ export class DespesasComponent {
     }).format(value);
   }
 
-  private prepararDespesa(despesa: Despesa): Observable<Despesa> {
+  private prepararDespesa(despesa: Despesa, usersById: Map<string, string>): Despesa {
     const currentUser = this.userService.getUser();
     const isNotResponsible = despesa.responsibleId !== currentUser.id;
     const payers = despesa.payers ?? [];
     const remainingPayers = despesa.remainingPayers ?? [];
     const unitValue = payers.length ? despesa.value / payers.length : 0;
     const despesaNormalizada = { ...despesa, payers, remainingPayers };
+    const responsibleName = usersById.get(despesa.responsibleId)
+      ?? (despesa.responsibleId === currentUser.id ? currentUser.name : '');
 
-    return this.userService.getUserById(despesa.responsibleId).pipe(
-      map(user => ({
-        ...despesaNormalizada,
-        unitValue,
-        responsibleName: user.name,
-        payerNames: this.displayNamesFor(payers, new Map([[user.id, user.name], [currentUser.id, currentUser.name]])),
-        remainingPayerNames: this.displayNamesFor(remainingPayers, new Map([[user.id, user.name], [currentUser.id, currentUser.name]])),
-        showPaymentButton: isNotResponsible && (payers.includes(currentUser.id) || payers.includes(currentUser.name)),
-        isPaid: !this.verificaUserRemainingPayers(despesaNormalizada)
-      })),
-      catchError(() => of({
-        ...despesaNormalizada,
-        unitValue,
-        responsibleName: '',
-        payerNames: this.displayNamesFor(payers, new Map([[currentUser.id, currentUser.name]])),
-        remainingPayerNames: this.displayNamesFor(remainingPayers, new Map([[currentUser.id, currentUser.name]])),
-        showPaymentButton: isNotResponsible && (payers.includes(currentUser.id) || payers.includes(currentUser.name)),
-        isPaid: !this.verificaUserRemainingPayers(despesaNormalizada)
-      }))
-    );
+    return {
+      ...despesaNormalizada,
+      unitValue,
+      responsibleName,
+      payerNames: this.displayNamesFor(payers, usersById),
+      remainingPayerNames: this.displayNamesFor(remainingPayers, usersById),
+      showPaymentButton: isNotResponsible && (payers.includes(currentUser.id) || payers.includes(currentUser.name)),
+      isPaid: !this.verificaUserRemainingPayers(despesaNormalizada)
+    };
   }
 
   private displayNamesFor(references: string[], usersById: Map<string, string>): string[] {
