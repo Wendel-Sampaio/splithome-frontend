@@ -1,8 +1,15 @@
-:host { display: block; }
+:host {
+  --sh-modal-body-padding: var(--sh-space-5) var(--sh-space-6) var(--sh-space-6);
+  display: block;
+}
 
 form {
   display: grid;
-  gap: var(--sh-space-6);
+  gap: var(--sh-space-7, 28px);
+}
+
+mat-form-field {
+  width: 100%;
 }
 
 .sh-full-row { grid-column: 1 / -1; }
@@ -46,22 +53,34 @@ form {
   }
 }
 
+.sh-payers-card {
+  background: var(--sh-color-surface-alt);
+  border: 1px solid var(--sh-color-border);
+  border-radius: var(--sh-radius-md);
+  display: grid;
+  gap: var(--sh-space-3);
+  padding: var(--sh-space-4);
+}
+
 .sh-chip-payer-list {
   display: flex;
   flex-wrap: wrap;
-  gap: var(--sh-space-2);
+  gap: var(--sh-space-3);
 }
 
 .sh-chip-payer {
-  background: var(--sh-color-bg-strong);
+  --mdc-chip-container-height: 38px;
+  background: var(--sh-color-surface);
   border: 1px solid var(--sh-color-border);
+  border-radius: 999px;
   color: var(--sh-color-text);
   cursor: pointer;
   font-weight: 500;
-  transition: background-color 120ms ease, color 120ms ease, border-color 120ms ease;
+  min-height: 38px;
+  transition: background-color 120ms ease, color 120ms ease, border-color 120ms ease, box-shadow 120ms ease;
 
   &:hover {
-    background: var(--sh-color-surface);
+    background: var(--sh-color-primary-soft);
     border-color: var(--sh-color-primary-muted);
   }
 
@@ -70,14 +89,63 @@ form {
     background: var(--sh-color-primary) !important;
     border-color: var(--sh-color-primary-strong) !important;
     color: #ffffff !important;
+    box-shadow: 0 8px 18px rgba(47, 158, 68, 0.22);
   }
+}
+
+:host ::ng-deep .sh-chip-payer .mdc-evolution-chip__text-label {
+  color: var(--sh-color-text);
+  font-weight: 700;
+}
+
+:host ::ng-deep .sh-chip-payer.sh-chip-payer--selected .mdc-evolution-chip__text-label,
+:host ::ng-deep .sh-chip-payer.mat-mdc-chip-selected .mdc-evolution-chip__text-label {
+  color: #ffffff;
+}
+
+:host ::ng-deep .sh-chip-payer .mat-mdc-chip-avatar {
+  border: 1px solid var(--sh-color-border);
+  height: 24px;
+  width: 24px;
+}
+
+:host ::ng-deep .sh-chip-payer.sh-chip-payer--selected .mat-mdc-chip-avatar,
+:host ::ng-deep .sh-chip-payer.mat-mdc-chip-selected .mat-mdc-chip-avatar {
+  border-color: rgba(255, 255, 255, 0.72);
 }
 
 .sh-payer-error {
   color: #b3261e;
   font-size: 12px;
-  margin: var(--sh-space-2) 0 0;
+  margin: 0;
 }
 
-.sh-btn-cancel { order: 1; }
-.sh-btn-primary { order: 2; }
+.sh-btn-cancel {
+  --mdc-outlined-button-label-text-color: var(--sh-color-primary-strong);
+  --mdc-outlined-button-outline-color: var(--sh-color-primary-muted);
+  --mat-outlined-button-state-layer-color: var(--sh-color-primary);
+  color: var(--sh-color-primary-strong);
+  font-weight: 700;
+  order: 1;
+}
+
+.sh-btn-primary {
+  --mdc-filled-button-container-color: var(--sh-color-primary);
+  --mdc-filled-button-label-text-color: #ffffff;
+  --mat-filled-button-state-layer-color: #ffffff;
+  font-weight: 800;
+  min-width: 168px;
+  order: 2;
+
+  &:hover:not(:disabled) {
+    --mdc-filled-button-container-color: var(--sh-color-primary-strong);
+  }
+}
+
+:host ::ng-deep .sh-btn-primary .mdc-button__label {
+  color: #ffffff;
+}
+
+:host ::ng-deep .mat-mdc-progress-spinner {
+  --mdc-circular-progress-active-indicator-color: #ffffff;
+}

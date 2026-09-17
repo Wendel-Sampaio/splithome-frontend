@@ -17,7 +17,7 @@
       <td mat-cell *matCellDef="let despesa">
         <div class="fixed-expense-cell">
           <span class="category-icon">
-            <mat-icon aria-hidden="true">{{ despesa.category | categoriaIcone }}</mat-icon>
+            <mat-icon aria-hidden="true" [style.color]="despesa.category | categoriaCor">{{ despesa.category | categoriaIcone }}</mat-icon>
           </span>
           <span>{{ despesa.title }}</span>
         </div>
@@ -28,7 +28,7 @@
       <th mat-header-cell *matHeaderCellDef>Categoria</th>
       <td mat-cell *matCellDef="let despesa">
         <span class="category-chip">
-          <mat-icon aria-hidden="true">{{ despesa.category | categoriaIcone }}</mat-icon>
+          <mat-icon aria-hidden="true" [style.color]="despesa.category | categoriaCor">{{ despesa.category | categoriaIcone }}</mat-icon>
           {{ despesa.category | categoria }}
         </span>
       </td>

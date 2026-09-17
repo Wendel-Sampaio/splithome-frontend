@@ -28,7 +28,7 @@
             }" mat-cell *matCellDef="let element">
                 <div class="expense-cell">
                     <span class="category-icon">
-                        <mat-icon aria-hidden="true">{{ element.category | categoriaIcone }}</mat-icon>
+                        <mat-icon aria-hidden="true" [style.color]="element.category | categoriaCor">{{ element.category | categoriaIcone }}</mat-icon>
                     </span>
                     <span>{{ element.title }}</span>
                 </div>
@@ -39,7 +39,7 @@
             <th class="column-name" mat-header-cell *matHeaderCellDef> Categoria </th>
             <td [ngClass]="{'payed-style': verificarPagamento(element)}" mat-cell *matCellDef="let element">
                 <span class="category-chip">
-                    <mat-icon aria-hidden="true">{{ element.category | categoriaIcone }}</mat-icon>
+                    <mat-icon aria-hidden="true" [style.color]="element.category | categoriaCor">{{ element.category | categoriaIcone }}</mat-icon>
                     {{ element.category | categoria }}
                 </span>
             </td>

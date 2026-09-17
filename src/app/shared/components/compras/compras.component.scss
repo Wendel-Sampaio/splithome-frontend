@@ -138,40 +138,76 @@
 .table-shell {
   border: 1px solid var(--sh-color-border);
   border-radius: var(--sh-radius-md);
+  background: var(--sh-color-surface-alt);
   overflow: auto;
+  padding: 8px;
 }
 
 table {
+  border-collapse: separate;
+  border-spacing: 0 8px;
   min-width: 980px;
   width: 100%;
 }
 
 .mat-mdc-header-row {
   background: var(--sh-color-surface-alt);
+  height: 48px;
 }
 
 .mat-mdc-header-cell {
+  border-bottom: 0;
   color: var(--sh-color-text-muted);
   font-size: 12px;
   font-weight: 800;
+  padding: 0 16px;
   text-transform: uppercase;
 }
 
 .mat-mdc-cell {
+  background: var(--sh-color-surface);
+  border-bottom: 1px solid var(--sh-color-border);
+  border-top: 1px solid var(--sh-color-border);
   color: var(--sh-color-text);
+  line-height: 1.45;
+  padding: 14px 16px;
+  vertical-align: middle;
 }
 
-.mat-mdc-row:hover {
+.mat-mdc-cell:first-child {
+  border-left: 1px solid var(--sh-color-border);
+  border-radius: var(--sh-radius-md) 0 0 var(--sh-radius-md);
+}
+
+.mat-mdc-cell:last-child {
+  border-radius: 0 var(--sh-radius-md) var(--sh-radius-md) 0;
+  border-right: 1px solid var(--sh-color-border);
+}
+
+.mat-mdc-row {
+  height: 76px;
+}
+
+.mat-mdc-row:hover .mat-mdc-cell {
   background: var(--sh-color-bg-strong);
+  border-color: var(--sh-color-primary-muted);
 }
 
 .payed-style {
   background: var(--sh-color-primary-soft);
 }
 
+.mat-mdc-cell.payed-style {
+  background: var(--sh-color-primary-soft);
+}
+
+.mat-mdc-row:hover .mat-mdc-cell.payed-style {
+  background: #e3f5e8;
+}
+
 .purchase-cell {
-  gap: var(--sh-space-3);
-  min-width: 210px;
+  gap: var(--sh-space-4);
+  min-width: 240px;
 }
 
 .purchase-icon,
@@ -186,16 +222,23 @@ table {
 }
 
 .purchase-icon {
-  flex: 0 0 40px;
-  height: 40px;
-  width: 40px;
+  flex: 0 0 44px;
+  height: 44px;
+  width: 44px;
+
+  mat-icon {
+    font-size: 22px;
+    height: 22px;
+    width: 22px;
+  }
 }
 
 .purchase-cell strong {
   color: var(--sh-color-text);
   display: block;
   font-weight: 800;
-  max-width: 190px;
+  margin-bottom: 3px;
+  max-width: 220px;
   overflow: hidden;
   text-overflow: ellipsis;
   white-space: nowrap;
@@ -207,6 +250,11 @@ table {
   font-size: 13px;
 }
 
+.people-text {
+  display: inline-block;
+  max-width: 150px;
+}
+
 .category-chip,
 .buyer-pill {
   background: var(--sh-color-surface-alt);
@@ -215,7 +263,9 @@ table {
 }
 
 .category-chip {
-  gap: 6px;
+  gap: 8px;
+  min-width: 86px;
+  padding-inline: 12px;
 
   mat-icon {
     color: var(--sh-color-primary-strong);
@@ -228,6 +278,7 @@ table {
 .money-value {
   color: var(--sh-color-text);
   font-weight: 900;
+  white-space: nowrap;
 }
 
 .payment-button.mat-mdc-outlined-button {
@@ -246,14 +297,20 @@ table {
   background: #fff4f4;
   border: 1px solid #ffd8d8;
   color: var(--sh-color-danger);
+  min-width: 94px;
+  justify-content: center;
 }
 
 .row-actions {
-  gap: 2px;
+  gap: 6px;
+  justify-content: flex-end;
 }
 
 .row-actions button {
   color: var(--sh-color-primary-strong);
+  flex: 0 0 36px;
+  height: 36px;
+  width: 36px;
 }
 
 .row-actions .danger-action {
@@ -294,6 +351,7 @@ table {
 
 mat-paginator {
   border-top: 1px solid var(--sh-color-border);
+  margin-top: 8px;
 }
 
 @media (max-width: 1180px) {

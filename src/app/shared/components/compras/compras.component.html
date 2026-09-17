@@ -44,7 +44,7 @@
                     <mat-option [value]="null">Todas</mat-option>
                     <mat-option *ngFor="let cat of categories" [value]="cat">
                         <span class="category-option">
-                            <mat-icon aria-hidden="true">{{ cat | categoriaIcone }}</mat-icon>
+                            <mat-icon aria-hidden="true" [style.color]="cat | categoriaCor">{{ cat | categoriaIcone }}</mat-icon>
                             {{ cat | categoria }}
                         </span>
                     </mat-option>
@@ -103,7 +103,7 @@
                     <td [ngClass]="{'payed-style': verificarPagamento(element)}" mat-cell *matCellDef="let element">
                         <div class="purchase-cell">
                             <span class="purchase-icon">
-                                <mat-icon aria-hidden="true">{{ element.category | categoriaIcone }}</mat-icon>
+                                <mat-icon aria-hidden="true" [style.color]="element.category | categoriaCor">{{ element.category | categoriaIcone }}</mat-icon>
                             </span>
                             <div>
                                 <strong>{{ element.title }}</strong>
@@ -117,7 +117,7 @@
                     <th mat-header-cell *matHeaderCellDef mat-sort-header="category">Categoria</th>
                     <td [ngClass]="{'payed-style': verificarPagamento(element)}" mat-cell *matCellDef="let element">
                         <span class="category-chip">
-                            <mat-icon aria-hidden="true">{{ element.category | categoriaIcone }}</mat-icon>
+                            <mat-icon aria-hidden="true" [style.color]="element.category | categoriaCor">{{ element.category | categoriaIcone }}</mat-icon>
                             {{ element.category | categoria }}
                         </span>
                     </td>

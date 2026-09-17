@@ -22,10 +22,30 @@ export const CategoriaIcone: Record<keyof typeof CategoriaEnum, string> = {
     OTHERS: 'category'
 };
 
+export const CategoriaCor: Record<keyof typeof CategoriaEnum, string> = {
+    CLEANING: '#0ea5e9',
+    FOOD: '#f97316',
+    UTILITIES: '#16a34a',
+    RENT: '#7c3aed',
+    INTERNET: '#2563eb',
+    ENERGY: '#eab308',
+    WATER: '#0891b2',
+    GAS: '#dc2626',
+    OTHERS: '#64748b'
+};
+
 export function getCategoriaIcone(categoria: string | null | undefined): string {
     if (!categoria) {
         return CategoriaIcone.OTHERS;
     }
 
     return CategoriaIcone[categoria as keyof typeof CategoriaIcone] ?? CategoriaIcone.OTHERS;
+}
+
+export function getCategoriaCor(categoria: string | null | undefined): string {
+    if (!categoria) {
+        return CategoriaCor.OTHERS;
+    }
+
+    return CategoriaCor[categoria as keyof typeof CategoriaCor] ?? CategoriaCor.OTHERS;
 }

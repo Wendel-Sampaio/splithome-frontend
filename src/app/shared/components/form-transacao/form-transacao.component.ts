@@ -23,6 +23,7 @@ import { DespesaFixa } from '../../../core/models/despesa-fixa/despesa-fixa';
 import { NotificationService } from '../../services/notification/notification.service';
 import { CategoriaPipe } from '../../pipes/categoria.pipe';
 import { CategoriaIconePipe } from '../../pipes/categoria-icone.pipe';
+import { CategoriaCorPipe } from '../../pipes/categoria-cor.pipe';
 import { PlanService } from '../../../core/plan/plan.service';
 import { UserStateService } from '../../../core/auth/user/user-state.service';
 import { Cartao, CreditCardBrand } from '../../../core/models/cartao/cartao';
@@ -60,6 +61,7 @@ type FormTransacaoData = {
     MatChipsModule,
     CategoriaPipe,
     CategoriaIconePipe,
+    CategoriaCorPipe,
     MatProgressSpinnerModule,
     MatIconModule,
     ModalHeaderComponent,

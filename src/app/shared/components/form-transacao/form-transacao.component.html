@@ -17,14 +17,14 @@
         <mat-select formControlName="categoria">
           <mat-select-trigger>
             <span class="sh-category-option sh-category-option--trigger">
-              <mat-icon aria-hidden="true">{{ formTransacao.get('categoria')?.value | categoriaIcone }}</mat-icon>
+              <mat-icon aria-hidden="true" [style.color]="formTransacao.get('categoria')?.value | categoriaCor">{{ formTransacao.get('categoria')?.value | categoriaIcone }}</mat-icon>
               {{ formTransacao.get('categoria')?.value | categoria }}
             </span>
           </mat-select-trigger>
           @for (categoria of categorias$ | async; track categoria) {
             <mat-option [value]="categoria">
               <span class="sh-category-option">
-                <mat-icon aria-hidden="true">{{ categoria | categoriaIcone }}</mat-icon>
+                <mat-icon aria-hidden="true" [style.color]="categoria | categoriaCor">{{ categoria | categoriaIcone }}</mat-icon>
                 {{ categoria | categoria }}
               </span>
             </mat-option>
@@ -135,31 +135,32 @@
           : (pagadores.length === 1
               ? '1 pagador selecionado.'
               : pagadores.length + ' pagadores selecionados.')">
-        <mat-chip-listbox class="sh-chip-payer-list" [multiple]="true" aria-label="Seleção de pagadores">
-          @for (usuario of usuarios$ | async; track usuario.id) {
-            <mat-chip-option
-              class="sh-chip-payer"
-              [class.sh-chip-payer--selected]="usuarioSelecionado(usuario)"
-              [selected]="usuarioSelecionado(usuario)"
-              (click)="mudarSelecaoUsuario(usuario)">
-              <img matChipAvatar [src]="getProfilePhoto(usuario)" alt="" />
-              {{ usuario.name }}
-            </mat-chip-option>
-          }
-        </mat-chip-listbox>
-        <p class="sh-payer-error" *ngIf="tentouEnviar && pagadoresObrigatoriosInvalidos">
-          Selecione pelo menos um pagador para a conta.
-        </p>
+        <div class="sh-payers-card">
+          <mat-chip-listbox class="sh-chip-payer-list" [multiple]="true" aria-label="Seleção de pagadores">
+            @for (usuario of usuarios$ | async; track usuario.id) {
+              <mat-chip-option
+                class="sh-chip-payer"
+                [class.sh-chip-payer--selected]="usuarioSelecionado(usuario)"
+                [selected]="usuarioSelecionado(usuario)"
+                (click)="mudarSelecaoUsuario(usuario)">
+                <img matChipAvatar [src]="getProfilePhoto(usuario)" alt="" />
+                {{ usuario.name }}
+              </mat-chip-option>
+            }
+          </mat-chip-listbox>
+          <p class="sh-payer-error" *ngIf="tentouEnviar && pagadoresObrigatoriosInvalidos">
+            Selecione pelo menos um pagador para a conta.
+          </p>
+        </div>
       </app-form-section>
     }
   </form>
 </app-modal-body>
 
 <app-modal-footer align="space-between">
-  <button mat-button class="sh-btn-cancel" mat-dialog-close>Cancelar</button>
+  <button mat-stroked-button class="sh-btn-cancel" mat-dialog-close>Cancelar</button>
   <button
     mat-flat-button
-    color="primary"
     class="sh-btn-primary"
     cdkFocusInitial
     [disabled]="!isFormularioProntoParaEnvio || loading()"

@@ -17,6 +17,7 @@ import { NotificationService } from '../../services/notification/notification.se
 import { PagadoresPipe } from '../../pipes/pagadores.pipe';
 import { CategoriaPipe } from '../../pipes/categoria.pipe';
 import { CategoriaIconePipe } from '../../pipes/categoria-icone.pipe';
+import { CategoriaCorPipe } from '../../pipes/categoria-cor.pipe';
 import { PlanService } from '../../../core/plan/plan.service';
 import { UserStateService } from '../../../core/auth/user/user-state.service';
 import { MatPaginatorModule, PageEvent } from '@angular/material/paginator';
@@ -51,6 +52,7 @@ interface Purchaser {
     PagadoresPipe,
     CategoriaPipe,
     CategoriaIconePipe,
+    CategoriaCorPipe,
     MatPaginatorModule,
     MatSortModule,
     MatFormFieldModule,

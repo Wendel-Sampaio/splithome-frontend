@@ -12,6 +12,7 @@ import { Despesa } from "../../../core/models/despesa/despesa";
 import { CompraService } from "../../services/compra/compra.service";
 import { CategoriaPipe } from "../../pipes/categoria.pipe";
 import { CategoriaIconePipe } from "../../pipes/categoria-icone.pipe";
+import { CategoriaCorPipe } from "../../pipes/categoria-cor.pipe";
 import { PagadoresPipe } from "../../pipes/pagadores.pipe";
 import { ConfirmDeleteComponent, ConfirmDeleteDialogData } from "../confirm-delete/confirm-delete.component";
 import { DialogPagamentoComponent } from "../dialog-pagamento/dialog-pagamento.component";
@@ -30,6 +31,7 @@ import { UserStateService } from "../../../core/auth/user/user-state.service";
     MatProgressSpinnerModule,
     CategoriaPipe,
     CategoriaIconePipe,
+    CategoriaCorPipe,
     PagadoresPipe
   ],
   templateUrl: './despesas.component.html',

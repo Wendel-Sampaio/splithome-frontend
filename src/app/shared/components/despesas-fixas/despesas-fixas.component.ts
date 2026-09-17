@@ -18,6 +18,7 @@ import { ConfirmDeleteComponent, ConfirmDeleteDialogData } from '../confirm-dele
 import { FormTransacaoComponent } from '../form-transacao/form-transacao.component';
 import { CategoriaPipe } from '../../pipes/categoria.pipe';
 import { CategoriaIconePipe } from '../../pipes/categoria-icone.pipe';
+import { CategoriaCorPipe } from '../../pipes/categoria-cor.pipe';
 import { BehaviorSubject, catchError, finalize, of, switchMap, tap } from 'rxjs';
 import { ModalService } from '../ui/modal';
 
@@ -36,7 +37,8 @@ import { ModalService } from '../ui/modal';
     MatPaginatorModule,
     MatTooltipModule,
     CategoriaPipe,
-    CategoriaIconePipe
+    CategoriaIconePipe,
+    CategoriaCorPipe
   ]
 })
 export class DespesasFixasComponent implements OnInit {
