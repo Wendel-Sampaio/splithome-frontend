@@ -15,6 +15,12 @@
       <mat-form-field appearance="outline">
         <mat-label>Categoria</mat-label>
         <mat-select formControlName="categoria">
+          <mat-select-trigger>
+            <span class="sh-category-option sh-category-option--trigger">
+              <mat-icon aria-hidden="true">{{ formTransacao.get('categoria')?.value | categoriaIcone }}</mat-icon>
+              {{ formTransacao.get('categoria')?.value | categoria }}
+            </span>
+          </mat-select-trigger>
           @for (categoria of categorias$ | async; track categoria) {
             <mat-option [value]="categoria">
               <span class="sh-category-option">
