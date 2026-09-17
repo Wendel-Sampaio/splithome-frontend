@@ -118,6 +118,28 @@ describe('FormTransacaoComponent', () => {
     expect(payload.remainingPayers).toEqual(['u2']);
   });
 
+  it('converte valor em formato brasileiro antes de enviar compra', () => {
+    compraService.cadastrarCompra.and.returnValue(of({} as any));
+    preencher();
+    component.formTransacao.patchValue({ valor: 'R$ 10,91' });
+    (component as any).usuariosFamilia = [{ id: 'u1', name: 'Eu' }];
+
+    component.cadastrarTransacao();
+
+    const payload = compraService.cadastrarCompra.calls.mostRecent().args[0];
+    expect(payload.value).toBe(10.91);
+  });
+
+  it('bloqueia envio quando valor da compra nao e numerico', () => {
+    preencher();
+    component.formTransacao.patchValue({ valor: 'R$ abc' });
+
+    component.cadastrarTransacao();
+
+    expect(notify.warning).toHaveBeenCalledWith('Informe um valor maior que R$ 0,00.');
+    expect(compraService.cadastrarCompra).not.toHaveBeenCalled();
+  });
+
   it('usuário free pode cadastrar compra sem divisão de pagadores', () => {
     compraService.cadastrarCompra.and.returnValue(of({} as any));
     preencher();

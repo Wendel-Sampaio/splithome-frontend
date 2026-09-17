@@ -377,10 +377,16 @@ export class FormTransacaoComponent {
   private enviarDespesaFixa(usuarioLogado: User, pagadores: string[]): void {
     const v = this.formTransacao.value;
     const responsavel = v.responsavel || this.responsavel || usuarioLogado.id;
+    const valorTotal = this.parseMoneyValue(v.valorTotal);
+    if (!this.isValidPositiveAmount(valorTotal)) {
+      this.notify.warning('Informe um valor maior que R$ 0,00.');
+      return;
+    }
+
     const payload: any = {
       title: v.titulo,
       category: v.categoria,
-      totalValue: Number(v.valorTotal),
+      totalValue: valorTotal,
       installmentsCount: v.modoCobranca === 'parcelada' ? Number(v.quantidadeParcelas) : null,
       dueDay: Number(v.diaVencimento),
       startDate: this.formatDateOnly(v.dataInicio),
@@ -410,6 +416,12 @@ export class FormTransacaoComponent {
 
   private enviarCompra(usuarioLogado: User, pagadores: string[]): void {
     const responsavel = this.formTransacao.value.responsavel || this.responsavel || usuarioLogado.id;
+    const valor = this.parseMoneyValue(this.formTransacao.value.valor);
+    if (!this.isValidPositiveAmount(valor)) {
+      this.notify.warning('Informe um valor maior que R$ 0,00.');
+      return;
+    }
+
     const pagadoresRestantes = this.isPremium
       ? this.getPagadoresRestantesCompra(pagadores, responsavel)
       : [];
@@ -418,7 +430,7 @@ export class FormTransacaoComponent {
       ...(this.isEdicaoCompra ? { id: this.data?.compra?.id } : {}),
       title: this.formTransacao.value.titulo,
       category: this.formTransacao.value.categoria,
-      value: Number(this.formTransacao.value.valor),
+      value: valor,
       payers: pagadores,
       paymentDate: this.formatDateOnly(this.formTransacao.value.dataPagamento),
       remainingPayers: pagadoresRestantes,
@@ -503,6 +515,28 @@ export class FormTransacaoComponent {
     }
 
     return format(value, 'yyyy-MM-dd');
+  }
+
+  private parseMoneyValue(value: unknown): number {
+    if (typeof value === 'number') {
+      return value;
+    }
+
+    const raw = String(value ?? '').trim();
+    if (!raw) {
+      return Number.NaN;
+    }
+
+    const normalized = raw
+      .replace(/[^\d,.-]/g, '')
+      .replace(/\.(?=\d{3}(?:\D|$))/g, '')
+      .replace(',', '.');
+
+    return Number(normalized);
+  }
+
+  private isValidPositiveAmount(value: number): boolean {
+    return Number.isFinite(value) && value > 0;
   }
 
   private usuarioPodeSerPagador(usuario: User): boolean {
