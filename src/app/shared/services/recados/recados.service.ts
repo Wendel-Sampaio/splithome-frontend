@@ -1,5 +1,7 @@
-import { Injectable } from '@angular/core';
-import { BehaviorSubject, Observable } from 'rxjs';
+import { HttpClient } from '@angular/common/http';
+import { inject, Injectable } from '@angular/core';
+import { Observable } from 'rxjs';
+import { environment } from '../../../../environments/environment';
 
 export type Recado = {
   id: string;
@@ -10,36 +12,20 @@ export type Recado = {
 
 type NovoRecado = {
   content: string;
-  authorName: string;
 };
 
 @Injectable({ providedIn: 'root' })
 export class RecadosService {
-  private readonly recadosSubject = new BehaviorSubject<Recado[]>([
-    {
-      id: '1',
-      content: 'Reunião da família no domingo, às 10h.',
-      authorName: 'Sistema',
-      createdAt: new Date().toISOString()
-    }
-  ]);
+  private readonly http = inject(HttpClient);
+  private readonly API = `${environment.apiUrl}/recados`;
 
   listar(): Observable<Recado[]> {
-    return this.recadosSubject.asObservable();
+    return this.http.get<Recado[]>(this.API);
   }
 
-  criar(recado: NovoRecado): void {
-    const novoRecado: Recado = {
-      id: this.gerarId(),
-      content: recado.content.trim(),
-      authorName: recado.authorName.trim(),
-      createdAt: new Date().toISOString()
-    };
-
-    this.recadosSubject.next([novoRecado, ...this.recadosSubject.value]);
-  }
-
-  private gerarId(): string {
-    return `${Date.now()}-${Math.random().toString(16).slice(2, 10)}`;
+  criar(recado: NovoRecado): Observable<Recado> {
+    return this.http.post<Recado>(this.API, {
+      content: recado.content.trim()
+    });
   }
 }

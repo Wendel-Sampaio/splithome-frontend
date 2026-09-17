@@ -56,9 +56,9 @@
               <mat-icon aria-hidden="true">visibility</mat-icon>
               Visível para todos da família
             </span>
-            <button mat-flat-button color="primary" type="submit">
+            <button mat-flat-button color="primary" type="submit" [disabled]="salvandoRecado">
               <mat-icon aria-hidden="true">send</mat-icon>
-              Publicar
+              {{ salvandoRecado ? 'Publicando...' : 'Publicar' }}
             </button>
           </div>
         </form>
@@ -99,7 +99,10 @@
       </div>
     </div>
 
-    <div class="empty-recados sh-empty-state" *ngIf="!recados.length">
+    <p class="sh-status" *ngIf="carregandoRecados">Carregando recados...</p>
+    <p class="sh-error" *ngIf="mensagemErro">{{ mensagemErro }}</p>
+
+    <div class="empty-recados sh-empty-state" *ngIf="!carregandoRecados && !recados.length">
       <span class="panel-icon">
         <mat-icon aria-hidden="true">mark_chat_unread</mat-icon>
       </span>
@@ -109,7 +112,7 @@
       </div>
     </div>
 
-    <div class="recados-stack" *ngIf="recados.length">
+    <div class="recados-stack" *ngIf="!carregandoRecados && recados.length">
       <article class="recado-item sh-panel" *ngFor="let recado of recados">
         <div class="recado-avatar" aria-hidden="true">{{ getAuthorInitial(recado.authorName) }}</div>
 
