@@ -7,39 +7,33 @@
   gap: var(--sh-space-5);
 }
 
-.compras-hero {
-  align-items: stretch;
-  background:
-    linear-gradient(135deg, rgba(233, 248, 237, 0.94), rgba(255, 255, 255, 0.98)),
-    radial-gradient(circle at top right, rgba(37, 99, 235, 0.1), transparent 34%);
-  border: 1px solid var(--sh-color-border);
-  border-radius: var(--sh-radius-lg);
-  display: grid;
-  gap: var(--sh-space-5);
-  grid-template-columns: minmax(260px, 1fr) auto;
-  padding: var(--sh-space-6);
+.compras-header {
+  align-items: flex-end;
+  display: flex;
+  gap: var(--sh-space-4);
+  justify-content: space-between;
 }
 
-.section-label {
-  color: var(--sh-color-text-muted);
-  font-size: 12px;
-  font-weight: 800;
-  letter-spacing: 0.06em;
-  text-transform: uppercase;
+.compras-header .sh-page-title {
+  font-size: 28px;
+  font-weight: 700;
+  letter-spacing: 0;
 }
 
-.compras-copy {
-  align-self: center;
+.compras-header .sh-page-subtitle {
+  font-size: 14px;
+  margin-top: 4px;
 }
 
 .compras-actions {
-  align-content: center;
-  display: grid;
-  gap: var(--sh-space-3);
+  align-items: center;
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--sh-space-2);
 }
 
 .compras-actions button,
-.filter-heading button,
+.clear-filters-button,
 .payment-button {
   gap: 8px;
 }
@@ -48,28 +42,32 @@
 .compras-actions .mat-mdc-flat-button {
   --mdc-filled-button-container-color: var(--sh-color-primary);
   --mdc-filled-button-label-text-color: #ffffff;
-  font-weight: 800;
+  border-radius: 8px !important;
+  font-weight: 700;
+  min-height: 38px;
 }
 
-.compras-actions .mat-mdc-outlined-button,
-.filter-heading .mat-mdc-outlined-button {
+.compras-actions .mat-mdc-outlined-button {
   --mdc-outlined-button-label-text-color: var(--sh-color-primary-strong);
-  --mdc-outlined-button-outline-color: var(--sh-color-primary-muted);
-  font-weight: 800;
+  --mdc-outlined-button-outline-color: var(--sh-color-border-strong);
+  border-radius: 8px !important;
+  font-weight: 700;
+  min-height: 38px;
 }
 
 .filter-panel,
 .compras-list-panel {
   border: 1px solid var(--sh-color-border);
-  border-radius: var(--sh-radius-lg);
+  border-radius: 8px;
 }
 
 .filter-panel {
-  background: var(--sh-color-surface-alt);
-  padding: var(--sh-space-5);
+  background: transparent;
+  border: 0;
+  border-radius: 0;
+  padding: 0;
 }
 
-.filter-heading,
 .list-toolbar,
 .purchase-cell,
 .row-actions {
@@ -77,50 +75,93 @@
   display: flex;
 }
 
-.filter-heading,
 .list-toolbar {
   gap: var(--sh-space-4);
   justify-content: space-between;
-  margin-bottom: var(--sh-space-4);
+  margin-bottom: var(--sh-space-3);
 }
 
-.filter-heading h2,
 .list-toolbar h2 {
   color: var(--sh-color-text);
-  font-size: 20px;
-  font-weight: 800;
+  font-size: 16px;
+  font-weight: 700;
   line-height: 1.2;
-  margin: 5px 0 0;
+  margin: 0;
 }
 
 .filter-grid {
-  display: grid;
-  gap: var(--sh-space-3);
-  grid-template-columns: minmax(240px, 1.4fr) repeat(4, minmax(170px, 1fr));
+  align-items: start;
+  display: flex;
+  gap: var(--sh-space-2);
 }
 
 .filter-grid mat-form-field {
+  flex: 1 1 176px;
   min-width: 0;
-  width: 100%;
+}
+
+.filter-grid .filter-search {
+  flex: 1.7 1 280px;
+}
+
+.filter-panel ::ng-deep .mat-mdc-form-field-subscript-wrapper {
+  display: none;
+}
+
+.filter-panel ::ng-deep .mat-mdc-text-field-wrapper {
+  background: var(--sh-color-surface);
+  height: 40px;
+}
+
+.filter-panel ::ng-deep .mat-mdc-form-field-flex,
+.filter-panel ::ng-deep .mat-mdc-form-field-infix {
+  min-height: 40px;
+}
+
+.filter-panel ::ng-deep .mat-mdc-form-field-infix {
+  padding-bottom: 8px;
+  padding-top: 8px;
+}
+
+.filter-panel ::ng-deep .mat-mdc-floating-label {
+  top: 20px;
+}
+
+.filter-panel ::ng-deep .mat-mdc-form-field-icon-suffix {
+  align-items: center;
+  display: flex;
+  height: 40px;
+}
+
+.clear-filters-button.mat-mdc-button {
+  color: var(--sh-color-text-muted);
+  flex: 0 0 auto;
+  font-weight: 600;
+  min-height: 40px;
+  padding-inline: 10px;
+}
+
+.clear-filters-button.mat-mdc-button:not(:disabled):hover {
+  background: #eef2f0;
+  color: var(--sh-color-text);
 }
 
 .compras-list-panel {
   background: var(--sh-color-surface);
   overflow: hidden;
-  padding: var(--sh-space-5);
+  padding: var(--sh-space-4);
 }
 
 .category-chip,
-.buyer-pill,
 .paid-status-chip,
 .unavailable-chip {
   align-items: center;
   border-radius: 999px;
   display: inline-flex;
   font-size: 12px;
-  font-weight: 800;
-  min-height: 28px;
-  padding: 5px 10px;
+  font-weight: 700;
+  min-height: 24px;
+  padding: 3px 9px;
 }
 
 .category-option {
@@ -138,107 +179,102 @@
 
 .table-shell {
   border: 1px solid var(--sh-color-border);
-  border-radius: var(--sh-radius-md);
-  background: var(--sh-color-surface-alt);
+  border-radius: 8px;
+  background: var(--sh-color-surface);
   overflow: auto;
-  padding: 8px;
 }
 
 table {
-  border-collapse: separate;
-  border-spacing: 0 8px;
+  border-collapse: collapse;
   min-width: 980px;
   width: 100%;
 }
 
 .mat-mdc-header-row {
-  background: var(--sh-color-surface-alt);
-  height: 48px;
+  background: #f8faf9;
+  height: 42px;
 }
 
 .mat-mdc-header-cell {
-  border-bottom: 0;
+  border-bottom: 1px solid var(--sh-color-border);
   color: var(--sh-color-text-muted);
   font-size: 12px;
-  font-weight: 800;
-  padding: 0 16px;
-  text-transform: uppercase;
+  font-weight: 600;
+  padding: 0 14px;
+  text-transform: none;
 }
 
 .mat-mdc-cell {
   background: var(--sh-color-surface);
   border-bottom: 1px solid var(--sh-color-border);
-  border-top: 1px solid var(--sh-color-border);
   color: var(--sh-color-text);
   line-height: 1.45;
-  padding: 14px 16px;
+  padding: 10px 14px;
   vertical-align: middle;
 }
 
 .mat-mdc-cell:first-child {
-  border-left: 1px solid var(--sh-color-border);
-  border-radius: var(--sh-radius-md) 0 0 var(--sh-radius-md);
+  border-left: 0;
 }
 
 .mat-mdc-cell:last-child {
-  border-radius: 0 var(--sh-radius-md) var(--sh-radius-md) 0;
-  border-right: 1px solid var(--sh-color-border);
+  border-right: 0;
 }
 
 .mat-mdc-row {
-  height: 76px;
+  height: 58px;
 }
 
 .mat-mdc-row:hover .mat-mdc-cell {
-  background: var(--sh-color-bg-strong);
-  border-color: var(--sh-color-primary-muted);
+  background: #f7faf8;
 }
 
 .payed-style {
-  background: var(--sh-color-primary-soft);
+  background: var(--sh-color-surface);
 }
 
 .mat-mdc-cell.payed-style {
-  background: var(--sh-color-primary-soft);
+  background: var(--sh-color-surface);
 }
 
 .mat-mdc-row:hover .mat-mdc-cell.payed-style {
-  background: #e3f5e8;
+  background: #f7faf8;
 }
 
 .purchase-cell {
-  gap: var(--sh-space-4);
+  gap: var(--sh-space-3);
   min-width: 240px;
 }
 
 .purchase-icon,
 .empty-icon {
   align-items: center;
-  background: var(--sh-color-primary-soft);
-  border: 1px solid var(--sh-color-primary-muted);
-  border-radius: var(--sh-radius-md);
+  background: #f1f5f3;
+  border: 1px solid var(--sh-color-border);
+  border-radius: 8px;
   color: var(--sh-color-primary-strong);
   display: inline-flex;
   justify-content: center;
 }
 
 .purchase-icon {
-  flex: 0 0 44px;
-  height: 44px;
-  width: 44px;
+  flex: 0 0 32px;
+  height: 32px;
+  width: 32px;
 
   mat-icon {
-    font-size: 22px;
-    height: 22px;
-    width: 22px;
+    font-size: 18px;
+    height: 18px;
+    width: 18px;
   }
 }
 
 .purchase-cell strong {
   color: var(--sh-color-text);
   display: block;
-  font-weight: 800;
-  margin-bottom: 3px;
+  font-size: 13px;
+  font-weight: 700;
+  margin-bottom: 2px;
   max-width: 220px;
   overflow: hidden;
   text-overflow: ellipsis;
@@ -246,7 +282,8 @@ table {
 }
 
 .purchase-cell span,
-.people-text {
+.people-text,
+.buyer-text {
   color: var(--sh-color-text-muted);
   font-size: 13px;
 }
@@ -256,23 +293,19 @@ table {
   max-width: 150px;
 }
 
-.category-chip,
-.buyer-pill {
-  background: var(--sh-color-surface-alt);
+.category-chip {
+  background: #f8faf9;
   border: 1px solid var(--sh-color-border);
   color: var(--sh-color-text-muted);
-}
-
-.category-chip {
   gap: 8px;
   min-width: 86px;
-  padding-inline: 12px;
+  padding-inline: 10px;
 
   mat-icon {
     color: var(--sh-color-primary-strong);
-    font-size: 18px;
-    height: 18px;
-    width: 18px;
+    font-size: 16px;
+    height: 16px;
+    width: 16px;
   }
 }
 
@@ -285,6 +318,8 @@ table {
 .payment-button.mat-mdc-outlined-button {
   --mdc-outlined-button-label-text-color: var(--sh-color-primary-strong);
   --mdc-outlined-button-outline-color: var(--sh-color-primary-muted);
+  border-radius: 8px !important;
+  min-height: 34px;
   min-width: 96px;
 }
 
@@ -295,34 +330,51 @@ table {
 }
 
 .paid-status-chip {
-  background: var(--sh-color-primary-soft);
-  border: 1px solid var(--sh-color-primary-muted);
+  background: #eef8f1;
+  border: 1px solid #d7ecd9;
   color: var(--sh-color-success);
-  min-width: 94px;
   justify-content: center;
+  min-width: 82px;
 }
 
 .unavailable-chip {
-  background: #fff4f4;
-  border: 1px solid #ffd8d8;
+  background: #fff6f6;
+  border: 1px solid #f6dada;
   color: var(--sh-color-danger);
-  min-width: 94px;
   justify-content: center;
+  min-width: 82px;
 }
 
 .row-actions {
-  gap: 6px;
+  gap: 2px;
   justify-content: flex-end;
 }
 
 .row-actions button {
+  color: var(--sh-color-text-subtle);
+  flex: 0 0 32px;
+  height: 32px;
+  opacity: 0.72;
+  transition: background 0.16s ease, color 0.16s ease, opacity 0.16s ease;
+  width: 32px;
+}
+
+.row-actions button:hover,
+.mat-mdc-row:hover .row-actions button {
+  opacity: 1;
+}
+
+.row-actions button:hover {
+  background: #eef2f0;
   color: var(--sh-color-primary-strong);
-  flex: 0 0 36px;
-  height: 36px;
-  width: 36px;
 }
 
 .row-actions .danger-action {
+  color: #b44646;
+}
+
+.row-actions .danger-action:hover {
+  background: #fff1f1;
   color: var(--sh-color-danger);
 }
 
@@ -360,37 +412,35 @@ table {
 
 mat-paginator {
   border-top: 1px solid var(--sh-color-border);
-  margin-top: 8px;
+  margin-top: 0;
 }
 
 @media (max-width: 1180px) {
-  .compras-hero {
-    grid-template-columns: 1fr;
-  }
-
-  .compras-actions {
-    grid-template-columns: repeat(2, minmax(0, 1fr));
-  }
-
   .filter-grid {
-    grid-template-columns: repeat(2, minmax(220px, 1fr));
+    flex-wrap: wrap;
   }
 }
 
 @media (max-width: 680px) {
-  .compras-hero,
-  .filter-heading,
+  .compras-header,
   .list-toolbar {
     align-items: stretch;
   }
 
   .compras-actions,
   .filter-grid {
-    grid-template-columns: 1fr;
+    flex-direction: column;
   }
 
-  .filter-heading,
+  .compras-header,
   .list-toolbar {
     flex-direction: column;
+  }
+
+  .filter-grid mat-form-field,
+  .filter-grid .filter-search,
+  .clear-filters-button.mat-mdc-button {
+    flex: 1 1 auto;
+    width: 100%;
   }
 }

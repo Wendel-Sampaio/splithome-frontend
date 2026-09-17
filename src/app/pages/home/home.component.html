@@ -134,9 +134,7 @@
             <app-dashboard-inicio *ngIf="currentView === 'inicio'"
                                    (abrirView)="abrirDashboardView($event)"></app-dashboard-inicio>
 
-            <mat-card class="content-card" appearance="outlined" *ngIf="currentView === 'compras'">
-                <mat-card-content><tabela-compras></tabela-compras></mat-card-content>
-            </mat-card>
+            <tabela-compras *ngIf="currentView === 'compras'"></tabela-compras>
 
             <mat-card class="content-card" appearance="outlined" *ngIf="currentView === 'despesasFixas'">
                 <mat-card-content><tabela-despesas-fixas></tabela-despesas-fixas></mat-card-content>

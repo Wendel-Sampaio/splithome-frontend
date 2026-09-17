@@ -51,6 +51,34 @@ describe('CompraService', () => {
     });
   });
 
+  it('normaliza metadados de pagina quando o Spring serializa em page', () => {
+    service.listarCompras({ page: 0, size: 5 }).subscribe(page => {
+      expect(page.content.length).toBe(5);
+      expect(page.totalElements).toBe(12);
+      expect(page.totalPages).toBe(3);
+      expect(page.size).toBe(5);
+      expect(page.number).toBe(0);
+      expect(page.last).toBeFalse();
+    });
+
+    const req = httpMock.expectOne(request => request.url.endsWith('/transactions/purchases'));
+    req.flush({
+      content: [
+        { id: 'c1' },
+        { id: 'c2' },
+        { id: 'c3' },
+        { id: 'c4' },
+        { id: 'c5' }
+      ],
+      page: {
+        size: 5,
+        number: 0,
+        totalElements: 12,
+        totalPages: 3
+      }
+    });
+  });
+
   it('normaliza despesas fixas e parcelas retornadas pelo backend', () => {
     service.listarDespesasFixas().subscribe(page => {
       expect(page.content[0].payers).toEqual(['Ana', 'Bruno']);

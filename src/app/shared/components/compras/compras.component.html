@@ -1,9 +1,8 @@
 <section class="compras-page" *ngIf="compras$ | async as compras">
-    <header class="compras-hero">
+    <header class="compras-header">
         <div class="compras-copy">
-            <span class="section-label">Controle mensal</span>
             <h1 class="sh-page-title">Compras</h1>
-            <p class="sh-page-subtitle">Gerencie as compras compartilhadas da casa com filtros rápidos e ações diretas.</p>
+            <p class="sh-page-subtitle">Gerencie as compras compartilhadas da casa.</p>
         </div>
 
         <div class="compras-actions">
@@ -20,17 +19,6 @@
     </header>
 
     <section class="filter-panel" [formGroup]="filterForm">
-        <div class="filter-heading">
-            <div>
-                <span class="section-label">Filtros</span>
-                <h2>Refine a lista</h2>
-            </div>
-            <button mat-stroked-button type="button" (click)="limparFiltros()" [disabled]="!hasActiveFilters">
-                <mat-icon aria-hidden="true">filter_alt_off</mat-icon>
-                Limpar filtros
-            </button>
-        </div>
-
         <div class="filter-grid">
             <mat-form-field appearance="outline" class="filter-search">
                 <mat-label>Buscar título</mat-label>
@@ -72,14 +60,18 @@
                     <mat-option *ngFor="let p of purchasers" [value]="p.id">{{ p.name }}</mat-option>
                 </mat-select>
             </mat-form-field>
+
+            <button mat-button class="clear-filters-button" type="button" (click)="limparFiltros()" [disabled]="!hasActiveFilters">
+                <mat-icon aria-hidden="true">filter_alt_off</mat-icon>
+                Limpar filtros
+            </button>
         </div>
     </section>
 
     <section class="compras-list-panel">
         <div class="list-toolbar">
             <div>
-                <span class="section-label">Histórico</span>
-                <h2>Compras Cadastradas</h2>
+                <h2>Compras cadastradas</h2>
             </div>
         </div>
 
@@ -161,7 +153,7 @@
                 <ng-container matColumnDef="purchaserName">
                     <th mat-header-cell *matHeaderCellDef>Comprador</th>
                     <td [ngClass]="{'payed-style': verificarPagamento(element)}" mat-cell *matCellDef="let element">
-                        <span class="buyer-pill">{{ element.purchaserName || 'Não informado' }}</span>
+                        <span class="buyer-text">{{ element.purchaserName || 'Não informado' }}</span>
                     </td>
                 </ng-container>
 

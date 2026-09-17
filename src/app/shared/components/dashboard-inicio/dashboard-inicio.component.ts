@@ -9,7 +9,9 @@ import { catchError, finalize, map } from 'rxjs/operators';
 import { Cartao, CreditCardBrand } from '../../../core/models/cartao/cartao';
 import { Compra } from '../../../core/models/compra/compra';
 import { DespesaFixa } from '../../../core/models/despesa-fixa/despesa-fixa';
+import { User } from '../../../core/models/user/user';
 import { UserService } from '../../../core/auth/user/user.service';
+import { UserStateService } from '../../../core/auth/user/user-state.service';
 import { CompraService } from '../../services/compra/compra.service';
 import { EstatisticaCategoria, EstatisticasResumo, EstatisticasService } from '../../services/estatisticas/estatisticas.service';
 import {
@@ -88,6 +90,7 @@ export class DashboardInicioComponent implements OnInit {
   private readonly resumoService = inject(ResumoFinanceiroService);
   private readonly compraService = inject(CompraService);
   private readonly userService = inject(UserService);
+  private readonly userStateService = inject(UserStateService);
   private readonly dialog = inject(MatDialog);
   private readonly modal = inject(ModalService);
   private readonly destroyRef = inject(DestroyRef);
@@ -135,24 +138,85 @@ export class DashboardInicioComponent implements OnInit {
         map(page => page?.content ?? []),
         catchError(() => of([] as DespesaFixa[]))
       ),
-      cartoes: this.compraService.listarCartoes().pipe(catchError(() => of([] as Cartao[])))
+      cartoes: this.compraService.listarCartoes().pipe(catchError(() => of([] as Cartao[]))),
+      usuarios: this.userStateService.getFamilyUsers().pipe(catchError(() => of([] as User[])))
     })
       .pipe(
         finalize(() => this.carregando.set(false)),
         takeUntilDestroyed(this.destroyRef)
       )
-      .subscribe(({ estatisticas, resumo, compras, despesas, cartoes }) => {
-        const comprasCarregadas = compras?.content ?? [];
+      .subscribe(({ estatisticas, resumo, compras, despesas, cartoes, usuarios }) => {
+        const usuariosPorId = this.criarMapaUsuarios(usuarios);
+        const comprasCarregadas = (compras?.content ?? []).map((compra) => this.prepararCompra(compra, usuariosPorId));
+        const despesasCarregadas = despesas.map((despesa) => this.prepararDespesa(despesa, usuariosPorId));
         const totalCompras = Math.max(compras?.totalElements ?? 0, comprasCarregadas.length);
-        const totalEmAbertoLocal = this.calcularTotalEmAberto(comprasCarregadas, despesas);
+        const totalEmAbertoLocal = this.calcularTotalEmAberto(comprasCarregadas, despesasCarregadas);
 
         this.aplicarEstatisticas(estatisticas);
         this.aplicarResumo(resumo, totalEmAbertoLocal);
         this.totalCompras.set(totalCompras);
-        this.montarAtividades(comprasCarregadas, despesas);
-        this.montarContasPendentes(comprasCarregadas, despesas);
-        this.montarResumoCartoes(cartoes, despesas);
+        this.montarAtividades(comprasCarregadas, despesasCarregadas);
+        this.montarContasPendentes(comprasCarregadas, despesasCarregadas);
+        this.montarResumoCartoes(cartoes, despesasCarregadas);
       });
+  }
+
+  private criarMapaUsuarios(usuarios: User[]): Map<string, string> {
+    const usuariosPorId = new Map<string, string>(usuarios.map((usuario) => [usuario.id, usuario.name]));
+    const usuarioAtual = this.userService.getUser();
+
+    if (usuarioAtual.id) {
+      usuariosPorId.set(usuarioAtual.id, usuarioAtual.name);
+    }
+
+    return usuariosPorId;
+  }
+
+  private prepararCompra(compra: Compra, usuariosPorId: Map<string, string>): Compra {
+    const payers = compra.payers ?? [];
+    const remainingPayers = compra.remainingPayers ?? [];
+
+    return {
+      ...compra,
+      payers,
+      remainingPayers,
+      purchaserName: this.nomeUsuario(compra.purchaserId, compra.purchaserName, usuariosPorId),
+      payerNames: this.displayNamesFor(payers, usuariosPorId),
+      remainingPayerNames: this.displayNamesFor(remainingPayers, usuariosPorId)
+    };
+  }
+
+  private prepararDespesa(despesa: DespesaFixa, usuariosPorId: Map<string, string>): DespesaFixa {
+    const payers = despesa.payers ?? [];
+    const remainingPayers = despesa.remainingPayers ?? [];
+
+    return {
+      ...despesa,
+      payers,
+      remainingPayers,
+      responsibleName: this.nomeUsuario(despesa.responsibleId, despesa.responsibleName, usuariosPorId),
+      payerNames: this.displayNamesFor(payers, usuariosPorId),
+      remainingPayerNames: this.displayNamesFor(remainingPayers, usuariosPorId),
+      parcelas: (despesa.parcelas ?? []).map((parcela) => ({
+        ...parcela,
+        pagadorNames: this.displayNamesFor(parcela.pagadores ?? [], usuariosPorId),
+        remainingPayerNames: this.displayNamesFor(parcela.remainingPayers ?? [], usuariosPorId)
+      }))
+    };
+  }
+
+  private nomeUsuario(id: string | undefined, nome: string | undefined, usuariosPorId: Map<string, string>): string {
+    const nomeLimpo = nome?.trim();
+
+    if (nomeLimpo) {
+      return nomeLimpo;
+    }
+
+    return id ? usuariosPorId.get(id) ?? 'Não informado' : 'Não informado';
+  }
+
+  private displayNamesFor(references: string[], usuariosPorId: Map<string, string>): string[] {
+    return references.map((reference) => usuariosPorId.get(reference) ?? reference);
   }
 
   private aplicarEstatisticas(estatisticas: EstatisticasResumo | null): void {

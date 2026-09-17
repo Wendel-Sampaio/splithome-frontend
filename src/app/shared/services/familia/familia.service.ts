@@ -7,6 +7,7 @@ export type FamiliaMember = {
   id: string;
   name: string;
   email: string;
+  profilePhoto?: string;
 };
 
 export type Familia = {
@@ -88,7 +89,8 @@ export class FamiliaService {
         return {
           id: this.readString(memberRecord['id']),
           name: this.readString(memberRecord['name']),
-          email: this.readString(memberRecord['email'])
+          email: this.readString(memberRecord['email']),
+          profilePhoto: this.readString(memberRecord['profilePhoto'])
         };
       })
     };

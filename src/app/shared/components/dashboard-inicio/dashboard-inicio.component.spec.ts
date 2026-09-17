@@ -1,20 +1,49 @@
 import { ComponentFixture, TestBed } from '@angular/core/testing';
 import { provideHttpClient } from '@angular/common/http';
 import { HttpTestingController, provideHttpClientTesting } from '@angular/common/http/testing';
+import { of } from 'rxjs';
 
 import { DashboardInicioComponent } from './dashboard-inicio.component';
 import { UserService } from '../../../core/auth/user/user.service';
+import { UserStateService } from '../../../core/auth/user/user-state.service';
 
 describe('DashboardInicioComponent', () => {
   let component: DashboardInicioComponent;
   let fixture: ComponentFixture<DashboardInicioComponent>;
   let httpMock: HttpTestingController;
   let userService: UserService;
+  let userStateService: jasmine.SpyObj<UserStateService>;
 
   beforeEach(async () => {
+    userStateService = jasmine.createSpyObj<UserStateService>('UserStateService', ['getFamilyUsers']);
+    userStateService.getFamilyUsers.and.returnValue(of([
+      {
+        id: 'u1',
+        name: 'Joao Silva',
+        email: 'joao@splithome.dev',
+        phoneNumber: '',
+        pixKey: '',
+        familyCode: 'FAM123',
+        plan: 'PREMIUM'
+      },
+      {
+        id: 'u2',
+        name: 'Maria',
+        email: 'maria@splithome.dev',
+        phoneNumber: '',
+        pixKey: '',
+        familyCode: 'FAM123',
+        plan: 'PREMIUM'
+      }
+    ]));
+
     await TestBed.configureTestingModule({
       imports: [DashboardInicioComponent],
-      providers: [provideHttpClient(), provideHttpClientTesting()]
+      providers: [
+        provideHttpClient(),
+        provideHttpClientTesting(),
+        { provide: UserStateService, useValue: userStateService }
+      ]
     }).compileComponents();
 
     httpMock = TestBed.inject(HttpTestingController);
@@ -160,6 +189,50 @@ describe('DashboardInicioComponent', () => {
     expect(texto).toContain('Nubank Casa');
     expect(texto).toContain('Gastos por categoria');
     expect(texto).toContain('Maria deve para Joao Silva');
+  });
+
+  it('resolve nomes ausentes nas contas pendentes para nao exibir undefined', () => {
+    carregarDashboard({
+      compras: {
+        content: [{
+          id: 'c1',
+          title: 'Rio Tinto',
+          category: 'OTHERS',
+          value: 18.70,
+          payers: ['u1', 'u2'],
+          paymentDate: '2099-09-07',
+          remainingPayers: ['u2'],
+          purchaserId: 'u1',
+          purchaseDate: '2099-09-07',
+          isPaid: false
+        }]
+      },
+      despesas: {
+        content: [{
+          id: 'd1',
+          title: 'Internet',
+          category: 'OTHERS',
+          valorTotal: 100,
+          quantidadeParcelas: null,
+          diaVencimento: 10,
+          dataInicio: '2099-09-01',
+          paymentDate: '2099-09-10',
+          responsibleId: 'u2',
+          creditCardId: null,
+          payers: ['u1', 'u2'],
+          remainingPayers: ['u1'],
+          parcelas: []
+        }]
+      }
+    });
+
+    fixture.detectChanges();
+    const texto = (fixture.nativeElement as HTMLElement).textContent ?? '';
+
+    expect(texto).toContain('Rio Tinto');
+    expect(texto).toContain('Joao Silva');
+    expect(texto).toContain('Maria');
+    expect(texto).not.toContain('undefined');
   });
 
   function carregarDashboard(payload?: {

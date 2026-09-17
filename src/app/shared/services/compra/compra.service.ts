@@ -140,15 +140,21 @@ export class CompraService {
 
     const payload = response as Record<string, unknown>;
     const content = this.lerLista<T>(payload, ['content', 'items', 'results', 'data']);
+    const pageMetadata = this.lerObjeto(payload, 'page');
     const totalElements = Math.max(
-      this.lerNumero(payload, ['totalElements', 'total_elements', 'total', 'count']) ?? content.length,
+      this.lerNumero(payload, ['totalElements', 'total_elements', 'total', 'count'])
+        ?? this.lerNumero(pageMetadata, ['totalElements', 'total_elements', 'total', 'count'])
+        ?? content.length,
       content.length
     );
     const totalPages = this.lerNumero(payload, ['totalPages', 'total_pages'])
+      ?? this.lerNumero(pageMetadata, ['totalPages', 'total_pages'])
       ?? (content.length ? 1 : 0);
     const size = this.lerNumero(payload, ['size', 'pageSize', 'page_size'])
+      ?? this.lerNumero(pageMetadata, ['size', 'pageSize', 'page_size'])
       ?? content.length;
     const number = this.lerNumero(payload, ['number', 'page', 'pageNumber', 'page_number'])
+      ?? this.lerNumero(pageMetadata, ['number', 'pageNumber', 'page_number'])
       ?? 0;
 
     return {
@@ -177,6 +183,13 @@ export class CompraService {
   private lerLista<T>(payload: Record<string, unknown>, chaves: string[]): T[] {
     const chave = chaves.find(key => Array.isArray(payload[key]));
     return chave ? payload[chave] as T[] : [];
+  }
+
+  private lerObjeto(payload: Record<string, unknown>, chave: string): Record<string, unknown> {
+    const valor = payload[chave];
+    return valor && typeof valor === 'object' && !Array.isArray(valor)
+      ? valor as Record<string, unknown>
+      : {};
   }
 
   private lerNumero(payload: Record<string, unknown>, chaves: string[]): number | null {
