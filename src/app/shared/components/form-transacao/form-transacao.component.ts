@@ -410,6 +410,10 @@ export class FormTransacaoComponent {
 
   private enviarCompra(usuarioLogado: User, pagadores: string[]): void {
     const responsavel = this.formTransacao.value.responsavel || this.responsavel || usuarioLogado.id;
+    const pagadoresRestantes = this.isPremium
+      ? this.getPagadoresRestantesCompra(pagadores, responsavel)
+      : [];
+    this.pagadoresRestantes = pagadoresRestantes;
     const formData = {
       ...(this.isEdicaoCompra ? { id: this.data?.compra?.id } : {}),
       title: this.formTransacao.value.titulo,
@@ -417,7 +421,7 @@ export class FormTransacaoComponent {
       value: Number(this.formTransacao.value.valor),
       payers: pagadores,
       paymentDate: this.formatDateOnly(this.formTransacao.value.dataPagamento),
-      remainingPayers: this.pagadoresRestantes,
+      remainingPayers: pagadoresRestantes,
       ...(this.isDespesaFixa
         ? { responsibleId: responsavel }
         : {
@@ -484,6 +488,13 @@ export class FormTransacaoComponent {
     const novosPagadores = pagadores.filter(p => !antiga.includes(p));
     const mantidos = antigosRestantes.filter(p => pagadores.includes(p));
     return [...new Set([...mantidos, ...novosPagadores])];
+  }
+
+  private getPagadoresRestantesCompra(pagadores: string[], compradorId: string): string[] {
+    const restantes = this.isEdicaoCompra
+      ? this.getPagadoresRestantesEdicao(pagadores)
+      : [...pagadores];
+    return restantes.filter((pagador) => pagador !== compradorId);
   }
 
   private formatDateOnly(value: Date | string): string {

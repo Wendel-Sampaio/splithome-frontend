@@ -269,7 +269,7 @@ export class ComprasComponent implements OnInit {
       purchaserId: user.id,
       purchaseDate: item.paymentDate,
       payers: [user.id],
-      remainingPayers: [user.id]
+      remainingPayers: []
     };
   }
 
@@ -439,10 +439,12 @@ export class ComprasComponent implements OnInit {
     const currentUser = this.userService.getUser();
     const isNotPurchaser = compra.purchaserId !== currentUser.id;
     const payers = compra.payers ?? [];
-    const remainingPayers = compra.remainingPayers ?? [];
     const unitValue = payers.length ? compra.value / payers.length : 0;
-    const compraNormalizada = { ...compra, payers, remainingPayers };
     const purchaserName = usersById.get(compra.purchaserId) ?? (compra.purchaserId === currentUser.id ? currentUser.name : '');
+    const remainingPayers = (compra.remainingPayers ?? []).filter(
+      (payer) => payer !== compra.purchaserId && payer !== purchaserName
+    );
+    const compraNormalizada = { ...compra, payers, remainingPayers };
     const payerNames = this.displayNamesFor(payers, usersById);
     const remainingPayerNames = this.displayNamesFor(remainingPayers, usersById);
 

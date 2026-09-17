@@ -5,6 +5,7 @@ void main() {
   test('formats backend category codes using friendly labels', () {
     expect(CategoryFormatter.label('FOOD'), 'Alimento');
     expect(CategoryFormatter.label('RENT'), 'Aluguel');
+    expect(CategoryFormatter.label('TRANSPORT'), 'Transporte');
     expect(CategoryFormatter.label('MERCADO'), 'Mercado');
   });
 

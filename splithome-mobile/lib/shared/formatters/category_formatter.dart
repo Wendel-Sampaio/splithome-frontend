@@ -10,6 +10,7 @@ class CategoryFormatter {
     'ENERGY': 'Energia',
     'WATER': 'Água',
     'GAS': 'Gás',
+    'TRANSPORT': 'Transporte',
     'OTHERS': 'Outros',
     'MERCADO': 'Mercado',
     'MORADIA': 'Moradia',

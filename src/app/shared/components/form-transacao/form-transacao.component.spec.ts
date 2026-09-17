@@ -88,7 +88,7 @@ describe('FormTransacaoComponent', () => {
     expect(component.loading()).toBe(false);
   });
 
-  it('normaliza pagador salvo por nome para id antes de enviar', () => {
+  it('normaliza pagador salvo por nome para id antes de enviar e nao deixa comprador pendente', () => {
     compraService.cadastrarCompra.and.returnValue(of({} as any));
     preencher();
     (component as any).usuariosFamilia = [{ id: 'u1', name: 'Eu' }];
@@ -98,7 +98,24 @@ describe('FormTransacaoComponent', () => {
 
     const payload = compraService.cadastrarCompra.calls.mostRecent().args[0];
     expect(payload.payers).toEqual(['u1']);
-    expect(payload.remainingPayers).toEqual(['u1']);
+    expect(payload.remainingPayers).toEqual([]);
+  });
+
+  it('mantem como pendente apenas pagadores diferentes do comprador', () => {
+    compraService.cadastrarCompra.and.returnValue(of({} as any));
+    preencher();
+    component.formTransacao.patchValue({ responsavel: 'u1' });
+    (component as any).usuariosFamilia = [
+      { id: 'u1', name: 'Eu' },
+      { id: 'u2', name: 'Outro' }
+    ];
+    component.pagadores = ['Eu', 'Outro'];
+
+    component.cadastrarTransacao();
+
+    const payload = compraService.cadastrarCompra.calls.mostRecent().args[0];
+    expect(payload.payers).toEqual(['u1', 'u2']);
+    expect(payload.remainingPayers).toEqual(['u2']);
   });
 
   it('usuário free pode cadastrar compra sem divisão de pagadores', () => {

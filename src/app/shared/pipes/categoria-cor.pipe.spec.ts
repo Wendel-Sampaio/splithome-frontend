@@ -4,7 +4,7 @@ describe('CategoriaCorPipe', () => {
   const pipe = new CategoriaCorPipe();
 
   it('retorna uma cor única para cada categoria conhecida', () => {
-    const categorias = ['CLEANING', 'FOOD', 'UTILITIES', 'RENT', 'INTERNET', 'ENERGY', 'WATER', 'GAS', 'OTHERS'];
+    const categorias = ['CLEANING', 'FOOD', 'UTILITIES', 'RENT', 'INTERNET', 'ENERGY', 'WATER', 'GAS', 'TRANSPORT', 'OTHERS'];
     const cores = categorias.map((categoria) => pipe.transform(categoria));
 
     expect(new Set(cores).size).toBe(categorias.length);

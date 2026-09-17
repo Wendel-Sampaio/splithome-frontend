@@ -7,6 +7,7 @@ export enum CategoriaEnum {
     ENERGY = 'Energia',
     WATER = 'Água',
     GAS = 'Gás',
+    TRANSPORT = 'Transporte',
     OTHERS = 'Outros'
 }
 
@@ -19,6 +20,7 @@ export const CategoriaIcone: Record<keyof typeof CategoriaEnum, string> = {
     ENERGY: 'bolt',
     WATER: 'water_drop',
     GAS: 'local_gas_station',
+    TRANSPORT: 'directions_car',
     OTHERS: 'category'
 };
 
@@ -31,6 +33,7 @@ export const CategoriaCor: Record<keyof typeof CategoriaEnum, string> = {
     ENERGY: '#eab308',
     WATER: '#0891b2',
     GAS: '#dc2626',
+    TRANSPORT: '#9333ea',
     OTHERS: '#64748b'
 };
 
