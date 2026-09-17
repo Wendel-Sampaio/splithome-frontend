@@ -11,6 +11,7 @@ import { MatPaginatorModule, PageEvent } from '@angular/material/paginator';
 import { MatTooltipModule } from '@angular/material/tooltip';
 import { CompraService } from '../../services/compra/compra.service';
 import { DespesaFixa } from '../../../core/models/despesa-fixa/despesa-fixa';
+import { Parcela } from '../../../core/models/parcela/parcela';
 import { NotificationService } from '../../services/notification/notification.service';
 import { UserService } from '../../../core/auth/user/user.service';
 import { UserStateService } from '../../../core/auth/user/user-state.service';
@@ -235,10 +236,28 @@ export class DespesasFixasComponent implements OnInit {
     return despesa.quantidadeParcelas ? `${despesa.quantidadeParcelas}x` : 'Mensal';
   }
 
+  valorTotalPorPessoa(despesa: DespesaFixa): number {
+    return this.valorPorPagador(despesa.valorTotal, despesa.payers);
+  }
+
   valorPorCobranca(despesa: DespesaFixa): number {
-    return despesa.quantidadeParcelas
+    const valor = despesa.quantidadeParcelas
       ? despesa.valorTotal / despesa.quantidadeParcelas
       : despesa.valorTotal;
+
+    return this.valorPorPagador(valor, despesa.payers);
+  }
+
+  valorParcelaPorPessoa(parcela: Parcela): number {
+    return this.valorPorPagador(parcela.valor, parcela.pagadores);
+  }
+
+  private valorPorPagador(valor: number, pagadores: string[] = []): number {
+    if (!valor || !pagadores.length) {
+      return valor ?? 0;
+    }
+
+    return valor / pagadores.length;
   }
 
   formatDate(date: string): string {

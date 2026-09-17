@@ -230,7 +230,7 @@ class _FixedExpenseTile extends StatelessWidget {
           crossAxisAlignment: CrossAxisAlignment.end,
           children: [
             Text(
-              CurrencyFormatter.brl(expense.totalValue),
+              CurrencyFormatter.brl(expense.chargeValuePerPayer),
               style: Theme.of(
                 context,
               ).textTheme.titleSmall?.copyWith(fontWeight: FontWeight.w800),

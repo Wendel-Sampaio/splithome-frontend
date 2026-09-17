@@ -64,6 +64,30 @@ class FixedExpense {
     return installmentsCount == null;
   }
 
+  double get totalValuePerPayer {
+    return _valuePerPayer(totalValue, payers);
+  }
+
+  double get chargeValue {
+    if (isRecurring || installmentsCount == null || installmentsCount == 0) {
+      return totalValue;
+    }
+
+    return totalValue / installmentsCount!;
+  }
+
+  double get chargeValuePerPayer {
+    return _valuePerPayer(chargeValue, payers);
+  }
+
+  static double _valuePerPayer(double value, List<String> payers) {
+    if (payers.isEmpty) {
+      return value;
+    }
+
+    return value / payers.length;
+  }
+
   static double _readNumber(Object? value) {
     return switch (value) {
       num number => number.toDouble(),
@@ -106,6 +130,8 @@ class Installment {
     required this.installmentNumber,
     required this.value,
     required this.paid,
+    this.payers = const [],
+    this.remainingPayers = const [],
     this.expenseId,
     this.dueDate,
   });
@@ -120,6 +146,10 @@ class Installment {
       value: FixedExpense._readNumber(payload['value']),
       dueDate: payload['dueDate']?.toString(),
       paid: payload['paid'] == true,
+      payers: FixedExpense._readStringList(payload['payers']),
+      remainingPayers: FixedExpense._readStringList(
+        payload['remainingPayers'],
+      ),
     );
   }
 
@@ -129,4 +159,10 @@ class Installment {
   final double value;
   final String? dueDate;
   final bool paid;
+  final List<String> payers;
+  final List<String> remainingPayers;
+
+  double get valuePerPayer {
+    return FixedExpense._valuePerPayer(value, payers);
+  }
 }

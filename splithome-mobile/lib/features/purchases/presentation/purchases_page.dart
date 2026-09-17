@@ -217,7 +217,7 @@ class _PurchaseTile extends StatelessWidget {
           crossAxisAlignment: CrossAxisAlignment.end,
           children: [
             Text(
-              CurrencyFormatter.brl(purchase.value),
+              CurrencyFormatter.brl(purchase.valuePerPayer),
               style: Theme.of(
                 context,
               ).textTheme.titleSmall?.copyWith(fontWeight: FontWeight.w800),

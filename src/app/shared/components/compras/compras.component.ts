@@ -302,7 +302,6 @@ export class ComprasComponent implements OnInit {
     'category',
     'purchaseDate',
     'paymentDate',
-    'value',
     'payers',
     'unitValue',
     'purchaserName',

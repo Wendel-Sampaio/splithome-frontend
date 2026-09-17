@@ -759,7 +759,7 @@ class _ActivityItem {
       title: purchase.title.isEmpty ? 'Compra sem título' : purchase.title,
       subtitle:
           '${CategoryFormatter.label(purchase.category)} • ${purchase.purchaserName ?? 'compra'}',
-      value: purchase.value,
+      value: purchase.valuePerPayer,
       dateLabel: purchase.purchaseDate ?? '',
       icon: Icons.shopping_cart_outlined,
       isPurchase: true,
@@ -770,7 +770,7 @@ class _ActivityItem {
     return _ActivityItem(
       title: expense.title.isEmpty ? 'Despesa sem título' : expense.title,
       subtitle: '${CategoryFormatter.label(expense.category)} • despesa fixa',
-      value: expense.totalValue,
+      value: expense.chargeValuePerPayer,
       dateLabel: expense.startDate ?? '',
       icon: Icons.receipt_long_outlined,
       isPurchase: false,

@@ -77,7 +77,7 @@ class PurchaseDetailPage extends ConsumerWidget {
                                   ?.copyWith(fontWeight: FontWeight.w800),
                             ),
                             Text(
-                              CurrencyFormatter.brl(purchase.value),
+                              CurrencyFormatter.brl(purchase.valuePerPayer),
                               style: Theme.of(context).textTheme.titleMedium
                                   ?.copyWith(color: scheme.primary),
                             ),

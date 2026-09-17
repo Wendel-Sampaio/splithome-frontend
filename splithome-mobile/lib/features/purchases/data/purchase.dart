@@ -42,6 +42,14 @@ class Purchase {
 
   bool get isPaid => remainingPayers.isEmpty;
 
+  double get valuePerPayer {
+    if (payers.isEmpty) {
+      return value;
+    }
+
+    return value / payers.length;
+  }
+
   static double _readNumber(Object? value) {
     return switch (value) {
       num number => number.toDouble(),

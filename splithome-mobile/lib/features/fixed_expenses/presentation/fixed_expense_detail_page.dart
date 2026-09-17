@@ -110,7 +110,9 @@ class _FixedExpenseDetailPageState
                                         ?.copyWith(fontWeight: FontWeight.w800),
                                   ),
                                   Text(
-                                    CurrencyFormatter.brl(expense.totalValue),
+                                    CurrencyFormatter.brl(
+                                      expense.chargeValuePerPayer,
+                                    ),
                                     style: Theme.of(context)
                                         .textTheme
                                         .titleMedium
@@ -350,7 +352,7 @@ class _InstallmentTile extends StatelessWidget {
             ),
           ),
           title: Text(
-            'Cobrança ${installment.installmentNumber} • ${CurrencyFormatter.brl(installment.value)}',
+            'Cobrança ${installment.installmentNumber} • ${CurrencyFormatter.brl(installment.valuePerPayer)}',
           ),
           subtitle: Text(installment.dueDate ?? 'Sem vencimento'),
           trailing: onPay == null

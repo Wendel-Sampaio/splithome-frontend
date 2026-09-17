@@ -262,7 +262,7 @@ export class DashboardInicioComponent implements OnInit {
     const deCompras: Atividade[] = compras.map((c) => ({
       title: c.title,
       category: c.category,
-      value: c.value,
+      value: this.calcularValorPorPagador(c.value, c.payers),
       date: c.purchaseDate,
       tipo: 'compra',
       autor: c.purchaserName
@@ -271,7 +271,7 @@ export class DashboardInicioComponent implements OnInit {
     const deDespesas: Atividade[] = despesas.map((d) => ({
       title: d.title,
       category: d.category,
-      value: d.valorTotal,
+      value: this.calcularValorPorPagador(this.valorPorCobranca(d), d.payers),
       date: d.dataInicio,
       tipo: 'despesa',
       autor: d.responsibleName
@@ -301,7 +301,8 @@ export class DashboardInicioComponent implements OnInit {
               compra.payers,
               compra.remainingPayers,
               [compra.purchaserId, compra.purchaserName]
-            )
+            ),
+            compra.payers
           ),
           dueDate: vencimento,
           tipo: 'compra' as const,
@@ -329,7 +330,8 @@ export class DashboardInicioComponent implements OnInit {
                   parcela.payers ?? parcela.pagadores ?? [],
                   parcela.remainingPayers ?? [],
                   [despesa.responsibleId, despesa.responsibleName]
-                )
+                ),
+                parcela.payers ?? parcela.pagadores ?? []
               ),
               dueDate: vencimento,
               tipo: 'parcela' as const,
@@ -350,7 +352,8 @@ export class DashboardInicioComponent implements OnInit {
             despesa.payers,
             despesa.remainingPayers,
             [despesa.responsibleId, despesa.responsibleName]
-          )
+          ),
+          despesa.payers
         ),
         dueDate: vencimento,
         tipo: 'despesa' as const,
@@ -398,7 +401,7 @@ export class DashboardInicioComponent implements OnInit {
         };
         const valorPendente = this.calcularPendenteDespesa(despesa);
 
-        resumo.total += despesa.valorTotal ?? 0;
+        resumo.total += this.calcularValorPorPagador(despesa.valorTotal ?? 0, despesa.payers);
         resumo.pendente += valorPendente;
         resumo.quantidade += 1;
         resumos.set(cartaoId, resumo);
@@ -496,8 +499,22 @@ export class DashboardInicioComponent implements OnInit {
     return parcela.pago ?? parcela.paid ?? false;
   }
 
-  private valorOuPendente(valorTotal: number, valorPendente: number): number {
-    return valorPendente > 0 ? valorPendente : valorTotal;
+  private valorOuPendente(valorTotal: number, valorPendente: number, pagadores: string[] = []): number {
+    return valorPendente > 0 ? valorPendente : this.calcularValorPorPagador(valorTotal, pagadores);
+  }
+
+  private valorPorCobranca(despesa: DespesaFixa): number {
+    return despesa.quantidadeParcelas
+      ? despesa.valorTotal / despesa.quantidadeParcelas
+      : despesa.valorTotal;
+  }
+
+  private calcularValorPorPagador(valor: number, pagadores: string[] = []): number {
+    if (!valor || !pagadores.length) {
+      return valor ?? 0;
+    }
+
+    return valor / pagadores.length;
   }
 
   private quantidadePendente(pendentes?: string[]): number {

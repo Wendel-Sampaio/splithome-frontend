@@ -67,7 +67,6 @@ export class DespesasComponent {
     'title',
     'category',
     'paymentDate',
-    'value',
     'payers',
     'unitValue',
     'responsibleName',
