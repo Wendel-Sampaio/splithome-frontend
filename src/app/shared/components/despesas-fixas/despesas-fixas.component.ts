@@ -229,6 +229,16 @@ export class DespesasFixasComponent implements OnInit {
     }).format(value);
   }
 
+  rotuloParcelas(despesa: DespesaFixa): string {
+    return despesa.quantidadeParcelas ? `${despesa.quantidadeParcelas}x` : 'Mensal';
+  }
+
+  valorPorCobranca(despesa: DespesaFixa): number {
+    return despesa.quantidadeParcelas
+      ? despesa.valorTotal / despesa.quantidadeParcelas
+      : despesa.valorTotal;
+  }
+
   formatDate(date: string): string {
     if (!date) {
       return '';

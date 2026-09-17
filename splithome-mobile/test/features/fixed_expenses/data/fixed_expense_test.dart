@@ -91,4 +91,18 @@ void main() {
       'remainingPayers': ['Ana'],
     });
   });
+
+  test('serializes recurring fixed expense without installments count', () {
+    const request = CreateFixedExpenseRequest(
+      title: 'Aluguel',
+      category: 'MORADIA',
+      totalValue: 1800,
+      installmentsCount: null,
+      dueDay: 5,
+      startDate: '2026-09-01',
+      responsibleId: 'user-1',
+    );
+
+    expect(request.toJson()['installmentsCount'], isNull);
+  });
 }

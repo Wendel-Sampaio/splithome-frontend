@@ -5,7 +5,7 @@ export interface DespesaFixa {
   title: string;
   category: string;
   valorTotal: number;
-  quantidadeParcelas: number;
+  quantidadeParcelas: number | null;
   diaVencimento: number;
   dataInicio: string;
   paymentDate: string;

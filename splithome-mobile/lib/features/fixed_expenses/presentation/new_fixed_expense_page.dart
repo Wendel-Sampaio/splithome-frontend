@@ -33,6 +33,7 @@ class _NewFixedExpensePageState extends ConsumerState<NewFixedExpensePage> {
   DateTime _startDate = DateTime.now();
   String? _category;
   List<String> _selectedPayers = [];
+  bool _isRecurring = true;
   bool _isSubmitting = false;
 
   bool get _isEditing => widget.expense != null;
@@ -44,7 +45,9 @@ class _NewFixedExpensePageState extends ConsumerState<NewFixedExpensePage> {
     if (expense != null) {
       _titleController.text = expense.title;
       _totalValueController.text = expense.totalValue.toStringAsFixed(2);
-      _installmentsController.text = expense.installmentsCount.toString();
+      _isRecurring = expense.isRecurring;
+      _installmentsController.text = (expense.installmentsCount ?? 1)
+          .toString();
       _dueDayController.text = expense.dueDay.toString();
       _category = expense.category.isEmpty ? null : expense.category;
       _selectedPayers = [...expense.payers];
@@ -161,7 +164,7 @@ class _NewFixedExpensePageState extends ConsumerState<NewFixedExpensePage> {
                               ),
                             ],
                             decoration: const InputDecoration(
-                              labelText: 'Valor total',
+                              labelText: 'Valor',
                               prefixIcon: Icon(Icons.payments_outlined),
                             ),
                             validator: (value) {
@@ -174,26 +177,49 @@ class _NewFixedExpensePageState extends ConsumerState<NewFixedExpensePage> {
                             },
                           ),
                           const SizedBox(height: 14),
+                          SegmentedButton<bool>(
+                            segments: const [
+                              ButtonSegment(
+                                value: true,
+                                icon: Icon(Icons.autorenew),
+                                label: Text('Mensal'),
+                              ),
+                              ButtonSegment(
+                                value: false,
+                                icon: Icon(Icons.format_list_numbered),
+                                label: Text('Parcelada'),
+                              ),
+                            ],
+                            selected: {_isRecurring},
+                            onSelectionChanged: (values) {
+                              setState(() {
+                                _isRecurring = values.first;
+                              });
+                            },
+                          ),
+                          const SizedBox(height: 14),
                           Row(
                             children: [
-                              Expanded(
-                                child: TextFormField(
-                                  controller: _installmentsController,
-                                  keyboardType: TextInputType.number,
-                                  inputFormatters: [
-                                    FilteringTextInputFormatter.digitsOnly,
-                                  ],
-                                  decoration: const InputDecoration(
-                                    labelText: 'Parcelas',
-                                    prefixIcon: Icon(
-                                      Icons.format_list_numbered,
+                              if (!_isRecurring) ...[
+                                Expanded(
+                                  child: TextFormField(
+                                    controller: _installmentsController,
+                                    keyboardType: TextInputType.number,
+                                    inputFormatters: [
+                                      FilteringTextInputFormatter.digitsOnly,
+                                    ],
+                                    decoration: const InputDecoration(
+                                      labelText: 'Parcelas',
+                                      prefixIcon: Icon(
+                                        Icons.format_list_numbered,
+                                      ),
                                     ),
+                                    validator: (value) =>
+                                        _validateIntRange(value, 1, 240),
                                   ),
-                                  validator: (value) =>
-                                      _validateIntRange(value, 1, 240),
                                 ),
-                              ),
-                              const SizedBox(width: 12),
+                                const SizedBox(width: 12),
+                              ],
                               Expanded(
                                 child: TextFormField(
                                   controller: _dueDayController,
@@ -218,7 +244,7 @@ class _NewFixedExpensePageState extends ConsumerState<NewFixedExpensePage> {
                             onPressed: _pickStartDate,
                             icon: const Icon(Icons.event_outlined),
                             label: Text(
-                              'Início: ${DateFormat('dd/MM/yyyy').format(_startDate)}',
+                              '${_isRecurring ? 'Cobrar a partir de' : 'Início'}: ${DateFormat('dd/MM/yyyy').format(_startDate)}',
                             ),
                           ),
                           if (canChoosePayers) ...[
@@ -299,7 +325,9 @@ class _NewFixedExpensePageState extends ConsumerState<NewFixedExpensePage> {
         title: _titleController.text.trim(),
         category: _category!,
         totalValue: _parseMoney(_totalValueController.text)!,
-        installmentsCount: int.parse(_installmentsController.text),
+        installmentsCount: _isRecurring
+            ? null
+            : int.parse(_installmentsController.text),
         dueDay: int.parse(_dueDayController.text),
         startDate: DateFormat('yyyy-MM-dd').format(_startDate),
         responsibleId: existing?.responsibleId ?? user.id,

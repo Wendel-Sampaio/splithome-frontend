@@ -41,6 +41,8 @@ type FormTransacaoData = {
   despesaFixa?: DespesaFixa;
 };
 
+type ModoCobrancaDespesa = 'recorrente' | 'parcelada';
+
 @Component({
   selector: 'dialog-content-example-dialog',
   standalone: true,
@@ -160,8 +162,12 @@ export class FormTransacaoComponent {
       return 'Edite a despesa fixa e o parcelamento.';
     }
     return this.isDespesaFixa
-      ? 'Cadastre uma despesa recorrente com parcelamento.'
+      ? 'Cadastre uma despesa mensal ou parcelada.'
       : 'Registre uma nova compra avulsa.';
+  }
+
+  get isDespesaRecorrente(): boolean {
+    return this.formTransacao?.get('modoCobranca')?.value === 'recorrente';
   }
 
   get textoBotaoConfirmacao(): string {
@@ -172,6 +178,9 @@ export class FormTransacaoComponent {
   }
 
   get valorParcela(): number | null {
+    if (this.isDespesaRecorrente) {
+      return this.valorTotal;
+    }
     if (!this.valorTotal || !this.quantidadeParcelas || this.quantidadeParcelas <= 0) {
       return null;
     }
@@ -196,7 +205,8 @@ export class FormTransacaoComponent {
 
     if (this.isDespesaFixa) {
       baseControls['valorTotal'] = new FormControl('', [Validators.required, Validators.min(0.01)]);
-      baseControls['quantidadeParcelas'] = new FormControl(1, [Validators.required, Validators.min(1), Validators.max(240)]);
+      baseControls['modoCobranca'] = new FormControl<ModoCobrancaDespesa>('recorrente', [Validators.required]);
+      baseControls['quantidadeParcelas'] = new FormControl(null);
       baseControls['diaVencimento'] = new FormControl(10, [Validators.required, Validators.min(1), Validators.max(31)]);
       baseControls['dataInicio'] = new FormControl(new Date(), [Validators.required]);
       baseControls['cartaoId'] = new FormControl(null);
@@ -217,9 +227,14 @@ export class FormTransacaoComponent {
         }
       });
 
+      this.formTransacao.get('modoCobranca')?.valueChanges.pipe(takeUntilDestroyed(this.destroyRef)).subscribe(value => {
+        this.atualizarValidadoresParcelas(value);
+      });
+      this.atualizarValidadoresParcelas(this.formTransacao.get('modoCobranca')?.value);
+
       this.formTransacao.valueChanges.pipe(takeUntilDestroyed(this.destroyRef)).subscribe(values => {
         this.valorTotal = values.valorTotal || null;
-        this.quantidadeParcelas = values.quantidadeParcelas || null;
+        this.quantidadeParcelas = values.modoCobranca === 'parcelada' ? values.quantidadeParcelas || null : null;
         this.dataInicio = values.dataInicio ? new Date(values.dataInicio) : null;
         this.diaVencimento = values.diaVencimento || null;
         this.cartaoSelecionado = values.cartaoId || null;
@@ -251,6 +266,24 @@ export class FormTransacaoComponent {
 
   private diasNoMes(ano: number, mes: number): number {
     return new Date(ano, mes + 1, 0).getDate();
+  }
+
+  private atualizarValidadoresParcelas(modo: ModoCobrancaDespesa | null): void {
+    const control = this.formTransacao.get('quantidadeParcelas');
+    if (!control) {
+      return;
+    }
+
+    if (modo === 'parcelada') {
+      control.setValidators([Validators.required, Validators.min(1), Validators.max(240)]);
+      if (!control.value) {
+        control.setValue(1, { emitEvent: false });
+      }
+    } else {
+      control.clearValidators();
+      control.setValue(null, { emitEvent: false });
+    }
+    control.updateValueAndValidity({ emitEvent: false });
   }
 
   mudarSelecaoUsuario(usuario: User): void {
@@ -348,7 +381,7 @@ export class FormTransacaoComponent {
       title: v.titulo,
       category: v.categoria,
       totalValue: Number(v.valorTotal),
-      installmentsCount: Number(v.quantidadeParcelas),
+      installmentsCount: v.modoCobranca === 'parcelada' ? Number(v.quantidadeParcelas) : null,
       dueDay: Number(v.diaVencimento),
       startDate: this.formatDateOnly(v.dataInicio),
       creditCardId: v.cartaoId || null,
@@ -434,6 +467,7 @@ export class FormTransacaoComponent {
         titulo: d.title,
         categoria: d.category,
         valorTotal: d.valorTotal,
+        modoCobranca: d.quantidadeParcelas ? 'parcelada' : 'recorrente',
         quantidadeParcelas: d.quantidadeParcelas,
         diaVencimento: d.diaVencimento,
         dataInicio: d.dataInicio ? new Date(d.dataInicio) : new Date(),

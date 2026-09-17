@@ -112,10 +112,10 @@ class CreateFixedExpenseRequest {
     required this.title,
     required this.category,
     required this.totalValue,
-    required this.installmentsCount,
     required this.dueDay,
     required this.startDate,
     required this.responsibleId,
+    this.installmentsCount,
     this.creditCardId,
     this.payers = const [],
     this.remainingPayers = const [],
@@ -124,7 +124,7 @@ class CreateFixedExpenseRequest {
   final String title;
   final String category;
   final double totalValue;
-  final int installmentsCount;
+  final int? installmentsCount;
   final int dueDay;
   final String startDate;
   final String responsibleId;

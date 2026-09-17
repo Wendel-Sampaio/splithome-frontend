@@ -53,10 +53,10 @@ void main() {
     expect(find.text('Bruno'), findsAtLeastNWidgets(1));
     expect(find.text('1/2 pagas'), findsOneWidget);
 
-    await tester.scrollUntilVisible(find.textContaining('Parcela 1'), 300);
+    await tester.scrollUntilVisible(find.textContaining('Cobrança 1'), 300);
 
-    expect(find.textContaining('Parcela 1'), findsOneWidget);
-    expect(find.textContaining('Parcela 2'), findsOneWidget);
+    expect(find.textContaining('Cobrança 1'), findsOneWidget);
+    expect(find.textContaining('Cobrança 2'), findsOneWidget);
     expect(find.text('Paga'), findsOneWidget);
     expect(find.text('Pagar'), findsOneWidget);
   });

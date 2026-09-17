@@ -41,7 +41,7 @@
 
     <ng-container matColumnDef="installmentsCount">
       <th mat-header-cell *matHeaderCellDef>Parcelas</th>
-      <td mat-cell *matCellDef="let despesa">{{ despesa.quantidadeParcelas }}x</td>
+      <td mat-cell *matCellDef="let despesa">{{ rotuloParcelas(despesa) }}</td>
     </ng-container>
 
     <ng-container matColumnDef="dueDay">
@@ -50,7 +50,7 @@
     </ng-container>
 
     <ng-container matColumnDef="startDate">
-      <th mat-header-cell *matHeaderCellDef>1ª parcela</th>
+      <th mat-header-cell *matHeaderCellDef>Início</th>
       <td mat-cell *matCellDef="let despesa">{{ formatDate(despesa.dataInicio) }}</td>
     </ng-container>
 
@@ -80,7 +80,7 @@
     <mat-accordion>
       <mat-expansion-panel *ngFor="let despesa of despesas">
         <mat-expansion-panel-header>
-          <mat-panel-title>{{ despesa.title }} — {{ despesa.quantidadeParcelas }}x {{ formatCurrency(despesa.valorTotal / despesa.quantidadeParcelas) }}</mat-panel-title>
+          <mat-panel-title>{{ despesa.title }} — {{ rotuloParcelas(despesa) }} {{ formatCurrency(valorPorCobranca(despesa)) }}</mat-panel-title>
         </mat-expansion-panel-header>
 
         <table class="parcelas-table">

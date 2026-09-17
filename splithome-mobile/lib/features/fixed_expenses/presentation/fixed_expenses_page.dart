@@ -237,7 +237,9 @@ class _FixedExpenseTile extends StatelessWidget {
             ),
             const SizedBox(height: 4),
             Text(
-              expense.installments.isEmpty
+              expense.isRecurring
+                  ? 'Mensal'
+                  : expense.installments.isEmpty
                   ? '${expense.installmentsCount} parc.'
                   : '${expense.paidInstallments}/${expense.installments.length} pagas',
               style: Theme.of(context).textTheme.bodySmall?.copyWith(

@@ -54,19 +54,29 @@
     }
 
     @if (isDespesaFixa) {
-      <app-form-section title="Parcelamento" [columns]="2">
+      <app-form-section title="Cobrança" [columns]="2">
         <mat-form-field appearance="outline" floatLabel="always">
-          <mat-label>Valor total</mat-label>
+          <mat-label>{{ isDespesaRecorrente ? 'Valor mensal' : 'Valor total' }}</mat-label>
           <input matInput formControlName="valorTotal" placeholder="0" type="number" />
           <span matTextPrefix>R$&nbsp;</span>
           <mat-error *ngIf="controlInvalido('valorTotal')">Informe um valor maior que R$ 0,00.</mat-error>
         </mat-form-field>
 
         <mat-form-field appearance="outline">
-          <mat-label>Quantidade de parcelas</mat-label>
-          <input matInput formControlName="quantidadeParcelas" type="number" min="1" max="240" />
-          <mat-error *ngIf="controlInvalido('quantidadeParcelas')">Informe entre 1 e 240 parcelas.</mat-error>
+          <mat-label>Tipo de cobrança</mat-label>
+          <mat-select formControlName="modoCobranca">
+            <mat-option value="recorrente">Mensal recorrente</mat-option>
+            <mat-option value="parcelada">Parcelada</mat-option>
+          </mat-select>
         </mat-form-field>
+
+        @if (!isDespesaRecorrente) {
+          <mat-form-field appearance="outline">
+            <mat-label>Quantidade de parcelas</mat-label>
+            <input matInput formControlName="quantidadeParcelas" type="number" min="1" max="240" />
+            <mat-error *ngIf="controlInvalido('quantidadeParcelas')">Informe entre 1 e 240 parcelas.</mat-error>
+          </mat-form-field>
+        }
 
         <mat-form-field appearance="outline">
           <mat-label>Dia de vencimento</mat-label>
@@ -75,7 +85,7 @@
         </mat-form-field>
 
         <mat-form-field appearance="outline">
-          <mat-label>Data da 1ª parcela</mat-label>
+          <mat-label>{{ isDespesaRecorrente ? 'Cobrar a partir de' : 'Data da 1ª parcela' }}</mat-label>
           <input matInput formControlName="dataInicio" [matDatepicker]="dpInicio" />
           <mat-datepicker-toggle matIconSuffix [for]="dpInicio"></mat-datepicker-toggle>
           <mat-datepicker #dpInicio disabled="false"></mat-datepicker>
@@ -100,7 +110,16 @@
         </mat-form-field>
       </app-form-section>
 
-      @if (valorParcela && primeiraDataVencimento) {
+      @if (isDespesaRecorrente && valorParcela && primeiraDataVencimento) {
+        <app-summary-block title="Resumo da cobrança" icon="autorenew" variant="primary">
+          <p class="sh-transacao__summary-main">
+            Todo mês: <strong>{{ formatCurrency(valorParcela) }}</strong>
+          </p>
+          <p class="sh-transacao__summary-sub">
+            Primeira cobrança em {{ primeiraDataVencimento | date: 'dd/MM/yyyy' }}
+          </p>
+        </app-summary-block>
+      } @else if (valorParcela && primeiraDataVencimento) {
         <app-summary-block title="Resumo do parcelamento" icon="autorenew" variant="primary">
           <p class="sh-transacao__summary-main">
             Em <strong>{{ quantidadeParcelas }}x</strong> de

@@ -135,15 +135,22 @@ class _FixedExpenseDetailPageState
                           value: expense.paymentDate ?? '',
                         ),
                         DetailRow(
+                          label: 'Tipo',
+                          value: expense.isRecurring
+                              ? 'Mensal recorrente'
+                              : 'Parcelada',
+                        ),
+                        DetailRow(
                           label: 'Vencimento',
                           value: expense.dueDay > 0
                               ? 'Dia ${expense.dueDay}'
                               : '',
                         ),
                         DetailRow(
-                          label: 'Parcelas',
-                          value:
-                              '${expense.paidInstallments}/${expense.installmentsCount} pagas',
+                          label: expense.isRecurring ? 'Cobranças' : 'Parcelas',
+                          value: expense.isRecurring
+                              ? '${expense.paidInstallments}/${expense.installments.length} pagas'
+                              : '${expense.paidInstallments}/${expense.installmentsCount} pagas',
                         ),
                       ],
                     ),
@@ -266,6 +273,8 @@ class _FixedExpenseDetailPageState
           paymentDate: _expense.paymentDate,
           responsibleId: _expense.responsibleId,
           creditCardId: _expense.creditCardId,
+          payers: _expense.payers,
+          remainingPayers: _expense.remainingPayers,
         );
       });
 
@@ -341,7 +350,7 @@ class _InstallmentTile extends StatelessWidget {
             ),
           ),
           title: Text(
-            'Parcela ${installment.installmentNumber} • ${CurrencyFormatter.brl(installment.value)}',
+            'Cobrança ${installment.installmentNumber} • ${CurrencyFormatter.brl(installment.value)}',
           ),
           subtitle: Text(installment.dueDate ?? 'Sem vencimento'),
           trailing: onPay == null

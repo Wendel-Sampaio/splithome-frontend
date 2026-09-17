@@ -4,9 +4,9 @@ class FixedExpense {
     required this.title,
     required this.category,
     required this.totalValue,
-    required this.installmentsCount,
     required this.dueDay,
     required this.installments,
+    this.installmentsCount,
     this.payers = const [],
     this.remainingPayers = const [],
     this.startDate,
@@ -26,7 +26,7 @@ class FixedExpense {
       title: payload['title']?.toString() ?? '',
       category: payload['category']?.toString() ?? '',
       totalValue: _readNumber(payload['valorTotal']),
-      installmentsCount: _readInt(payload['quantidadeParcelas']),
+      installmentsCount: _readNullableInt(payload['quantidadeParcelas']),
       dueDay: _readInt(payload['diaVencimento']),
       startDate: payload['dataInicio']?.toString(),
       paymentDate: payload['paymentDate']?.toString(),
@@ -42,7 +42,7 @@ class FixedExpense {
   final String title;
   final String category;
   final double totalValue;
-  final int installmentsCount;
+  final int? installmentsCount;
   final int dueDay;
   final String? startDate;
   final String? paymentDate;
@@ -60,6 +60,10 @@ class FixedExpense {
     return installments.isNotEmpty && paidInstallments == installments.length;
   }
 
+  bool get isRecurring {
+    return installmentsCount == null;
+  }
+
   static double _readNumber(Object? value) {
     return switch (value) {
       num number => number.toDouble(),
@@ -74,6 +78,16 @@ class FixedExpense {
       num number => number.toInt(),
       String text => int.tryParse(text) ?? 0,
       _ => 0,
+    };
+  }
+
+  static int? _readNullableInt(Object? value) {
+    return switch (value) {
+      null => null,
+      int number => number,
+      num number => number.toInt(),
+      String text => int.tryParse(text),
+      _ => null,
     };
   }
 
