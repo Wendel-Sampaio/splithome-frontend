@@ -50,4 +50,37 @@ describe('CompraService', () => {
       size: '5'
     });
   });
+
+  it('normaliza despesas fixas e parcelas retornadas pelo backend', () => {
+    service.listarDespesasFixas().subscribe(page => {
+      expect(page.content[0].payers).toEqual(['Ana', 'Bruno']);
+      expect(page.content[0].remainingPayers).toEqual(['Bruno']);
+      expect(page.content[0].parcelas[0].numero).toBe(1);
+      expect(page.content[0].parcelas[0].valor).toBe(50);
+      expect(page.content[0].parcelas[0].dataVencimento).toBe('2026-09-10');
+      expect(page.content[0].parcelas[0].pago).toBeFalse();
+      expect(page.content[0].parcelas[0].pagadores).toEqual(['Ana', 'Bruno']);
+      expect(page.content[0].parcelas[0].remainingPayers).toEqual(['Bruno']);
+    });
+
+    const req = httpMock.expectOne(request => request.url.endsWith('/transactions/fixed-expenses'));
+    req.flush({
+      content: [{
+        id: 'd1',
+        title: 'Internet',
+        payers: ['Ana', 'Bruno'],
+        remainingPayers: ['Bruno'],
+        parcelas: [{
+          id: 'p1',
+          expenseId: 'd1',
+          installmentNumber: 1,
+          value: 50,
+          dueDate: '2026-09-10',
+          paid: false,
+          payers: ['Ana', 'Bruno'],
+          remainingPayers: ['Bruno']
+        }]
+      }]
+    });
+  });
 });

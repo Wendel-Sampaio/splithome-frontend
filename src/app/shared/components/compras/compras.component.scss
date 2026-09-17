@@ -122,6 +122,19 @@
   padding: 5px 10px;
 }
 
+.category-option {
+  align-items: center;
+  display: inline-flex;
+  gap: 8px;
+
+  mat-icon {
+    color: var(--sh-color-primary-strong);
+    font-size: 20px;
+    height: 20px;
+    width: 20px;
+  }
+}
+
 .table-shell {
   border: 1px solid var(--sh-color-border);
   border-radius: var(--sh-radius-md);
@@ -199,6 +212,17 @@ table {
   background: var(--sh-color-surface-alt);
   border: 1px solid var(--sh-color-border);
   color: var(--sh-color-text-muted);
+}
+
+.category-chip {
+  gap: 6px;
+
+  mat-icon {
+    color: var(--sh-color-primary-strong);
+    font-size: 18px;
+    height: 18px;
+    width: 18px;
+  }
 }
 
 .money-value {

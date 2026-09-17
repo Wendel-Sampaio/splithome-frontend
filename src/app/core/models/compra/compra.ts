@@ -5,8 +5,10 @@ export class Compra {
     value!: number;
     unitValue!: number;
     payers!: Array<string>;
+    payerNames?: Array<string>;
     paymentDate!: string;
     remainingPayers!: Array<string>;
+    remainingPayerNames?: Array<string>;
     purchaserId!: string;
     purchaserName!: string;
     purchaseDate!: string;

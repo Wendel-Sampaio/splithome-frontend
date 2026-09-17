@@ -165,7 +165,7 @@ export class DashboardInicioComponent implements OnInit {
         compra.value,
         compra.payers,
         compra.remainingPayers,
-        compra.purchaserName
+        [compra.purchaserId, compra.purchaserName]
       );
     }, 0);
 
@@ -178,7 +178,7 @@ export class DashboardInicioComponent implements OnInit {
             parcela.value ?? parcela.valor ?? 0,
             parcela.payers ?? parcela.pagadores ?? [],
             parcela.remainingPayers ?? [],
-            despesa.responsibleName
+            [despesa.responsibleId, despesa.responsibleName]
           );
         }, 0);
       }
@@ -187,7 +187,7 @@ export class DashboardInicioComponent implements OnInit {
         despesa.valorTotal,
         despesa.payers,
         despesa.remainingPayers,
-        despesa.responsibleName
+        [despesa.responsibleId, despesa.responsibleName]
       );
     }, 0);
 
@@ -198,14 +198,17 @@ export class DashboardInicioComponent implements OnInit {
     valor: number,
     pagadores: string[] = [],
     pagadoresRestantes: string[] = [],
-    responsavel?: string
+    responsavel?: string | Array<string | undefined>
   ): number {
     if (!valor || !pagadores.length || !pagadoresRestantes.length) {
       return 0;
     }
 
     const cota = valor / pagadores.length;
-    const pendentes = pagadoresRestantes.filter((pagador) => pagador && pagador !== responsavel);
+    const referenciasResponsavel = Array.isArray(responsavel)
+      ? responsavel.filter((reference): reference is string => !!reference)
+      : [responsavel].filter((reference): reference is string => !!reference);
+    const pendentes = pagadoresRestantes.filter((pagador) => pagador && !referenciasResponsavel.includes(pagador));
 
     return pendentes.length * cota;
   }

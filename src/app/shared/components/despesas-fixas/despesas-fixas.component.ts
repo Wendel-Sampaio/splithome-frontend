@@ -17,6 +17,7 @@ import { UserStateService } from '../../../core/auth/user/user-state.service';
 import { ConfirmDeleteComponent, ConfirmDeleteDialogData } from '../confirm-delete/confirm-delete.component';
 import { FormTransacaoComponent } from '../form-transacao/form-transacao.component';
 import { CategoriaPipe } from '../../pipes/categoria.pipe';
+import { CategoriaIconePipe } from '../../pipes/categoria-icone.pipe';
 import { BehaviorSubject, catchError, finalize, of, switchMap, tap } from 'rxjs';
 import { ModalService } from '../ui/modal';
 
@@ -34,7 +35,8 @@ import { ModalService } from '../ui/modal';
     MatExpansionModule,
     MatPaginatorModule,
     MatTooltipModule,
-    CategoriaPipe
+    CategoriaPipe,
+    CategoriaIconePipe
   ]
 })
 export class DespesasFixasComponent implements OnInit {
@@ -127,8 +129,15 @@ export class DespesasFixasComponent implements OnInit {
     return {
       ...despesa,
       responsibleName,
-      showPaymentButton: isNotResponsible && payers.includes(currentUser.name),
-      isPaid: !(remainingPayers ?? []).includes(currentUser.name)
+      payerNames: this.displayNamesFor(payers, usersById),
+      remainingPayerNames: this.displayNamesFor(remainingPayers, usersById),
+      parcelas: (despesa.parcelas ?? []).map((parcela) => ({
+        ...parcela,
+        pagadorNames: this.displayNamesFor(parcela.pagadores ?? [], usersById),
+        remainingPayerNames: this.displayNamesFor(parcela.remainingPayers ?? [], usersById)
+      })),
+      showPaymentButton: isNotResponsible && (payers.includes(currentUser.id) || payers.includes(currentUser.name)),
+      isPaid: !(remainingPayers ?? []).includes(currentUser.id) && !(remainingPayers ?? []).includes(currentUser.name)
     };
   }
 
@@ -175,9 +184,14 @@ export class DespesasFixasComponent implements OnInit {
     });
   }
 
-  verificaParcelaPagaPorMim(parcela: import("../../../core/models/parcela/parcela").Parcela): boolean {
-    const userName = this.userService.getUser().name;
-    return (parcela.remainingPayers ?? []).includes(userName);
+  verificaParcelaPendenteParaMim(parcela: import("../../../core/models/parcela/parcela").Parcela): boolean {
+    const user = this.userService.getUser();
+    return (parcela.remainingPayers ?? []).includes(user.id)
+      || (parcela.remainingPayers ?? []).includes(user.name);
+  }
+
+  private displayNamesFor(references: string[], usersById: Map<string, string>): string[] {
+    return references.map((reference) => usersById.get(reference) ?? reference);
   }
 
   delete(despesa: DespesaFixa): void {

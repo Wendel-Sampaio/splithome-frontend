@@ -16,6 +16,7 @@ import { MatProgressSpinnerModule } from '@angular/material/progress-spinner';
 import { NotificationService } from '../../services/notification/notification.service';
 import { PagadoresPipe } from '../../pipes/pagadores.pipe';
 import { CategoriaPipe } from '../../pipes/categoria.pipe';
+import { CategoriaIconePipe } from '../../pipes/categoria-icone.pipe';
 import { PlanService } from '../../../core/plan/plan.service';
 import { UserStateService } from '../../../core/auth/user/user-state.service';
 import { MatPaginatorModule, PageEvent } from '@angular/material/paginator';
@@ -49,6 +50,7 @@ interface Purchaser {
     MatIconModule,
     PagadoresPipe,
     CategoriaPipe,
+    CategoriaIconePipe,
     MatPaginatorModule,
     MatSortModule,
     MatFormFieldModule,
@@ -186,12 +188,12 @@ export class ComprasComponent implements OnInit {
 
   efetuarPagamento(element: Compra) {
     if (!this.verificaUserRemainingPayers(element)) {
-      const userName = this.userService.getUser().name;
-      element.remainingPayers.push(userName)
+      const user = this.userService.getUser();
+      element.remainingPayers.push(user.id)
       element.isPaid = false;
       this.loadingAcao.set(true);
       this.compraService.atualizarCompra({
-        id: element.id,
+        ...element,
         remainingPayers: element.remainingPayers
       }).pipe(
         finalize(() => this.loadingAcao.set(false)),
@@ -264,8 +266,8 @@ export class ComprasComponent implements OnInit {
       paymentDate: item.paymentDate,
       purchaserId: user.id,
       purchaseDate: item.paymentDate,
-      payers: [user.name],
-      remainingPayers: [user.name]
+      payers: [user.id],
+      remainingPayers: [user.id]
     };
   }
 
@@ -360,8 +362,9 @@ export class ComprasComponent implements OnInit {
   }
 
   verificaUserRemainingPayers(compra: Compra): boolean {
-    const userName = this.userService.getUser().name;
-    return (compra.remainingPayers ?? []).includes(userName);
+    const user = this.userService.getUser();
+    return (compra.remainingPayers ?? []).includes(user.id)
+      || (compra.remainingPayers ?? []).includes(user.name);
   }
 
   verificarPagamento(element: Compra): boolean {
@@ -432,20 +435,27 @@ export class ComprasComponent implements OnInit {
 
   private prepararCompra(compra: Compra, usersById: Map<string, string>): Compra {
     const currentUser = this.userService.getUser();
-    const userName = currentUser.name;
     const isNotPurchaser = compra.purchaserId !== currentUser.id;
     const payers = compra.payers ?? [];
     const remainingPayers = compra.remainingPayers ?? [];
     const unitValue = payers.length ? compra.value / payers.length : 0;
     const compraNormalizada = { ...compra, payers, remainingPayers };
     const purchaserName = usersById.get(compra.purchaserId) ?? (compra.purchaserId === currentUser.id ? currentUser.name : '');
+    const payerNames = this.displayNamesFor(payers, usersById);
+    const remainingPayerNames = this.displayNamesFor(remainingPayers, usersById);
 
     return {
       ...compraNormalizada,
       unitValue,
       purchaserName,
-      showPaymentButton: isNotPurchaser && payers.includes(userName),
+      payerNames,
+      remainingPayerNames,
+      showPaymentButton: isNotPurchaser && (payers.includes(currentUser.id) || payers.includes(currentUser.name)),
       isPaid: !this.verificaUserRemainingPayers(compraNormalizada)
     };
+  }
+
+  private displayNamesFor(references: string[], usersById: Map<string, string>): string[] {
+    return references.map((reference) => usersById.get(reference) ?? reference);
   }
 }

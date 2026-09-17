@@ -14,7 +14,9 @@ export interface DespesaFixa {
   creditCardId: string | null;
   creditCardName?: string;
   payers: Array<string>;
+  payerNames?: Array<string>;
   remainingPayers: Array<string>;
+  remainingPayerNames?: Array<string>;
   parcelas: Parcela[];
   showPaymentButton?: boolean;
   isPaid?: boolean;

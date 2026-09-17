@@ -33,6 +33,19 @@ form {
   gap: 6px;
 }
 
+.sh-category-option {
+  align-items: center;
+  display: inline-flex;
+  gap: 8px;
+
+  mat-icon {
+    color: var(--sh-color-primary-strong);
+    font-size: 20px;
+    height: 20px;
+    width: 20px;
+  }
+}
+
 .sh-chip-payer-list {
   display: flex;
   flex-wrap: wrap;

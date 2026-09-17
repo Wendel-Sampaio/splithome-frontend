@@ -47,7 +47,7 @@ export class FamiliaService {
   }
 
   obterMinhaFamilia(): Observable<Familia | null> {
-    return this.http.get<unknown>(this.API).pipe(
+    return this.http.get<unknown>(`${this.API}/my-family`).pipe(
       map((response) => this.extractFamily(response))
     );
   }

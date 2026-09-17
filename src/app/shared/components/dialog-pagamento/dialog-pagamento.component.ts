@@ -21,6 +21,15 @@ export interface ModeloPagamento {
   remainingPayers: string[];
 }
 
+type DialogPagamentoData = {
+  id: string;
+  remainingPayers: string[];
+  unitValue: number;
+  responsibleId?: string;
+  purchaserId?: string;
+  [key: string]: unknown;
+};
+
 @Component({
   selector: 'app-dialog-pagamento',
   standalone: true,
@@ -52,7 +61,7 @@ export class DialogPagamentoComponent implements OnInit {
 
   constructor(
     public dialogRef: MatDialogRef<DialogPagamentoComponent>,
-    @Inject(MAT_DIALOG_DATA) public data: { id: string; remainingPayers: string[]; unitValue: number; responsibleId?: string; purchaserId?: string }
+    @Inject(MAT_DIALOG_DATA) public data: DialogPagamentoData
   ) {}
 
   ngOnInit(): void {
@@ -76,13 +85,12 @@ export class DialogPagamentoComponent implements OnInit {
   }
 
   efetuarPagamento(): void {
-    const nomePagador = this.userService.getUser().name;
-    const index = this.data.remainingPayers.indexOf(nomePagador);
-    if (index !== -1) {
-      this.data.remainingPayers.splice(index, 1);
-    }
-    const modeloPagamento: ModeloPagamento = {
-      id: this.data.id,
+    const user = this.userService.getUser();
+    this.data.remainingPayers = this.data.remainingPayers.filter(
+      (payer) => payer !== user.id && payer !== user.name
+    );
+    const modeloPagamento: DialogPagamentoData = {
+      ...this.data,
       remainingPayers: this.data.remainingPayers
     };
     this.loading.set(true);

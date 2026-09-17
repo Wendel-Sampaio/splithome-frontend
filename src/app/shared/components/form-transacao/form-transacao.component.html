@@ -16,7 +16,12 @@
         <mat-label>Categoria</mat-label>
         <mat-select formControlName="categoria">
           @for (categoria of categorias$ | async; track categoria) {
-            <mat-option [value]="categoria">{{ categoria | categoria }}</mat-option>
+            <mat-option [value]="categoria">
+              <span class="sh-category-option">
+                <mat-icon aria-hidden="true">{{ categoria | categoriaIcone }}</mat-icon>
+                {{ categoria | categoria }}
+              </span>
+            </mat-option>
           }
         </mat-select>
         <mat-error *ngIf="controlInvalido('categoria')">{{ getMensagemErroCampo('categoria') }}</mat-error>
@@ -103,6 +108,20 @@
     }
 
     @if (isPremium) {
+      <app-form-section
+        [title]="isDespesaFixa ? 'Responsável' : 'Comprador'"
+        [description]="isDespesaFixa ? 'Quem paga a despesa fixa para depois dividir?' : 'Quem fez a compra para depois dividir?'">
+        <mat-form-field appearance="outline" class="sh-full-row">
+          <mat-label>{{ isDespesaFixa ? 'Responsável' : 'Comprador' }}</mat-label>
+          <mat-select formControlName="responsavel">
+            @for (usuario of usuarios$ | async; track usuario.id) {
+              <mat-option [value]="usuario.id">{{ usuario.name }}</mat-option>
+            }
+          </mat-select>
+          <mat-error *ngIf="controlInvalido('responsavel')">Selecione uma pessoa da família.</mat-error>
+        </mat-form-field>
+      </app-form-section>
+
       <app-form-section
         title="Pagadores"
         [optional]="true"

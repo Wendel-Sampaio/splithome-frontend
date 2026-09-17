@@ -26,14 +26,22 @@
                 'payed-style': verificarPagamento(element),
                 'payed-style-last-left': isLastDespesa(element, despesas)
             }" mat-cell *matCellDef="let element">
-                {{element.title}}
+                <div class="expense-cell">
+                    <span class="category-icon">
+                        <mat-icon aria-hidden="true">{{ element.category | categoriaIcone }}</mat-icon>
+                    </span>
+                    <span>{{ element.title }}</span>
+                </div>
             </td>
         </ng-container>
 
         <ng-container matColumnDef="category">
             <th class="column-name" mat-header-cell *matHeaderCellDef> Categoria </th>
             <td [ngClass]="{'payed-style': verificarPagamento(element)}" mat-cell *matCellDef="let element">
-                {{ element.category | categoria }}
+                <span class="category-chip">
+                    <mat-icon aria-hidden="true">{{ element.category | categoriaIcone }}</mat-icon>
+                    {{ element.category | categoria }}
+                </span>
             </td>
         </ng-container>
 
@@ -54,7 +62,7 @@
         <ng-container matColumnDef="payers">
             <th class="column-name" mat-header-cell *matHeaderCellDef> Pagadores </th>
             <td [ngClass]="{'payed-style': verificarPagamento(element)}" mat-cell *matCellDef="let element">
-                {{ element.payers | pagadores }}
+                {{ (element.payerNames || element.payers) | pagadores }}
             </td>
         </ng-container>
 
@@ -89,7 +97,7 @@
                 'payed-style': verificarPagamento(element),
                 'payed-style-last-right': isLastDespesa(element, despesas)
             }" mat-cell *matCellDef="let element">
-                {{ element.remainingPayers | pagadores:'Todos efetuaram o pagamento.' }}
+                {{ (element.remainingPayerNames || element.remainingPayers) | pagadores:'Todos efetuaram o pagamento.' }}
             </td>
         </ng-container>
 

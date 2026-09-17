@@ -11,6 +11,7 @@ import { UserService } from "../../../core/auth/user/user.service";
 import { Despesa } from "../../../core/models/despesa/despesa";
 import { CompraService } from "../../services/compra/compra.service";
 import { CategoriaPipe } from "../../pipes/categoria.pipe";
+import { CategoriaIconePipe } from "../../pipes/categoria-icone.pipe";
 import { PagadoresPipe } from "../../pipes/pagadores.pipe";
 import { ConfirmDeleteComponent, ConfirmDeleteDialogData } from "../confirm-delete/confirm-delete.component";
 import { DialogPagamentoComponent } from "../dialog-pagamento/dialog-pagamento.component";
@@ -27,6 +28,7 @@ import { ModalService } from "../ui/modal";
     MatDialogModule,
     MatProgressSpinnerModule,
     CategoriaPipe,
+    CategoriaIconePipe,
     PagadoresPipe
   ],
   templateUrl: './despesas.component.html',
@@ -133,8 +135,8 @@ export class DespesasComponent {
       value: despesa.value,
       paymentDate: despesa.paymentDate,
       responsibleId: user.id,
-      payers: [user.name],
-      remainingPayers: [user.name]
+      payers: [user.id],
+      remainingPayers: [user.id]
     };
   }
 
@@ -152,12 +154,12 @@ export class DespesasComponent {
 
   efetuarPagamento(element: Despesa): void {
     if (!this.verificaUserRemainingPayers(element)) {
-      const userName = this.userService.getUser().name;
-      element.remainingPayers.push(userName);
+      const user = this.userService.getUser();
+      element.remainingPayers.push(user.id);
       element.isPaid = false;
       this.loadingAcao.set(true);
       this.despesaService.atualizarDespesa({
-        id: element.id,
+        ...element,
         remainingPayers: element.remainingPayers
       }).pipe(
         finalize(() => this.loadingAcao.set(false)),
@@ -201,8 +203,9 @@ export class DespesasComponent {
   }
 
   verificaUserRemainingPayers(despesa: Despesa): boolean {
-    const userName = this.userService.getUser().name;
-    return (despesa.remainingPayers ?? []).includes(userName);
+    const user = this.userService.getUser();
+    return (despesa.remainingPayers ?? []).includes(user.id)
+      || (despesa.remainingPayers ?? []).includes(user.name);
   }
 
   verificarPagamento(element: Despesa): boolean {
@@ -252,7 +255,6 @@ export class DespesasComponent {
 
   private prepararDespesa(despesa: Despesa): Observable<Despesa> {
     const currentUser = this.userService.getUser();
-    const userName = currentUser.name;
     const isNotResponsible = despesa.responsibleId !== currentUser.id;
     const payers = despesa.payers ?? [];
     const remainingPayers = despesa.remainingPayers ?? [];
@@ -264,16 +266,24 @@ export class DespesasComponent {
         ...despesaNormalizada,
         unitValue,
         responsibleName: user.name,
-        showPaymentButton: isNotResponsible && payers.includes(userName),
+        payerNames: this.displayNamesFor(payers, new Map([[user.id, user.name], [currentUser.id, currentUser.name]])),
+        remainingPayerNames: this.displayNamesFor(remainingPayers, new Map([[user.id, user.name], [currentUser.id, currentUser.name]])),
+        showPaymentButton: isNotResponsible && (payers.includes(currentUser.id) || payers.includes(currentUser.name)),
         isPaid: !this.verificaUserRemainingPayers(despesaNormalizada)
       })),
       catchError(() => of({
         ...despesaNormalizada,
         unitValue,
         responsibleName: '',
-        showPaymentButton: isNotResponsible && payers.includes(userName),
+        payerNames: this.displayNamesFor(payers, new Map([[currentUser.id, currentUser.name]])),
+        remainingPayerNames: this.displayNamesFor(remainingPayers, new Map([[currentUser.id, currentUser.name]])),
+        showPaymentButton: isNotResponsible && (payers.includes(currentUser.id) || payers.includes(currentUser.name)),
         isPaid: !this.verificaUserRemainingPayers(despesaNormalizada)
       }))
     );
+  }
+
+  private displayNamesFor(references: string[], usersById: Map<string, string>): string[] {
+    return references.map((reference) => usersById.get(reference) ?? reference);
   }
 }

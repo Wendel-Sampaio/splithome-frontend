@@ -14,12 +14,24 @@
   <table mat-table [dataSource]="despesas" *ngIf="!loadingLista()" class="mat-elevation-z1">
     <ng-container matColumnDef="title">
       <th mat-header-cell *matHeaderCellDef>Título</th>
-      <td mat-cell *matCellDef="let despesa">{{ despesa.title }}</td>
+      <td mat-cell *matCellDef="let despesa">
+        <div class="fixed-expense-cell">
+          <span class="category-icon">
+            <mat-icon aria-hidden="true">{{ despesa.category | categoriaIcone }}</mat-icon>
+          </span>
+          <span>{{ despesa.title }}</span>
+        </div>
+      </td>
     </ng-container>
 
     <ng-container matColumnDef="category">
       <th mat-header-cell *matHeaderCellDef>Categoria</th>
-      <td mat-cell *matCellDef="let despesa">{{ despesa.category | categoria }}</td>
+      <td mat-cell *matCellDef="let despesa">
+        <span class="category-chip">
+          <mat-icon aria-hidden="true">{{ despesa.category | categoriaIcone }}</mat-icon>
+          {{ despesa.category | categoria }}
+        </span>
+      </td>
     </ng-container>
 
     <ng-container matColumnDef="totalValue">
@@ -95,9 +107,9 @@
                   mat-stroked-button
                   color="primary"
                   (click)="pagarParcela(parcela.id)"
-                  [disabled]="parcela.pago || loadingAcao()"
+                  [disabled]="!verificaParcelaPendenteParaMim(parcela) || loadingAcao()"
                 >
-                  <mat-icon>paid</mat-icon> Pagar
+                  <mat-icon>paid</mat-icon> {{ verificaParcelaPendenteParaMim(parcela) ? 'Pagar minha parte' : 'Pago por mim' }}
                 </button>
               </td>
             </tr>

@@ -42,7 +42,12 @@
                 <mat-label>Categoria</mat-label>
                 <mat-select formControlName="category">
                     <mat-option [value]="null">Todas</mat-option>
-                    <mat-option *ngFor="let cat of categories" [value]="cat">{{ cat | categoria }}</mat-option>
+                    <mat-option *ngFor="let cat of categories" [value]="cat">
+                        <span class="category-option">
+                            <mat-icon aria-hidden="true">{{ cat | categoriaIcone }}</mat-icon>
+                            {{ cat | categoria }}
+                        </span>
+                    </mat-option>
                 </mat-select>
             </mat-form-field>
 
@@ -98,7 +103,7 @@
                     <td [ngClass]="{'payed-style': verificarPagamento(element)}" mat-cell *matCellDef="let element">
                         <div class="purchase-cell">
                             <span class="purchase-icon">
-                                <mat-icon aria-hidden="true">shopping_bag</mat-icon>
+                                <mat-icon aria-hidden="true">{{ element.category | categoriaIcone }}</mat-icon>
                             </span>
                             <div>
                                 <strong>{{ element.title }}</strong>
@@ -111,7 +116,10 @@
                 <ng-container matColumnDef="category">
                     <th mat-header-cell *matHeaderCellDef mat-sort-header="category">Categoria</th>
                     <td [ngClass]="{'payed-style': verificarPagamento(element)}" mat-cell *matCellDef="let element">
-                        <span class="category-chip">{{ element.category | categoria }}</span>
+                        <span class="category-chip">
+                            <mat-icon aria-hidden="true">{{ element.category | categoriaIcone }}</mat-icon>
+                            {{ element.category | categoria }}
+                        </span>
                     </td>
                 </ng-container>
 
@@ -139,7 +147,7 @@
                 <ng-container matColumnDef="payers">
                     <th mat-header-cell *matHeaderCellDef>Pagadores</th>
                     <td [ngClass]="{'payed-style': verificarPagamento(element)}" mat-cell *matCellDef="let element">
-                        <span class="people-text">{{ element.payers | pagadores }}</span>
+                        <span class="people-text">{{ (element.payerNames || element.payers) | pagadores }}</span>
                     </td>
                 </ng-container>
 
@@ -181,7 +189,7 @@
                     <th mat-header-cell *matHeaderCellDef>Restantes</th>
                     <td [ngClass]="{'payed-style': verificarPagamento(element)}" mat-cell *matCellDef="let element">
                         <span class="people-text">
-                            {{ element.remainingPayers | pagadores:'Todos efetuaram o pagamento.' }}
+                            {{ (element.remainingPayerNames || element.remainingPayers) | pagadores:'Todos efetuaram o pagamento.' }}
                         </span>
                     </td>
                 </ng-container>

@@ -14,6 +14,51 @@
     padding: 32px;
   }
 
+  .fixed-expense-cell,
+  .category-chip,
+  .category-icon {
+    align-items: center;
+    display: inline-flex;
+  }
+
+  .fixed-expense-cell {
+    gap: 10px;
+  }
+
+  .category-icon {
+    background: var(--sh-color-primary-soft);
+    border: 1px solid var(--sh-color-primary-muted);
+    border-radius: 8px;
+    color: var(--sh-color-primary-strong);
+    flex: 0 0 36px;
+    height: 36px;
+    justify-content: center;
+    width: 36px;
+
+    mat-icon {
+      font-size: 20px;
+      height: 20px;
+      width: 20px;
+    }
+  }
+
+  .category-chip {
+    background: var(--sh-color-surface-alt);
+    border: 1px solid var(--sh-color-border);
+    border-radius: 999px;
+    color: var(--sh-color-text-muted);
+    gap: 6px;
+    min-height: 28px;
+    padding: 5px 10px;
+
+    mat-icon {
+      color: var(--sh-color-primary-strong);
+      font-size: 18px;
+      height: 18px;
+      width: 18px;
+    }
+  }
+
   .empty {
     text-align: center;
     color: #777;

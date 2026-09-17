@@ -66,7 +66,13 @@ export class CompraService {
     if (filter.size !== undefined) params = params.set('size', filter.size.toString());
     if (filter.sort) params = params.set('sort', filter.sort);
     return this.http.get<unknown>(`${this.API}/fixed-expenses`, { params }).pipe(
-      map(response => this.normalizarPagina<DespesaFixa>(response))
+      map(response => {
+        const page = this.normalizarPagina<DespesaFixa>(response);
+        return {
+          ...page,
+          content: page.content.map((despesa) => this.normalizarDespesaFixa(despesa))
+        };
+      })
     );
   }
 
@@ -187,5 +193,24 @@ export class CompraService {
     }
 
     return null;
+  }
+
+  private normalizarDespesaFixa(despesa: DespesaFixa): DespesaFixa {
+    return {
+      ...despesa,
+      payers: despesa.payers ?? [],
+      remainingPayers: despesa.remainingPayers ?? [],
+      parcelas: (despesa.parcelas ?? []).map((parcela) => ({
+        ...parcela,
+        id: parcela.id,
+        expenseId: parcela.expenseId,
+        numero: parcela.numero ?? (parcela as unknown as { installmentNumber?: number }).installmentNumber ?? 0,
+        valor: parcela.valor ?? (parcela as unknown as { value?: number }).value ?? 0,
+        dataVencimento: parcela.dataVencimento ?? (parcela as unknown as { dueDate?: string }).dueDate ?? '',
+        pago: parcela.pago ?? (parcela as unknown as { paid?: boolean }).paid ?? false,
+        pagadores: parcela.pagadores ?? (parcela as unknown as { payers?: string[] }).payers ?? [],
+        remainingPayers: parcela.remainingPayers ?? []
+      }))
+    };
   }
 }

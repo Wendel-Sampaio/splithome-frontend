@@ -22,6 +22,7 @@ import { Compra } from '../../../core/models/compra/compra';
 import { DespesaFixa } from '../../../core/models/despesa-fixa/despesa-fixa';
 import { NotificationService } from '../../services/notification/notification.service';
 import { CategoriaPipe } from '../../pipes/categoria.pipe';
+import { CategoriaIconePipe } from '../../pipes/categoria-icone.pipe';
 import { PlanService } from '../../../core/plan/plan.service';
 import { UserStateService } from '../../../core/auth/user/user-state.service';
 import { Cartao, CreditCardBrand } from '../../../core/models/cartao/cartao';
@@ -58,6 +59,7 @@ type FormTransacaoData = {
     MatDatepickerModule,
     MatChipsModule,
     CategoriaPipe,
+    CategoriaIconePipe,
     MatProgressSpinnerModule,
     MatIconModule,
     ModalHeaderComponent,
@@ -89,7 +91,13 @@ export class FormTransacaoComponent {
     shareReplay({ bufferSize: 1, refCount: true })
   );
   readonly usuarios$ = this.userStateService.getFamilyUsers().pipe(
-    map((usuarios) => usuarios.filter((usuario) => this.usuarioPodeSerPagador(usuario))),
+    map((usuarios) => {
+      const usuarioLogado = this.userService.getUser();
+      const usuariosComLogado = usuarioLogado.id
+        ? [usuarioLogado, ...usuarios.filter((usuario) => usuario.id !== usuarioLogado.id)]
+        : usuarios;
+      return usuariosComLogado.filter((usuario) => this.usuarioPodeSerPagador(usuario));
+    }),
     shareReplay({ bufferSize: 1, refCount: true })
   );
   readonly cartoes$ = this.compraService.listarCartoes().pipe(
@@ -177,6 +185,7 @@ export class FormTransacaoComponent {
     const baseControls: Record<string, FormControl> = {
       titulo: new FormControl('', [Validators.required]),
       categoria: new FormControl('', [Validators.required]),
+      responsavel: new FormControl(this.responsavel, [Validators.required]),
     };
 
     if (this.isDespesaFixa) {
@@ -239,16 +248,16 @@ export class FormTransacaoComponent {
   }
 
   mudarSelecaoUsuario(usuario: User): void {
-    const index = this.pagadores.indexOf(usuario.name);
+    const index = this.pagadores.findIndex((pagador) => this.isMesmoUsuario(pagador, usuario));
     if (index === -1) {
-      this.pagadores.push(usuario.name);
+      this.pagadores.push(usuario.id);
     } else {
       this.pagadores.splice(index, 1);
     }
   }
 
   usuarioSelecionado(usuario: User): boolean {
-    return this.pagadores.includes(usuario.name);
+    return this.pagadores.some((pagador) => this.isMesmoUsuario(pagador, usuario));
   }
 
   getProfilePhoto(usuario: User): string {
@@ -319,6 +328,7 @@ export class FormTransacaoComponent {
 
   private enviarDespesaFixa(usuarioLogado: User, pagadores: string[]): void {
     const v = this.formTransacao.value;
+    const responsavel = v.responsavel || this.responsavel || usuarioLogado.id;
     const payload: any = {
       title: v.titulo,
       category: v.categoria,
@@ -327,7 +337,7 @@ export class FormTransacaoComponent {
       dueDay: Number(v.diaVencimento),
       startDate: this.formatDateOnly(v.dataInicio),
       creditCardId: v.cartaoId || null,
-      responsibleId: this.responsavel,
+      responsibleId: responsavel,
       payers: pagadores,
       remainingPayers: this.pagadoresRestantes
     };
@@ -351,6 +361,7 @@ export class FormTransacaoComponent {
   }
 
   private enviarCompra(usuarioLogado: User, pagadores: string[]): void {
+    const responsavel = this.formTransacao.value.responsavel || this.responsavel || usuarioLogado.id;
     const formData = {
       ...(this.isEdicaoCompra ? { id: this.data?.compra?.id } : {}),
       title: this.formTransacao.value.titulo,
@@ -360,9 +371,9 @@ export class FormTransacaoComponent {
       paymentDate: this.formatDateOnly(this.formTransacao.value.dataPagamento),
       remainingPayers: this.pagadoresRestantes,
       ...(this.isDespesaFixa
-        ? { responsibleId: this.responsavel }
+        ? { responsibleId: responsavel }
         : {
-          purchaserId: this.responsavel,
+          purchaserId: responsavel,
           purchaseDate: this.isEdicaoCompra && this.data?.compra?.purchaseDate
             ? this.formatDateOnly(this.data.compra.purchaseDate)
             : this.formatDateOnly(new Date())
@@ -394,7 +405,8 @@ export class FormTransacaoComponent {
         titulo: this.data.compra.title,
         categoria: this.data.compra.category,
         valor: this.data.compra.value,
-        dataPagamento: this.data.compra.paymentDate ? new Date(this.data.compra.paymentDate) : ''
+        dataPagamento: this.data.compra.paymentDate ? new Date(this.data.compra.paymentDate) : '',
+        responsavel: this.responsavel
       });
       this.pagadores = [...(this.data.compra.payers ?? [])];
       return;
@@ -410,7 +422,8 @@ export class FormTransacaoComponent {
         quantidadeParcelas: d.quantidadeParcelas,
         diaVencimento: d.diaVencimento,
         dataInicio: d.dataInicio ? new Date(d.dataInicio) : new Date(),
-        cartaoId: d.creditCardId || null
+        cartaoId: d.creditCardId || null,
+        responsavel: this.responsavel
       });
       this.pagadores = [...(d.payers ?? [])];
     }
@@ -437,6 +450,10 @@ export class FormTransacaoComponent {
     const familyCodeLogado = usuarioLogado.familyId ?? usuarioLogado.familyCode;
     const familyCodeUsuario = usuario.familyId ?? usuario.familyCode;
     return usuario.plan === 'PREMIUM' && familyCodeUsuario === familyCodeLogado;
+  }
+
+  private isMesmoUsuario(reference: string, usuario: User): boolean {
+    return reference === usuario.id || reference === usuario.name;
   }
 
   formatCurrency(value: number): string {
