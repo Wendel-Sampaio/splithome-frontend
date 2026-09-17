@@ -6,12 +6,19 @@ import { MatDialog } from '@angular/material/dialog';
 import { MatIcon } from '@angular/material/icon';
 import { forkJoin, of } from 'rxjs';
 import { catchError, finalize, map } from 'rxjs/operators';
+import { Cartao, CreditCardBrand } from '../../../core/models/cartao/cartao';
 import { Compra } from '../../../core/models/compra/compra';
 import { DespesaFixa } from '../../../core/models/despesa-fixa/despesa-fixa';
 import { UserService } from '../../../core/auth/user/user.service';
 import { CompraService } from '../../services/compra/compra.service';
-import { EstatisticasResumo, EstatisticasService } from '../../services/estatisticas/estatisticas.service';
-import { ResumoFinanceiro, ResumoFinanceiroService } from '../../services/resumo-financeiro/resumo-financeiro.service';
+import { EstatisticaCategoria, EstatisticasResumo, EstatisticasService } from '../../services/estatisticas/estatisticas.service';
+import {
+  DividaMembro,
+  ResumoFinanceiro,
+  ResumoFinanceiroService,
+  SaldoMembro,
+  SugestaoLiquidacao
+} from '../../services/resumo-financeiro/resumo-financeiro.service';
 import { CategoriaPipe } from '../../pipes/categoria.pipe';
 import { FormTransacaoComponent } from '../form-transacao/form-transacao.component';
 import { ModalService } from '../ui/modal';
@@ -33,7 +40,33 @@ interface BarraMes {
   altura: number;
 }
 
+interface ContaPendente {
+  title: string;
+  subtitle: string;
+  value: number;
+  dueDate: string;
+  tipo: 'compra' | 'despesa' | 'parcela';
+  atrasada: boolean;
+}
+
+interface CartaoResumo {
+  id: string;
+  name: string;
+  brand: CreditCardBrand | null;
+  lastDigits: string | null;
+  dueDay: number;
+  total: number;
+  pendente: number;
+  quantidade: number;
+}
+
 interface ParcelaResumo {
+  id?: string;
+  numero?: number;
+  dataVencimento?: string;
+  dueDate?: string;
+  pago?: boolean;
+  paid?: boolean;
   valor?: number;
   value?: number;
   pagadores?: string[];
@@ -63,9 +96,20 @@ export class DashboardInicioComponent implements OnInit {
   readonly totalDespesasMes = signal(0);
   readonly totalEmAberto = signal(0);
   readonly totalCompras = signal(0);
+  readonly totalAReceber = signal(0);
+  readonly totalAPagar = signal(0);
+  readonly pagamentosSugeridos = signal(0);
   readonly maiorCategoria = signal<string>('—');
   readonly atividades = signal<Atividade[]>([]);
   readonly barrasMes = signal<BarraMes[]>([]);
+  readonly categorias = signal<EstatisticaCategoria[]>([]);
+  readonly contasPendentes = signal<ContaPendente[]>([]);
+  readonly cartoesResumo = signal<CartaoResumo[]>([]);
+  readonly saldos = signal<SaldoMembro[]>([]);
+  readonly dividas = signal<DividaMembro[]>([]);
+  readonly liquidacoes = signal<SugestaoLiquidacao[]>([]);
+
+  readonly coresCategoria = ['#22c55e', '#3b82f6', '#f59e0b', '#8b5cf6', '#ef4444', '#06b6d4', '#eab308', '#14b8a6'];
 
   ngOnInit(): void {
     this.carregarDados();
@@ -90,13 +134,14 @@ export class DashboardInicioComponent implements OnInit {
       despesas: this.compraService.listarDespesasFixas({ size: 1000, sort: 'createdAt,desc' }).pipe(
         map(page => page?.content ?? []),
         catchError(() => of([] as DespesaFixa[]))
-      )
+      ),
+      cartoes: this.compraService.listarCartoes().pipe(catchError(() => of([] as Cartao[])))
     })
       .pipe(
         finalize(() => this.carregando.set(false)),
         takeUntilDestroyed(this.destroyRef)
       )
-      .subscribe(({ estatisticas, resumo, compras, despesas }) => {
+      .subscribe(({ estatisticas, resumo, compras, despesas, cartoes }) => {
         const comprasCarregadas = compras?.content ?? [];
         const totalCompras = Math.max(compras?.totalElements ?? 0, comprasCarregadas.length);
         const totalEmAbertoLocal = this.calcularTotalEmAberto(comprasCarregadas, despesas);
@@ -105,6 +150,8 @@ export class DashboardInicioComponent implements OnInit {
         this.aplicarResumo(resumo, totalEmAbertoLocal);
         this.totalCompras.set(totalCompras);
         this.montarAtividades(comprasCarregadas, despesas);
+        this.montarContasPendentes(comprasCarregadas, despesas);
+        this.montarResumoCartoes(cartoes, despesas);
       });
   }
 
@@ -115,6 +162,7 @@ export class DashboardInicioComponent implements OnInit {
 
     this.totalDespesasMes.set(estatisticas.totalMesAtual ?? 0);
     this.maiorCategoria.set(estatisticas.maiorCategoria?.categoria ?? '—');
+    this.categorias.set((estatisticas.totaisPorCategoria ?? []).slice(0, 6));
 
     const meses = estatisticas.totaisPorMes ?? [];
     const maior = meses.reduce((max, mes) => Math.max(max, mes.total), 0) || 1;
@@ -130,6 +178,20 @@ export class DashboardInicioComponent implements OnInit {
   private aplicarResumo(resumo: ResumoFinanceiro | null, totalEmAbertoLocal: number): void {
     const totalResumo = resumo?.totalOutstanding ?? 0;
     this.totalEmAberto.set(Math.max(totalResumo, totalEmAbertoLocal));
+    this.saldos.set(resumo?.balances ?? []);
+    this.dividas.set((resumo?.debts ?? []).slice(0, 4));
+    this.liquidacoes.set((resumo?.settlements ?? []).slice(0, 4));
+    this.pagamentosSugeridos.set(resumo?.settlements.length ?? 0);
+    this.totalAReceber.set(
+      resumo?.balances
+        .filter((saldo) => saldo.netBalance > 0)
+        .reduce((total, saldo) => total + saldo.netBalance, 0) ?? 0
+    );
+    this.totalAPagar.set(
+      Math.abs(resumo?.balances
+        .filter((saldo) => saldo.netBalance < 0)
+        .reduce((total, saldo) => total + saldo.netBalance, 0) ?? 0)
+    );
   }
 
   private montarAtividades(compras: Compra[], despesas: DespesaFixa[]): void {
@@ -157,6 +219,155 @@ export class DashboardInicioComponent implements OnInit {
       .slice(0, 6);
 
     this.atividades.set(todas);
+  }
+
+  private montarContasPendentes(compras: Compra[], despesas: DespesaFixa[]): void {
+    const pendenciasCompras: ContaPendente[] = compras
+      .filter((compra) => !compra.isPaid || (compra.remainingPayers?.length ?? 0) > 0)
+      .map((compra) => {
+        const vencimento = compra.paymentDate || compra.purchaseDate;
+
+        return {
+          title: compra.title,
+          subtitle: `${compra.purchaserName} · ${this.quantidadePendente(compra.remainingPayers)} pendente(s)`,
+          value: this.valorOuPendente(
+            compra.value,
+            this.calcularValorPendente(
+              compra.value,
+              compra.payers,
+              compra.remainingPayers,
+              [compra.purchaserId, compra.purchaserName]
+            )
+          ),
+          dueDate: vencimento,
+          tipo: 'compra' as const,
+          atrasada: this.estaAtrasada(vencimento)
+        };
+      });
+
+    const pendenciasDespesas: ContaPendente[] = despesas.flatMap<ContaPendente>((despesa): ContaPendente[] => {
+      const parcelas = this.lerParcelas(despesa);
+
+      if (parcelas.length) {
+        return parcelas
+          .filter((parcela) => !this.parcelaPaga(parcela) || (parcela.remainingPayers?.length ?? 0) > 0)
+          .map((parcela) => {
+            const valor = parcela.value ?? parcela.valor ?? 0;
+            const vencimento = parcela.dueDate ?? parcela.dataVencimento ?? despesa.paymentDate ?? despesa.dataInicio;
+
+            return {
+              title: despesa.title,
+              subtitle: `Parcela ${parcela.numero ?? '-'} · ${this.quantidadePendente(parcela.remainingPayers)} pendente(s)`,
+              value: this.valorOuPendente(
+                valor,
+                this.calcularValorPendente(
+                  valor,
+                  parcela.payers ?? parcela.pagadores ?? [],
+                  parcela.remainingPayers ?? [],
+                  [despesa.responsibleId, despesa.responsibleName]
+                )
+              ),
+              dueDate: vencimento,
+              tipo: 'parcela' as const,
+              atrasada: this.estaAtrasada(vencimento)
+            };
+          });
+      }
+
+      const vencimento = despesa.paymentDate || despesa.dataInicio;
+
+      return [{
+        title: despesa.title,
+        subtitle: `${despesa.responsibleName} · ${this.quantidadePendente(despesa.remainingPayers)} pendente(s)`,
+        value: this.valorOuPendente(
+          despesa.valorTotal,
+          this.calcularValorPendente(
+            despesa.valorTotal,
+            despesa.payers,
+            despesa.remainingPayers,
+            [despesa.responsibleId, despesa.responsibleName]
+          )
+        ),
+        dueDate: vencimento,
+        tipo: 'despesa' as const,
+        atrasada: this.estaAtrasada(vencimento)
+      }];
+    });
+
+    const pendencias = [...pendenciasCompras, ...pendenciasDespesas]
+      .filter((conta) => conta.value > 0)
+      .sort((a, b) => this.timestamp(a.dueDate) - this.timestamp(b.dueDate))
+      .slice(0, 6);
+
+    this.contasPendentes.set(pendencias);
+  }
+
+  private montarResumoCartoes(cartoes: Cartao[], despesas: DespesaFixa[]): void {
+    const resumos = new Map<string, CartaoResumo>();
+
+    cartoes.forEach((cartao) => {
+      resumos.set(cartao.id, {
+        id: cartao.id,
+        name: cartao.name,
+        brand: cartao.brand,
+        lastDigits: cartao.lastDigits,
+        dueDay: cartao.dueDay,
+        total: 0,
+        pendente: 0,
+        quantidade: 0
+      });
+    });
+
+    despesas
+      .filter((despesa) => !!despesa.creditCardId)
+      .forEach((despesa) => {
+        const cartaoId = despesa.creditCardId as string;
+        const resumo = resumos.get(cartaoId) ?? {
+          id: cartaoId,
+          name: despesa.creditCardName || 'Cartão vinculado',
+          brand: null,
+          lastDigits: null,
+          dueDay: despesa.diaVencimento,
+          total: 0,
+          pendente: 0,
+          quantidade: 0
+        };
+        const valorPendente = this.calcularPendenteDespesa(despesa);
+
+        resumo.total += despesa.valorTotal ?? 0;
+        resumo.pendente += valorPendente;
+        resumo.quantidade += 1;
+        resumos.set(cartaoId, resumo);
+      });
+
+    this.cartoesResumo.set(
+      [...resumos.values()]
+        .sort((a, b) => b.pendente - a.pendente || b.total - a.total || a.name.localeCompare(b.name))
+        .slice(0, 5)
+    );
+  }
+
+  private calcularPendenteDespesa(despesa: DespesaFixa): number {
+    const parcelas = this.lerParcelas(despesa);
+
+    if (parcelas.length) {
+      return parcelas.reduce((total, parcela) => {
+        const valor = parcela.value ?? parcela.valor ?? 0;
+        return total + this.calcularValorPendente(
+          valor,
+          parcela.payers ?? parcela.pagadores ?? [],
+          parcela.remainingPayers ?? [],
+          [despesa.responsibleId, despesa.responsibleName]
+        );
+      }, 0);
+    }
+
+    return this.calcularValorPendente(
+      despesa.valorTotal,
+      despesa.payers,
+      despesa.remainingPayers,
+      [despesa.responsibleId, despesa.responsibleName]
+    );
   }
 
   private calcularTotalEmAberto(compras: Compra[], despesas: DespesaFixa[]): number {
@@ -217,6 +428,35 @@ export class DashboardInicioComponent implements OnInit {
     return Array.isArray(despesa.parcelas) ? despesa.parcelas as ParcelaResumo[] : [];
   }
 
+  private parcelaPaga(parcela: ParcelaResumo): boolean {
+    return parcela.pago ?? parcela.paid ?? false;
+  }
+
+  private valorOuPendente(valorTotal: number, valorPendente: number): number {
+    return valorPendente > 0 ? valorPendente : valorTotal;
+  }
+
+  private quantidadePendente(pendentes?: string[]): number {
+    return pendentes?.length ?? 0;
+  }
+
+  private estaAtrasada(data: string): boolean {
+    if (!data) {
+      return false;
+    }
+
+    const hoje = new Date();
+    hoje.setHours(0, 0, 0, 0);
+    const dataConta = new Date(data);
+    dataConta.setHours(0, 0, 0, 0);
+    return !Number.isNaN(dataConta.getTime()) && dataConta < hoje;
+  }
+
+  private timestamp(data: string): number {
+    const time = new Date(data).getTime();
+    return Number.isNaN(time) ? Number.MAX_SAFE_INTEGER : time;
+  }
+
   novaCompra(): void {
     this.abrirFormulario('compra');
   }
@@ -250,5 +490,98 @@ export class DashboardInicioComponent implements OnInit {
 
   iconeAtividade(tipo: 'compra' | 'despesa'): string {
     return tipo === 'compra' ? 'shopping_cart' : 'payments';
+  }
+
+  iconeConta(tipo: ContaPendente['tipo']): string {
+    if (tipo === 'compra') {
+      return 'shopping_cart';
+    }
+
+    if (tipo === 'parcela') {
+      return 'event_repeat';
+    }
+
+    return 'payments';
+  }
+
+  get totalCategorias(): number {
+    return this.categorias().reduce((total, item) => total + item.total, 0);
+  }
+
+  get pieGradient(): string {
+    const categorias = this.categorias();
+
+    if (!categorias.length || this.totalCategorias <= 0) {
+      return '#eef3ef';
+    }
+
+    let inicio = 0;
+    const partes = categorias.map((item, index) => {
+      const fim = inicio + (item.total / this.totalCategorias) * 360;
+      const cor = this.getCorCategoria(index);
+      const segmento = `${cor} ${inicio}deg ${fim}deg`;
+      inicio = fim;
+      return segmento;
+    });
+
+    return `conic-gradient(${partes.join(', ')})`;
+  }
+
+  getCorCategoria(index: number): string {
+    return this.coresCategoria[index % this.coresCategoria.length];
+  }
+
+  saldoClasse(saldo: SaldoMembro): string {
+    if (saldo.netBalance > 0) {
+      return 'positivo';
+    }
+
+    if (saldo.netBalance < 0) {
+      return 'negativo';
+    }
+
+    return 'neutro';
+  }
+
+  formatarMes(mes: string): string {
+    const [ano, numeroMes] = mes.split('-');
+    const data = new Date(Number(ano), Number(numeroMes) - 1, 1);
+
+    if (Number.isNaN(data.getTime())) {
+      return mes;
+    }
+
+    return new Intl.DateTimeFormat('pt-BR', { month: 'short' }).format(data).replace('.', '');
+  }
+
+  formatarDataCurta(data: string): string {
+    if (!data) {
+      return 'Sem data';
+    }
+
+    const dataObj = new Date(data);
+
+    if (Number.isNaN(dataObj.getTime())) {
+      return data;
+    }
+
+    return new Intl.DateTimeFormat('pt-BR', { day: '2-digit', month: 'short' }).format(dataObj).replace('.', '');
+  }
+
+  brandLabel(brand: CreditCardBrand | null): string {
+    const labels: Record<CreditCardBrand, string> = {
+      VISA: 'Visa',
+      MASTERCARD: 'Mastercard',
+      ELO: 'Elo',
+      AMEX: 'Amex',
+      HIPERCARD: 'Hipercard',
+      OUTROS: 'Outros'
+    };
+
+    return brand ? labels[brand] : 'Sem bandeira';
+  }
+
+  brandInitial(brand: CreditCardBrand | null): string {
+    return this.brandLabel(brand).slice(0, 2).toUpperCase();
   }
 }

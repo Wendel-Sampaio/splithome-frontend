@@ -1,0 +1,115 @@
+<app-modal-header
+  [title]="compra.title || 'Compra sem título'"
+  description="Detalhes da compra e da divisão"
+  [icon]="compra.category | categoriaIcone" />
+
+<app-modal-body>
+  <section class="detail-shell">
+    <div class="detail-hero">
+      <span class="detail-category" [style.border-color]="compra.category | categoriaCor">
+        <mat-icon aria-hidden="true" [style.color]="compra.category | categoriaCor">{{ compra.category | categoriaIcone }}</mat-icon>
+        {{ compra.category | categoria }}
+      </span>
+
+      <div class="detail-title-row">
+        <div>
+          <span class="eyebrow">Valor total</span>
+          <strong>{{ compra.value | currency:'BRL' }}</strong>
+        </div>
+        <span class="status-chip" [class.status-chip--paid]="statusLabel === 'Pago'">
+          <mat-icon aria-hidden="true">{{ statusLabel === 'Pago' ? 'check_circle' : 'schedule' }}</mat-icon>
+          {{ statusLabel }}
+        </span>
+      </div>
+
+      @if (isPremium) {
+        <div class="progress-block" aria-label="Progresso de pagamento">
+          <div class="progress-copy">
+            <span>{{ pagos.length }} de {{ pagadores.length }} participantes já pagaram</span>
+            <strong>{{ progressoPagamento }}%</strong>
+          </div>
+          <div class="progress-track">
+            <span [style.width.%]="progressoPagamento"></span>
+          </div>
+        </div>
+      }
+    </div>
+
+    <div class="info-grid">
+      <div class="info-item">
+        <span>Comprador</span>
+        <strong>{{ compra.purchaserName || 'Não informado' }}</strong>
+      </div>
+      <div class="info-item">
+        <span>Data da compra</span>
+        <strong>{{ compra.purchaseDate | date:'dd/MM/yyyy' }}</strong>
+      </div>
+      <div class="info-item">
+        <span>Data de pagamento</span>
+        <strong>{{ compra.paymentDate | date:'dd/MM/yyyy' }}</strong>
+      </div>
+      <div class="info-item">
+        <span>Valor por pessoa</span>
+        <strong>{{ isPremium ? (valorUnitario | currency:'BRL') : 'Premium' }}</strong>
+      </div>
+    </div>
+
+    @if (isPremium) {
+      <section class="split-panel" aria-label="Divisão de pagamento">
+        <div class="split-heading">
+          <div>
+            <span class="eyebrow">Divisão da conta</span>
+            <h3>Quem paga e quem já pagou</h3>
+          </div>
+          <span class="split-total">{{ pagadores.length }} pessoa(s)</span>
+        </div>
+
+        @if (pessoasPagamento.length) {
+          <div class="people-grid">
+            @for (pessoa of pessoasPagamento; track pessoa.nome) {
+              <div class="person-row" [class.person-row--pending]="pessoa.status === 'pending'">
+                <span class="person-avatar">{{ pessoa.nome.charAt(0) }}</span>
+                <div>
+                  <strong>{{ pessoa.nome }}</strong>
+                  <span>{{ valorUnitario | currency:'BRL' }}</span>
+                </div>
+                <span class="person-status">
+                  <mat-icon aria-hidden="true">{{ pessoa.status === 'paid' ? 'verified' : 'hourglass_top' }}</mat-icon>
+                  {{ pessoa.status === 'paid' ? 'Pago' : 'Pendente' }}
+                </span>
+              </div>
+            }
+          </div>
+        } @else {
+          <p class="empty-split">Não há pagadores vinculados a esta compra.</p>
+        }
+      </section>
+    } @else {
+      <section class="premium-panel" aria-label="Recurso premium">
+        <span class="premium-icon">
+          <mat-icon aria-hidden="true">workspace_premium</mat-icon>
+        </span>
+        <div>
+          <span class="eyebrow">Premium</span>
+          <h3>Divisão de contas bloqueada</h3>
+          <p>
+            No plano grátis você vê os dados principais da compra. A divisão por pessoa,
+            valores individuais e status de quem já pagou ficam disponíveis no Premium.
+          </p>
+        </div>
+        <button mat-stroked-button type="button" (click)="abrirUpgrade()">
+          <mat-icon aria-hidden="true">lock_open</mat-icon>
+          Ver Premium
+        </button>
+      </section>
+    }
+  </section>
+</app-modal-body>
+
+<app-modal-footer align="space-between">
+  <span class="footer-note">
+    <mat-icon aria-hidden="true">receipt_long</mat-icon>
+    {{ compra.id }}
+  </span>
+  <button mat-flat-button type="button" [mat-dialog-close]="true">Fechar</button>
+</app-modal-footer>

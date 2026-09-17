@@ -173,16 +173,15 @@
                             type="button"
                             [ngClass]="{'payed-button': element.isPaid}"
                             (click)="efetuarPagamento(element)"
-                            *ngIf="element.showPaymentButton ; else indisponivel"
+                            *ngIf="element.showPaymentButton"
                             class="payment-button">
                             <mat-icon aria-hidden="true">{{ element.isPaid ? 'check_circle' : 'payments' }}</mat-icon>
                             {{ element.isPaid ? 'Pago' : 'Pagar' }}
                         </button>
+                        <span class="paid-status-chip" *ngIf="!element.showPaymentButton && element.isPaid">Pago</span>
+                        <span class="unavailable-chip" *ngIf="!element.showPaymentButton && !element.isPaid">Indisponível</span>
                         {{ element.payment }}
                     </td>
-                    <ng-template #indisponivel>
-                        <span class="unavailable-chip">Indisponível</span>
-                    </ng-template>
                 </ng-container>
 
                 <ng-container matColumnDef="remainingPayers">
@@ -198,6 +197,9 @@
                     <th mat-header-cell *matHeaderCellDef>Ações</th>
                     <td [ngClass]="{'payed-style': verificarPagamento(element)}" mat-cell *matCellDef="let element">
                         <div class="row-actions">
+                            <button mat-icon-button type="button" (click)="abrirDetalheCompra(element)" matTooltip="Ver detalhes" aria-label="Ver detalhes da compra">
+                                <mat-icon aria-hidden="true">visibility</mat-icon>
+                            </button>
                             <button mat-icon-button type="button" (click)="editarCompra(element)" matTooltip="Editar compra" aria-label="Editar compra">
                                 <mat-icon aria-hidden="true">edit</mat-icon>
                             </button>

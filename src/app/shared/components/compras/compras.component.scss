@@ -112,6 +112,7 @@
 
 .category-chip,
 .buyer-pill,
+.paid-status-chip,
 .unavailable-chip {
   align-items: center;
   border-radius: 999px;
@@ -291,6 +292,14 @@ table {
   --mdc-outlined-button-label-text-color: var(--sh-color-success);
   --mdc-outlined-button-outline-color: var(--sh-color-primary-muted);
   background: var(--sh-color-primary-soft);
+}
+
+.paid-status-chip {
+  background: var(--sh-color-primary-soft);
+  border: 1px solid var(--sh-color-primary-muted);
+  color: var(--sh-color-success);
+  min-width: 94px;
+  justify-content: center;
 }
 
 .unavailable-chip {

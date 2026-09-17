@@ -34,6 +34,7 @@ import { forkJoin } from 'rxjs';
 import { ModalService } from '../ui/modal';
 import { MatButtonModule } from '@angular/material/button';
 import { MatTooltipModule } from '@angular/material/tooltip';
+import { CompraDetalheComponent, CompraDetalheDialogData } from '../compra-detalhe/compra-detalhe.component';
 
 interface Purchaser {
   id: string;
@@ -185,6 +186,16 @@ export class ComprasComponent implements OnInit {
     formRef.afterClosed().pipe(takeUntilDestroyed(this.destroyRef)).subscribe(result => {
       console.log(`Dialog result: ${result}`);
       this.recarregarCompras();
+    });
+  }
+
+  abrirDetalheCompra(compra: Compra): void {
+    this.modal.open<CompraDetalheComponent, CompraDetalheDialogData>(CompraDetalheComponent, {
+      size: 'xl',
+      data: {
+        compra,
+        isPremium: this.isPremium
+      }
     });
   }
 
@@ -370,11 +381,6 @@ export class ComprasComponent implements OnInit {
   }
 
   verificarPagamento(element: Compra): boolean {
-    if (element.purchaserId === this.userService.getUser().id) {
-      if ((element.remainingPayers ?? []).length !== 0) {
-        return element.isPaid = false;
-      }
-    }
     return element.isPaid;
   }
 
@@ -437,13 +443,10 @@ export class ComprasComponent implements OnInit {
 
   private prepararCompra(compra: Compra, usersById: Map<string, string>): Compra {
     const currentUser = this.userService.getUser();
-    const isNotPurchaser = compra.purchaserId !== currentUser.id;
     const payers = compra.payers ?? [];
     const unitValue = payers.length ? compra.value / payers.length : 0;
     const purchaserName = usersById.get(compra.purchaserId) ?? (compra.purchaserId === currentUser.id ? currentUser.name : '');
-    const remainingPayers = (compra.remainingPayers ?? []).filter(
-      (payer) => payer !== compra.purchaserId && payer !== purchaserName
-    );
+    const remainingPayers = compra.remainingPayers ?? [];
     const compraNormalizada = { ...compra, payers, remainingPayers };
     const payerNames = this.displayNamesFor(payers, usersById);
     const remainingPayerNames = this.displayNamesFor(remainingPayers, usersById);
@@ -454,7 +457,7 @@ export class ComprasComponent implements OnInit {
       purchaserName,
       payerNames,
       remainingPayerNames,
-      showPaymentButton: isNotPurchaser && (payers.includes(currentUser.id) || payers.includes(currentUser.name)),
+      showPaymentButton: payers.includes(currentUser.id) || payers.includes(currentUser.name),
       isPaid: !this.verificaUserRemainingPayers(compraNormalizada)
     };
   }

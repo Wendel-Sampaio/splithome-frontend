@@ -88,11 +88,86 @@ describe('DashboardInicioComponent', () => {
     expect(texto).not.toContain('OTHERS');
   });
 
+  it('monta pendencias, resumo por cartao e dados financeiros na tela inicial', () => {
+    carregarDashboard({
+      estatisticas: {
+        totalByCategory: [{ category: 'OTHERS', total: 190 }],
+        totalByMonth: [{ month: '2026-09', total: 190 }]
+      },
+      resumo: {
+        balances: [
+          { memberId: 'u1', memberName: 'Joao Silva', netBalance: 95 },
+          { memberId: 'u2', memberName: 'Maria', netBalance: -95 }
+        ],
+        debts: [{ fromMemberId: 'u2', fromMemberName: 'Maria', toMemberId: 'u1', toMemberName: 'Joao Silva', amount: 95 }],
+        settlements: [{ fromMemberId: 'u2', fromMemberName: 'Maria', toMemberId: 'u1', toMemberName: 'Joao Silva', amount: 95 }],
+        totalOutstanding: 95
+      },
+      compras: {
+        content: [{
+          id: 'c1',
+          title: 'Mercado',
+          category: 'OTHERS',
+          value: 90,
+          payers: ['Joao Silva', 'Maria'],
+          paymentDate: '2099-09-20',
+          remainingPayers: ['Maria'],
+          purchaserId: 'u1',
+          purchaserName: 'Joao Silva',
+          purchaseDate: '2099-09-16',
+          isPaid: false
+        }]
+      },
+      despesas: {
+        content: [{
+          id: 'd1',
+          title: 'Internet',
+          category: 'OTHERS',
+          valorTotal: 100,
+          quantidadeParcelas: null,
+          diaVencimento: 10,
+          dataInicio: '2099-09-01',
+          paymentDate: '2099-09-10',
+          responsibleId: 'u1',
+          responsibleName: 'Joao Silva',
+          creditCardId: 'card-1',
+          creditCardName: 'Nubank Casa',
+          payers: ['Joao Silva', 'Maria'],
+          remainingPayers: ['Maria'],
+          parcelas: []
+        }]
+      },
+      cartoes: [{
+        id: 'card-1',
+        name: 'Nubank Casa',
+        brand: 'MASTERCARD',
+        lastDigits: '4321',
+        billingDay: 25,
+        dueDay: 5
+      }]
+    });
+
+    expect(component.contasPendentes().length).toBe(2);
+    expect(component.cartoesResumo()[0].name).toBe('Nubank Casa');
+    expect(component.cartoesResumo()[0].pendente).toBe(50);
+    expect(component.totalAReceber()).toBe(95);
+    expect(component.totalAPagar()).toBe(95);
+    expect(component.pagamentosSugeridos()).toBe(1);
+
+    fixture.detectChanges();
+    const texto = (fixture.nativeElement as HTMLElement).textContent ?? '';
+    expect(texto).toContain('Contas ainda');
+    expect(texto).toContain('Nubank Casa');
+    expect(texto).toContain('Gastos por categoria');
+    expect(texto).toContain('Maria deve para Joao Silva');
+  });
+
   function carregarDashboard(payload?: {
     estatisticas?: Record<string, unknown>;
     resumo?: Record<string, unknown>;
     compras?: Record<string, unknown>;
     despesas?: Record<string, unknown>;
+    cartoes?: Record<string, unknown>[];
   }): void {
     fixture.detectChanges();
 
@@ -117,5 +192,6 @@ describe('DashboardInicioComponent', () => {
     httpMock.expectOne(request => request.url.endsWith('/transactions/fixed-expenses')).flush(
       payload?.despesas ?? { content: [], totalElements: 0 }
     );
+    httpMock.expectOne(request => request.url.endsWith('/transactions/credit-cards')).flush(payload?.cartoes ?? []);
   }
 });

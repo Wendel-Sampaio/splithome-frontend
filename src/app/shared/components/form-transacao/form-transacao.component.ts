@@ -423,7 +423,7 @@ export class FormTransacaoComponent {
     }
 
     const pagadoresRestantes = this.isPremium
-      ? this.getPagadoresRestantesCompra(pagadores, responsavel)
+      ? this.getPagadoresRestantesCompra(pagadores)
       : [];
     this.pagadoresRestantes = pagadoresRestantes;
     const formData = {
@@ -502,11 +502,10 @@ export class FormTransacaoComponent {
     return [...new Set([...mantidos, ...novosPagadores])];
   }
 
-  private getPagadoresRestantesCompra(pagadores: string[], compradorId: string): string[] {
-    const restantes = this.isEdicaoCompra
+  private getPagadoresRestantesCompra(pagadores: string[]): string[] {
+    return this.isEdicaoCompra
       ? this.getPagadoresRestantesEdicao(pagadores)
       : [...pagadores];
-    return restantes.filter((pagador) => pagador !== compradorId);
   }
 
   private formatDateOnly(value: Date | string): string {

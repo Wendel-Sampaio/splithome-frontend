@@ -88,7 +88,7 @@ describe('FormTransacaoComponent', () => {
     expect(component.loading()).toBe(false);
   });
 
-  it('normaliza pagador salvo por nome para id antes de enviar e nao deixa comprador pendente', () => {
+  it('normaliza pagador salvo por nome para id antes de enviar e deixa comprador pendente', () => {
     compraService.cadastrarCompra.and.returnValue(of({} as any));
     preencher();
     (component as any).usuariosFamilia = [{ id: 'u1', name: 'Eu' }];
@@ -98,10 +98,10 @@ describe('FormTransacaoComponent', () => {
 
     const payload = compraService.cadastrarCompra.calls.mostRecent().args[0];
     expect(payload.payers).toEqual(['u1']);
-    expect(payload.remainingPayers).toEqual([]);
+    expect(payload.remainingPayers).toEqual(['u1']);
   });
 
-  it('mantem como pendente apenas pagadores diferentes do comprador', () => {
+  it('mantem todos os pagadores como pendentes ao criar compra', () => {
     compraService.cadastrarCompra.and.returnValue(of({} as any));
     preencher();
     component.formTransacao.patchValue({ responsavel: 'u1' });
@@ -115,7 +115,7 @@ describe('FormTransacaoComponent', () => {
 
     const payload = compraService.cadastrarCompra.calls.mostRecent().args[0];
     expect(payload.payers).toEqual(['u1', 'u2']);
-    expect(payload.remainingPayers).toEqual(['u2']);
+    expect(payload.remainingPayers).toEqual(['u1', 'u2']);
   });
 
   it('converte valor em formato brasileiro antes de enviar compra', () => {
