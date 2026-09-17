@@ -88,6 +88,19 @@ describe('FormTransacaoComponent', () => {
     expect(component.loading()).toBe(false);
   });
 
+  it('normaliza pagador salvo por nome para id antes de enviar', () => {
+    compraService.cadastrarCompra.and.returnValue(of({} as any));
+    preencher();
+    (component as any).usuariosFamilia = [{ id: 'u1', name: 'Eu' }];
+    component.pagadores = ['Eu'];
+
+    component.cadastrarTransacao();
+
+    const payload = compraService.cadastrarCompra.calls.mostRecent().args[0];
+    expect(payload.payers).toEqual(['u1']);
+    expect(payload.remainingPayers).toEqual(['u1']);
+  });
+
   it('usuário free pode cadastrar compra sem divisão de pagadores', () => {
     compraService.cadastrarCompra.and.returnValue(of({} as any));
     preencher();

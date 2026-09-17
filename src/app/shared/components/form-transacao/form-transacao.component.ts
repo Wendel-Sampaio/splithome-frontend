@@ -12,7 +12,7 @@ import { provideNativeDateAdapter } from '@angular/material/core';
 import { MatChipsModule } from '@angular/material/chips';
 import { MatProgressSpinnerModule } from '@angular/material/progress-spinner';
 import { MatIconModule } from '@angular/material/icon';
-import { finalize, map, shareReplay } from 'rxjs';
+import { finalize, map, shareReplay, tap } from 'rxjs';
 import { TransacaoService } from '../../services/transacao/transacao.service';
 import { User } from '../../../core/models/user/user';
 import { UserService } from '../../../core/auth/user/user.service';
@@ -98,6 +98,9 @@ export class FormTransacaoComponent {
         : usuarios;
       return usuariosComLogado.filter((usuario) => this.usuarioPodeSerPagador(usuario));
     }),
+    tap((usuarios) => {
+      this.usuariosFamilia = usuarios;
+    }),
     shareReplay({ bufferSize: 1, refCount: true })
   );
   readonly cartoes$ = this.compraService.listarCartoes().pipe(
@@ -110,6 +113,7 @@ export class FormTransacaoComponent {
 
   pagadores: string[] = [];
   pagadoresRestantes: string[] = [];
+  private usuariosFamilia: User[] = [];
   responsavel: string = this.userService.getUser().id;
   tentouEnviar = false;
   formTransacao!: FormGroup;
@@ -316,7 +320,7 @@ export class FormTransacaoComponent {
     }
 
     const usuarioLogado = this.userService.getUser();
-    const pagadores = this.isPremium ? this.pagadores : [];
+    const pagadores = this.isPremium ? this.normalizarPagadoresSelecionados() : [];
     if (this.isPremium && pagadores.length === 0) {
       this.notify.warning('Selecione pelo menos um pagador para a conta.');
       return;
@@ -325,7 +329,7 @@ export class FormTransacaoComponent {
     this.pagadoresRestantes = !this.isPremium
       ? []
       : this.isEdicao
-      ? this.getPagadoresRestantesEdicao()
+      ? this.getPagadoresRestantesEdicao(pagadores)
       : [...pagadores];
 
     if (this.isDespesaFixa) {
@@ -438,11 +442,11 @@ export class FormTransacaoComponent {
     }
   }
 
-  private getPagadoresRestantesEdicao(): string[] {
-    const antiga = this.data?.compra?.payers ?? this.data?.despesaFixa?.payers ?? [];
-    const antigosRestantes = this.data?.compra?.remainingPayers ?? this.data?.despesaFixa?.remainingPayers ?? [];
-    const novosPagadores = this.pagadores.filter(p => !antiga.includes(p));
-    const mantidos = antigosRestantes.filter(p => this.pagadores.includes(p));
+  private getPagadoresRestantesEdicao(pagadores: string[]): string[] {
+    const antiga = this.normalizarReferenciasPagadores(this.data?.compra?.payers ?? this.data?.despesaFixa?.payers ?? []);
+    const antigosRestantes = this.normalizarReferenciasPagadores(this.data?.compra?.remainingPayers ?? this.data?.despesaFixa?.remainingPayers ?? []);
+    const novosPagadores = pagadores.filter(p => !antiga.includes(p));
+    const mantidos = antigosRestantes.filter(p => pagadores.includes(p));
     return [...new Set([...mantidos, ...novosPagadores])];
   }
 
@@ -467,6 +471,19 @@ export class FormTransacaoComponent {
 
   private isMesmoUsuario(reference: string, usuario: User): boolean {
     return reference === usuario.id || reference === usuario.name;
+  }
+
+  private normalizarPagadoresSelecionados(): string[] {
+    return this.normalizarReferenciasPagadores(this.pagadores);
+  }
+
+  private normalizarReferenciasPagadores(referencias: string[]): string[] {
+    const pagadores = referencias
+      .map((pagador) => this.usuariosFamilia.find((usuario) => this.isMesmoUsuario(pagador, usuario))?.id ?? pagador)
+      .map((pagador) => pagador.trim())
+      .filter(Boolean);
+
+    return [...new Set(pagadores)];
   }
 
   formatCurrency(value: number): string {
