@@ -87,10 +87,16 @@ describe('ComprasComponent', () => {
         remainingPayers: ['u1']
       });
 
-      const preparada = (component as any).prepararCompra(compra, new Map([['u1', 'João']]));
+      const preparada = (component as any).prepararCompra(compra, new Map([
+        ['u1', makeUser({ id: 'u1', name: 'João', profilePhoto: 'data:image/jpeg;base64,foto' })],
+        ['João', makeUser({ id: 'u1', name: 'João', profilePhoto: 'data:image/jpeg;base64,foto' })]
+      ]));
 
       expect(preparada.showPaymentButton).toBeTrue();
       expect(preparada.isPaid).toBeFalse();
+      expect(preparada.payerProfiles).toEqual([
+        { reference: 'u1', name: 'João', profilePhoto: 'data:image/jpeg;base64,foto' }
+      ]);
     });
   });
 

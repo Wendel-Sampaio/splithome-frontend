@@ -4,7 +4,7 @@ import { MAT_DIALOG_DATA, MatDialogClose } from '@angular/material/dialog';
 import { MatButtonModule } from '@angular/material/button';
 import { MatIconModule } from '@angular/material/icon';
 
-import { Compra } from '../../../core/models/compra/compra';
+import { Compra, PaymentPerson } from '../../../core/models/compra/compra';
 import { PlanService } from '../../../core/plan/plan.service';
 import { CategoriaCorPipe } from '../../pipes/categoria-cor.pipe';
 import { CategoriaIconePipe } from '../../pipes/categoria-icone.pipe';
@@ -20,6 +20,7 @@ export type CompraDetalheDialogData = {
 
 type PessoaPagamento = {
   nome: string;
+  profilePhoto?: string;
   status: 'paid' | 'pending';
 };
 
@@ -65,9 +66,12 @@ export class CompraDetalheComponent {
   }
 
   get pessoasPagamento(): PessoaPagamento[] {
-    return this.pagadores.map((nome) => ({
-      nome,
-      status: this.pendentes.includes(nome) ? 'pending' : 'paid',
+    const profiles = this.paymentPeople(this.compra.payerProfiles, this.pagadores);
+
+    return profiles.map((pessoa) => ({
+      nome: pessoa.name,
+      profilePhoto: pessoa.profilePhoto,
+      status: this.pendentes.includes(pessoa.name) ? 'pending' : 'paid',
     }));
   }
 
@@ -82,5 +86,13 @@ export class CompraDetalheComponent {
   private displayNames(names: string[] | undefined, fallbacks: string[] | undefined): string[] {
     const source = names?.length ? names : fallbacks;
     return (source ?? []).filter(Boolean);
+  }
+
+  private paymentPeople(profiles: PaymentPerson[] | undefined, names: string[]): PaymentPerson[] {
+    if (profiles?.length) {
+      return profiles;
+    }
+
+    return names.map((name) => ({ reference: name, name }));
   }
 }

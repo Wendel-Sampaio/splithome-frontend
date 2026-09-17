@@ -139,7 +139,18 @@
                 <ng-container matColumnDef="payers">
                     <th mat-header-cell *matHeaderCellDef>Pagadores</th>
                     <td [ngClass]="{'payed-style': verificarPagamento(element)}" mat-cell *matCellDef="let element">
-                        <span class="people-text">{{ (element.payerNames || element.payers) | pagadores }}</span>
+                        <div class="people-stack" *ngIf="element.payerProfiles?.length; else payerNamesText">
+                            <span class="people-avatars" aria-hidden="true">
+                                <span class="person-avatar" *ngFor="let payer of visiblePeople(element.payerProfiles)">
+                                    <img *ngIf="payer.profilePhoto; else payerInitial" [src]="payer.profilePhoto" [alt]="'Foto de ' + payer.name">
+                                    <ng-template #payerInitial>{{ getPersonInitial(payer.name) }}</ng-template>
+                                </span>
+                            </span>
+                            <span class="people-text">{{ element.payerNames | pagadores }}</span>
+                        </div>
+                        <ng-template #payerNamesText>
+                            <span class="people-text">{{ (element.payerNames || element.payers) | pagadores }}</span>
+                        </ng-template>
                     </td>
                 </ng-container>
 
@@ -179,9 +190,20 @@
                 <ng-container matColumnDef="remainingPayers">
                     <th mat-header-cell *matHeaderCellDef>Restantes</th>
                     <td [ngClass]="{'payed-style': verificarPagamento(element)}" mat-cell *matCellDef="let element">
-                        <span class="people-text">
-                            {{ (element.remainingPayerNames || element.remainingPayers) | pagadores:'Todos efetuaram o pagamento.' }}
-                        </span>
+                        <div class="people-stack" *ngIf="element.remainingPayerProfiles?.length; else remainingNamesText">
+                            <span class="people-avatars" aria-hidden="true">
+                                <span class="person-avatar" *ngFor="let payer of visiblePeople(element.remainingPayerProfiles)">
+                                    <img *ngIf="payer.profilePhoto; else remainingInitial" [src]="payer.profilePhoto" [alt]="'Foto de ' + payer.name">
+                                    <ng-template #remainingInitial>{{ getPersonInitial(payer.name) }}</ng-template>
+                                </span>
+                            </span>
+                            <span class="people-text">{{ element.remainingPayerNames | pagadores:'Todos efetuaram o pagamento.' }}</span>
+                        </div>
+                        <ng-template #remainingNamesText>
+                            <span class="people-text">
+                                {{ (element.remainingPayerNames || element.remainingPayers) | pagadores:'Todos efetuaram o pagamento.' }}
+                            </span>
+                        </ng-template>
                     </td>
                 </ng-container>
 

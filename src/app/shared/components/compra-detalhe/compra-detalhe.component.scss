@@ -218,11 +218,18 @@
   height: 38px;
   justify-content: center;
   text-transform: uppercase;
+  overflow: hidden;
   width: 38px;
 }
 
 .person-row--pending .person-avatar {
   background: var(--sh-color-warning);
+}
+
+.person-avatar img {
+  height: 100%;
+  object-fit: cover;
+  width: 100%;
 }
 
 .person-row div {

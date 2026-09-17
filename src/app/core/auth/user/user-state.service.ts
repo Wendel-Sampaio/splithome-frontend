@@ -51,7 +51,7 @@ export class UserStateService {
       pixKey: '',
       familyCode,
       plan: 'PREMIUM',
-      profilePhoto: member.profilePhoto || this.userService.getProfilePhoto({ id: member.id })
+      profilePhoto: member.profilePhoto
     }));
   }
 

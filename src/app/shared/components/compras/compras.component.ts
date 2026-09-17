@@ -2,7 +2,7 @@ import { Component, DestroyRef, inject, OnInit, signal } from '@angular/core';
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { MatTableModule } from '@angular/material/table';
 import { CompraService } from '../../services/compra/compra.service';
-import { Compra } from '../../../core/models/compra/compra';
+import { Compra, PaymentPerson } from '../../../core/models/compra/compra';
 import { CommonModule } from '@angular/common';
 import { MatDialog, MatDialogModule } from '@angular/material/dialog';
 import { FormTransacaoComponent } from '../form-transacao/form-transacao.component';
@@ -35,6 +35,7 @@ import { ModalService } from '../ui/modal';
 import { MatButtonModule } from '@angular/material/button';
 import { MatTooltipModule } from '@angular/material/tooltip';
 import { CompraDetalheComponent, CompraDetalheDialogData } from '../compra-detalhe/compra-detalhe.component';
+import { User } from '../../../core/models/user/user';
 
 interface Purchaser {
   id: string;
@@ -353,19 +354,17 @@ export class ComprasComponent implements OnInit {
     }
 
     if (!this.isPremium) {
-      const usersById = new Map<string, string>();
-      return of(compras.map((compra) => this.prepararCompra(compra, usersById)));
+      const currentUser = this.userService.getUser();
+      const usersByReference = this.buildUsersByReference([currentUser]);
+      return of(compras.map((compra) => this.prepararCompra(compra, usersByReference)));
     }
 
     return this.userStateService.getFamilyUsers().pipe(
       map((users) => {
-        const usersById = new Map<string, string>(users.map((user) => [user.id, user.name]));
         const currentUser = this.userService.getUser();
-        if (currentUser.id) {
-          usersById.set(currentUser.id, currentUser.name);
-        }
+        const usersByReference = this.buildUsersByReference([...users, currentUser]);
 
-        return compras.map((compra) => this.prepararCompra(compra, usersById));
+        return compras.map((compra) => this.prepararCompra(compra, usersByReference));
       })
     );
   }
@@ -441,28 +440,77 @@ export class ComprasComponent implements OnInit {
     return result;
   }
 
-  private prepararCompra(compra: Compra, usersById: Map<string, string>): Compra {
+  private prepararCompra(compra: Compra, usersByReference: Map<string, User>): Compra {
     const currentUser = this.userService.getUser();
     const payers = compra.payers ?? [];
     const unitValue = payers.length ? compra.value / payers.length : 0;
-    const purchaserName = usersById.get(compra.purchaserId) ?? (compra.purchaserId === currentUser.id ? currentUser.name : '');
+    const purchaserName = usersByReference.get(compra.purchaserId)?.name ?? (compra.purchaserId === currentUser.id ? currentUser.name : '');
     const remainingPayers = compra.remainingPayers ?? [];
     const compraNormalizada = { ...compra, payers, remainingPayers };
-    const payerNames = this.displayNamesFor(payers, usersById);
-    const remainingPayerNames = this.displayNamesFor(remainingPayers, usersById);
+    const payerProfiles = this.paymentPeopleFor(payers, usersByReference);
+    const remainingPayerProfiles = this.paymentPeopleFor(remainingPayers, usersByReference);
+    const payerNames = payerProfiles.map((payer) => payer.name);
+    const remainingPayerNames = remainingPayerProfiles.map((payer) => payer.name);
 
     return {
       ...compraNormalizada,
       unitValue,
       purchaserName,
       payerNames,
+      payerProfiles,
       remainingPayerNames,
+      remainingPayerProfiles,
       showPaymentButton: payers.includes(currentUser.id) || payers.includes(currentUser.name),
       isPaid: !this.verificaUserRemainingPayers(compraNormalizada)
     };
   }
 
-  private displayNamesFor(references: string[], usersById: Map<string, string>): string[] {
-    return references.map((reference) => usersById.get(reference) ?? reference);
+  private buildUsersByReference(users: User[]): Map<string, User> {
+    const usersByReference = new Map<string, User>();
+
+    users.forEach((user) => {
+      if (user.id) {
+        this.setUserReference(usersByReference, user.id, user);
+      }
+
+      if (user.name) {
+        this.setUserReference(usersByReference, user.name, user);
+      }
+    });
+
+    return usersByReference;
+  }
+
+  private setUserReference(usersByReference: Map<string, User>, reference: string, user: User): void {
+    const existing = usersByReference.get(reference);
+
+    if (!existing || (!this.realProfilePhoto(existing.profilePhoto) && this.realProfilePhoto(user.profilePhoto))) {
+      usersByReference.set(reference, user);
+    }
+  }
+
+  private paymentPeopleFor(references: string[], usersByReference: Map<string, User>): PaymentPerson[] {
+    return references.map((reference) => {
+      const user = usersByReference.get(reference);
+      const profilePhoto = this.realProfilePhoto(user?.profilePhoto);
+
+      return {
+        reference,
+        name: user?.name ?? reference,
+        profilePhoto
+      };
+    });
+  }
+
+  getPersonInitial(name: string): string {
+    return (name || '?').trim().charAt(0).toUpperCase() || '?';
+  }
+
+  visiblePeople(people?: PaymentPerson[]): PaymentPerson[] {
+    return (people ?? []).slice(0, 3);
+  }
+
+  private realProfilePhoto(profilePhoto?: string): string | undefined {
+    return profilePhoto && profilePhoto !== this.userService.defaultProfilePhoto ? profilePhoto : undefined;
   }
 }

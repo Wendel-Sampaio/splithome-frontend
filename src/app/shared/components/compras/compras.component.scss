@@ -293,6 +293,44 @@ table {
   max-width: 150px;
 }
 
+.people-stack {
+  align-items: center;
+  display: flex;
+  gap: 8px;
+  min-width: 0;
+}
+
+.people-avatars {
+  align-items: center;
+  display: inline-flex;
+  flex: 0 0 auto;
+}
+
+.person-avatar {
+  align-items: center;
+  background: var(--sh-color-primary-soft);
+  border: 2px solid var(--sh-color-surface);
+  border-radius: 999px;
+  color: var(--sh-color-primary-strong);
+  display: inline-flex;
+  font-size: 11px;
+  font-weight: 800;
+  height: 26px;
+  justify-content: center;
+  overflow: hidden;
+  width: 26px;
+}
+
+.person-avatar + .person-avatar {
+  margin-left: -8px;
+}
+
+.person-avatar img {
+  height: 100%;
+  object-fit: cover;
+  width: 100%;
+}
+
 .category-chip {
   background: #f8faf9;
   border: 1px solid var(--sh-color-border);

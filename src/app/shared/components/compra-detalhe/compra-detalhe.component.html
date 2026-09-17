@@ -68,7 +68,10 @@
           <div class="people-grid">
             @for (pessoa of pessoasPagamento; track pessoa.nome) {
               <div class="person-row" [class.person-row--pending]="pessoa.status === 'pending'">
-                <span class="person-avatar">{{ pessoa.nome.charAt(0) }}</span>
+                <span class="person-avatar">
+                  <img *ngIf="pessoa.profilePhoto; else personInitial" [src]="pessoa.profilePhoto" [alt]="'Foto de ' + pessoa.nome">
+                  <ng-template #personInitial>{{ pessoa.nome.charAt(0) }}</ng-template>
+                </span>
                 <div>
                   <strong>{{ pessoa.nome }}</strong>
                   <span>{{ valorUnitario | currency:'BRL' }}</span>
