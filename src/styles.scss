@@ -117,6 +117,17 @@ a:hover {
   margin: var(--sh-space-2) 0 0;
 }
 
+.sh-page-title--compact {
+  font-size: 28px;
+  font-weight: 700;
+  letter-spacing: 0;
+}
+
+.sh-page-subtitle--compact {
+  font-size: 14px;
+  margin-top: 4px;
+}
+
 .sh-card {
   background: var(--sh-color-surface);
   border: 1px solid var(--sh-color-border);
