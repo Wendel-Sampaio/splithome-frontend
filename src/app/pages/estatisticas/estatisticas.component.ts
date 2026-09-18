@@ -3,7 +3,6 @@ import { Component, DestroyRef, OnInit, inject, signal } from '@angular/core';
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { FormControl, FormGroup, ReactiveFormsModule } from '@angular/forms';
 import { MatButtonModule } from '@angular/material/button';
-import { provideNativeDateAdapter } from '@angular/material/core';
 import { MatDatepickerModule } from '@angular/material/datepicker';
 import { MatFormFieldModule } from '@angular/material/form-field';
 import { MatIconModule } from '@angular/material/icon';
@@ -32,7 +31,6 @@ import {
     MatProgressSpinnerModule,
     CategoriaPipe
   ],
-  providers: [provideNativeDateAdapter()],
   templateUrl: './estatisticas.component.html',
   styleUrl: './estatisticas.component.scss'
 })
