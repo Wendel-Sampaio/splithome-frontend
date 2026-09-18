@@ -145,7 +145,13 @@
               <ul>
                 @for (member of familyMembers; track member.id) {
                   <li>
-                    <span class="member-avatar" aria-hidden="true">{{ member.name.charAt(0) || '?' }}</span>
+                    <span class="member-avatar">
+                      @if (member.profilePhoto) {
+                        <img [src]="member.profilePhoto" [alt]="'Foto de ' + member.name">
+                      } @else {
+                        <span aria-hidden="true">{{ member.name.charAt(0) || '?' }}</span>
+                      }
+                    </span>
                     <div>
                       <strong>{{ member.name }}</strong>
                       <span>{{ member.email }}</span>

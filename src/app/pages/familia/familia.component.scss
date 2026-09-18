@@ -178,14 +178,16 @@ button mat-icon {
   gap: 8px;
 }
 
-.familia-status-panel button {
+.familia-status-panel button,
+.code-actions button[mat-flat-button] {
   --mdc-filled-button-container-color: var(--sh-color-primary);
   --mdc-filled-button-label-text-color: #ffffff;
   --mat-filled-button-state-layer-color: #ffffff;
   --mat-filled-button-ripple-color: rgba(255, 255, 255, 0.18);
 }
 
-.familia-status-panel button:hover:not(:disabled) {
+.familia-status-panel button:hover:not(:disabled),
+.code-actions button[mat-flat-button]:hover:not(:disabled) {
   --mdc-filled-button-container-color: var(--sh-color-primary-strong);
 }
 
@@ -201,14 +203,16 @@ button mat-icon {
   padding: var(--sh-space-4);
 }
 
-.join-box button {
+.join-box button,
+.code-actions button[mat-stroked-button] {
   --mdc-outlined-button-label-text-color: var(--sh-color-primary-strong);
   --mdc-outlined-button-outline-color: var(--sh-color-primary);
   --mat-outlined-button-state-layer-color: var(--sh-color-primary);
   --mat-outlined-button-ripple-color: rgba(47, 158, 68, 0.12);
 }
 
-.join-box button:hover:not(:disabled) {
+.join-box button:hover:not(:disabled),
+.code-actions button[mat-stroked-button]:hover:not(:disabled) {
   background: var(--sh-color-primary-soft);
   border-color: var(--sh-color-primary-strong);
 }
@@ -303,10 +307,10 @@ button mat-icon {
   align-items: center;
   display: flex;
   gap: var(--sh-space-5);
+  grid-column: 1 / -1;
   justify-content: space-between;
 }
 
-.family-code,
 .family-switch,
 .family-next {
   grid-column: 1;
@@ -385,8 +389,15 @@ button mat-icon {
   font-weight: 800;
   height: 40px;
   justify-content: center;
+  overflow: hidden;
   text-transform: uppercase;
   width: 40px;
+}
+
+.member-avatar img {
+  height: 100%;
+  object-fit: cover;
+  width: 100%;
 }
 
 .members li div {

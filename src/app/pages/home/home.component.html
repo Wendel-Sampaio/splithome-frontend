@@ -28,9 +28,13 @@
                     </button>
                     <button (click)="abrirDespesas()"
                             class="botoes-menu-lateral"
-                            [ngClass]="{'selected': currentView === 'despesasFixas'}">
+                            [ngClass]="{'selected': currentView === 'despesasFixas', 'premium-locked': !isPremium}">
                         <mat-icon class="icones-botao">payments</mat-icon>
                         <span class="menu-label">Despesas Fixas</span>
+                        <span *ngIf="!isPremium" class="premium-lock">
+                            <mat-icon class="lock-icon" aria-hidden="true">lock</mat-icon>
+                            Premium
+                        </span>
                     </button>
                 </div>
 
@@ -136,9 +140,7 @@
 
             <tabela-compras *ngIf="currentView === 'compras'"></tabela-compras>
 
-            <mat-card class="content-card" appearance="outlined" *ngIf="currentView === 'despesasFixas'">
-                <mat-card-content><tabela-despesas-fixas></tabela-despesas-fixas></mat-card-content>
-            </mat-card>
+            <tabela-despesas-fixas *ngIf="currentView === 'despesasFixas'"></tabela-despesas-fixas>
 
             <mat-card class="content-card" appearance="outlined" *ngIf="currentView === 'graficos'">
                 <mat-card-content><app-estatisticas></app-estatisticas></mat-card-content>

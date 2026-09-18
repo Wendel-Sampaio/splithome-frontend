@@ -81,6 +81,23 @@ describe('FamiliaComponent', () => {
     expect(textContent).toContain('Use o código recebido para trocar a família vinculada à sua conta.');
   });
 
+  it('mostra a foto do membro quando ela está disponível', () => {
+    component.familyMembers = [
+      {
+        id: 'user-1',
+        name: 'Ana Silva',
+        email: 'ana@splithome.dev',
+        profilePhoto: 'data:image/jpeg;base64,foto'
+      }
+    ];
+    fixture.detectChanges();
+
+    const avatarImage = fixture.nativeElement.querySelector('.member-avatar img') as HTMLImageElement | null;
+
+    expect(avatarImage?.src).toContain('data:image/jpeg;base64,foto');
+    expect(avatarImage?.alt).toBe('Foto de Ana Silva');
+  });
+
   it('entra em outra família usando o código informado', () => {
     familiaService.entrarNaFamilia.and.returnValue(of('jwt-token'));
     component.codigoEntrada = ' nova123 ';
