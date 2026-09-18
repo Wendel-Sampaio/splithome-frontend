@@ -4,6 +4,7 @@ import { of, throwError } from 'rxjs';
 import { EstatisticasComponent } from './estatisticas.component';
 import { EstatisticasService } from '../../shared/services/estatisticas/estatisticas.service';
 import { NotificationService } from '../../shared/services/notification/notification.service';
+import { provideBrDateAdapterTesting } from '../../shared/testing/br-date-adapter-testing';
 
 describe('EstatisticasComponent', () => {
   let component: EstatisticasComponent;
@@ -21,6 +22,7 @@ describe('EstatisticasComponent', () => {
       imports: [EstatisticasComponent],
       providers: [
         provideHttpClient(),
+        ...provideBrDateAdapterTesting(),
         { provide: EstatisticasService, useValue: service },
         { provide: NotificationService, useValue: notify }
       ]

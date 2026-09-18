@@ -9,6 +9,7 @@ import { UserService } from '../../../core/auth/user/user.service';
 import { UserStateService } from '../../../core/auth/user/user-state.service';
 import { PlanService } from '../../../core/plan/plan.service';
 import { NotificationService } from '../../services/notification/notification.service';
+import { provideBrDateAdapterTesting } from '../../testing/br-date-adapter-testing';
 
 describe('FormTransacaoComponent', () => {
   let component: FormTransacaoComponent;
@@ -43,6 +44,7 @@ describe('FormTransacaoComponent', () => {
       imports: [FormTransacaoComponent],
       providers: [
         provideHttpClient(),
+        ...provideBrDateAdapterTesting(),
         { provide: CompraService, useValue: compraService },
         { provide: TransacaoService, useValue: transacaoService },
         { provide: UserService, useValue: userService },
