@@ -1,7 +1,6 @@
 import { Component, DestroyRef, inject, OnInit, signal } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
-import { MatTableModule } from '@angular/material/table';
 import { MatButtonModule } from '@angular/material/button';
 import { MatIconModule } from '@angular/material/icon';
 import { MatProgressSpinnerModule } from '@angular/material/progress-spinner';
@@ -20,6 +19,7 @@ import { FormTransacaoComponent } from '../form-transacao/form-transacao.compone
 import { CategoriaPipe } from '../../pipes/categoria.pipe';
 import { CategoriaIconePipe } from '../../pipes/categoria-icone.pipe';
 import { CategoriaCorPipe } from '../../pipes/categoria-cor.pipe';
+import { PagadoresPipe } from '../../pipes/pagadores.pipe';
 import { BehaviorSubject, catchError, finalize, of, switchMap, tap } from 'rxjs';
 import { ModalService } from '../ui/modal';
 
@@ -29,7 +29,6 @@ import { ModalService } from '../ui/modal';
   templateUrl: './despesas-fixas.component.html',
   imports: [
     CommonModule,
-    MatTableModule,
     MatButtonModule,
     MatIconModule,
     MatDialogModule,
@@ -39,7 +38,8 @@ import { ModalService } from '../ui/modal';
     MatTooltipModule,
     CategoriaPipe,
     CategoriaIconePipe,
-    CategoriaCorPipe
+    CategoriaCorPipe,
+    PagadoresPipe
   ]
 })
 export class DespesasFixasComponent implements OnInit {
@@ -234,6 +234,39 @@ export class DespesasFixasComponent implements OnInit {
 
   rotuloParcelas(despesa: DespesaFixa): string {
     return despesa.quantidadeParcelas ? `${despesa.quantidadeParcelas}x` : 'Mensal';
+  }
+
+  temParcelas(despesa: DespesaFixa): boolean {
+    return !!despesa.parcelas?.length;
+  }
+
+  totalParcelas(despesa: DespesaFixa): number {
+    return despesa.parcelas?.length ?? 0;
+  }
+
+  parcelasPagas(despesa: DespesaFixa): number {
+    return despesa.parcelas?.filter(parcela => parcela.pago).length ?? 0;
+  }
+
+  percentualParcelasPagas(despesa: DespesaFixa): number {
+    const total = this.totalParcelas(despesa);
+    if (!total) {
+      return 0;
+    }
+
+    return Math.round((this.parcelasPagas(despesa) / total) * 100);
+  }
+
+  proximaCobranca(despesa: DespesaFixa): string {
+    if (!despesa.parcelas?.length) {
+      return `Dia ${despesa.diaVencimento}`;
+    }
+
+    const proxima = [...despesa.parcelas]
+      .sort((a, b) => a.numero - b.numero)
+      .find(parcela => !parcela.pago);
+
+    return proxima ? this.formatDate(proxima.dataVencimento) : 'Quitada';
   }
 
   valorTotalPorPessoa(despesa: DespesaFixa): number {

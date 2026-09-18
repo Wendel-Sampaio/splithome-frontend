@@ -2,7 +2,7 @@
   <header class="despesas-fixas-header">
     <div class="despesas-fixas-copy">
       <h1 class="sh-page-title">Despesas Fixas</h1>
-      <p class="sh-page-subtitle">Gerencie cobranças recorrentes e parceladas da casa.</p>
+      <p class="sh-page-subtitle">Acompanhe recorrências, parcelas e pagamentos da casa em um só lugar.</p>
     </div>
 
     <div class="despesas-fixas-actions">
@@ -16,7 +16,8 @@
   <section class="despesas-list-panel">
     <div class="list-toolbar">
       <div>
-        <h2>Despesas fixas cadastradas</h2>
+        <h2>Despesas cadastradas</h2>
+        <p>{{ totalElements }} {{ totalElements === 1 ? 'despesa fixa encontrada' : 'despesas fixas encontradas' }}</p>
       </div>
     </div>
 
@@ -33,68 +34,37 @@
       <p>Cadastre uma nova despesa fixa para acompanhar as cobranças da casa.</p>
     </div>
 
-    <div class="table-shell" *ngIf="!loadingLista() && despesas.length">
-      <table mat-table [dataSource]="despesas">
-        <ng-container matColumnDef="title">
-          <th mat-header-cell *matHeaderCellDef>Despesa</th>
-          <td mat-cell *matCellDef="let despesa">
-            <div class="fixed-expense-cell">
-              <span class="category-icon">
-                <mat-icon aria-hidden="true" [style.color]="despesa.category | categoriaCor">{{ despesa.category | categoriaIcone }}</mat-icon>
-              </span>
-              <div>
-                <strong>{{ despesa.title }}</strong>
-                <span>Início em {{ formatDate(despesa.dataInicio) }}</span>
-              </div>
-            </div>
-          </td>
-        </ng-container>
-
-        <ng-container matColumnDef="category">
-          <th mat-header-cell *matHeaderCellDef>Categoria</th>
-          <td mat-cell *matCellDef="let despesa">
-            <span class="category-chip">
+    <mat-accordion class="fixed-expense-list" *ngIf="!loadingLista() && despesas.length">
+      <mat-expansion-panel class="fixed-expense-card" *ngFor="let despesa of despesas">
+        <mat-expansion-panel-header>
+          <mat-panel-title>
+            <span class="category-icon">
               <mat-icon aria-hidden="true" [style.color]="despesa.category | categoriaCor">{{ despesa.category | categoriaIcone }}</mat-icon>
-              {{ despesa.category | categoria }}
             </span>
-          </td>
-        </ng-container>
+            <span class="expense-title-group">
+              <strong>{{ despesa.title }}</strong>
+              <span>{{ despesa.category | categoria }} · Início {{ formatDate(despesa.dataInicio) }}</span>
+            </span>
+          </mat-panel-title>
 
-        <ng-container matColumnDef="totalValue">
-          <th mat-header-cell *matHeaderCellDef>Valor por pessoa</th>
-          <td mat-cell *matCellDef="let despesa">
+          <mat-panel-description>
+            <span class="due-summary">
+              <mat-icon aria-hidden="true">event</mat-icon>
+              Dia {{ despesa.diaVencimento }}
+            </span>
             <strong class="money-value">{{ formatCurrency(valorTotalPorPessoa(despesa)) }}</strong>
-          </td>
-        </ng-container>
+          </mat-panel-description>
+        </mat-expansion-panel-header>
 
-        <ng-container matColumnDef="installmentsCount">
-          <th mat-header-cell *matHeaderCellDef>Parcelas</th>
-          <td mat-cell *matCellDef="let despesa">
-            <span class="installment-chip">{{ rotuloParcelas(despesa) }}</span>
-          </td>
-        </ng-container>
+        <div class="expense-card-body">
+          <div class="expense-hero">
+            <div class="expense-primary-metric">
+              <span>Valor por pessoa</span>
+              <strong>{{ formatCurrency(valorTotalPorPessoa(despesa)) }}</strong>
+              <small>{{ rotuloParcelas(despesa) }} · {{ formatCurrency(valorPorCobranca(despesa)) }} por cobrança</small>
+            </div>
 
-        <ng-container matColumnDef="dueDay">
-          <th mat-header-cell *matHeaderCellDef>Vencimento</th>
-          <td mat-cell *matCellDef="let despesa">Dia {{ despesa.diaVencimento }}</td>
-        </ng-container>
-
-        <ng-container matColumnDef="startDate">
-          <th mat-header-cell *matHeaderCellDef>Início</th>
-          <td mat-cell *matCellDef="let despesa">{{ formatDate(despesa.dataInicio) }}</td>
-        </ng-container>
-
-        <ng-container matColumnDef="responsibleName">
-          <th mat-header-cell *matHeaderCellDef>Responsável</th>
-          <td mat-cell *matCellDef="let despesa">
-            <span class="responsible-text">{{ despesa.responsibleName || 'Não informado' }}</span>
-          </td>
-        </ng-container>
-
-        <ng-container matColumnDef="actions">
-          <th mat-header-cell *matHeaderCellDef>Ações</th>
-          <td mat-cell *matCellDef="let despesa">
-            <div class="row-actions">
+            <div class="expense-actions">
               <button mat-icon-button type="button" (click)="editar(despesa)" matTooltip="Editar despesa fixa" aria-label="Editar despesa fixa">
                 <mat-icon aria-hidden="true">edit</mat-icon>
               </button>
@@ -102,15 +72,69 @@
                 <mat-icon aria-hidden="true">delete</mat-icon>
               </button>
             </div>
-          </td>
-        </ng-container>
+          </div>
 
-        <tr mat-header-row *matHeaderRowDef="displayedColumns"></tr>
-        <tr mat-row *matRowDef="let row; columns: displayedColumns;"></tr>
-      </table>
-    </div>
+          <div class="expense-meta-grid">
+            <div class="expense-meta-item">
+              <span>Vencimento</span>
+              <strong>Dia {{ despesa.diaVencimento }}</strong>
+            </div>
+            <div class="expense-meta-item">
+              <span>Responsável</span>
+              <strong>{{ despesa.responsibleName || 'Não informado' }}</strong>
+            </div>
+            <div class="expense-meta-item">
+              <span>Pagadores</span>
+              <strong>{{ (despesa.payerNames || despesa.payers) | pagadores:'Não informado' }}</strong>
+            </div>
+            <div class="expense-meta-item">
+              <span>Próxima cobrança</span>
+              <strong>{{ proximaCobranca(despesa) }}</strong>
+            </div>
+          </div>
+
+          <div class="expense-progress" *ngIf="temParcelas(despesa)">
+            <div class="progress-copy">
+              <span>{{ parcelasPagas(despesa) }} de {{ totalParcelas(despesa) }} parcelas pagas</span>
+              <strong>{{ percentualParcelasPagas(despesa) }}%</strong>
+            </div>
+            <span class="progress-track" aria-hidden="true">
+              <span class="progress-fill" [style.width.%]="percentualParcelasPagas(despesa)"></span>
+            </span>
+          </div>
+
+          <div class="installments-block" *ngIf="temParcelas(despesa)">
+            <div class="installments-header">
+              <h3>Parcelas</h3>
+              <span class="installment-chip">{{ rotuloParcelas(despesa) }}</span>
+            </div>
+
+            <div class="installments-list">
+              <div class="installment-row" *ngFor="let parcela of despesa.parcelas">
+                <span class="installment-number">{{ parcela.numero }}</span>
+                <span class="installment-date">{{ formatDate(parcela.dataVencimento) }}</span>
+                <strong class="installment-value">{{ formatCurrency(valorParcelaPorPessoa(parcela)) }}</strong>
+                <span *ngIf="parcela.pago" class="status-chip paid-status-chip">Paga</span>
+                <span *ngIf="!parcela.pago" class="status-chip pending-status-chip">Pendente</span>
+                <button
+                  mat-stroked-button
+                  type="button"
+                  class="payment-button"
+                  (click)="pagarParcela(parcela.id)"
+                  [disabled]="!verificaParcelaPendenteParaMim(parcela) || loadingAcao()"
+                >
+                  <mat-icon aria-hidden="true">{{ verificaParcelaPendenteParaMim(parcela) ? 'paid' : 'check_circle' }}</mat-icon>
+                  {{ verificaParcelaPendenteParaMim(parcela) ? 'Pagar minha parte' : 'Pago por mim' }}
+                </button>
+              </div>
+            </div>
+          </div>
+        </div>
+      </mat-expansion-panel>
+    </mat-accordion>
 
     <mat-paginator
+      *ngIf="!loadingLista() && despesas.length"
       [length]="totalElements"
       [pageSize]="pageSize"
       [pageIndex]="pageIndex"
@@ -118,63 +142,5 @@
       showFirstLastButtons
       (page)="onPageChange($event)">
     </mat-paginator>
-  </section>
-
-  <section *ngIf="!loadingLista() && despesas.length" class="parcelas-panel">
-    <div class="list-toolbar">
-      <div>
-        <h2>Parcelas</h2>
-      </div>
-    </div>
-
-    <mat-accordion>
-      <mat-expansion-panel *ngFor="let despesa of despesas">
-        <mat-expansion-panel-header>
-          <mat-panel-title>{{ despesa.title }}</mat-panel-title>
-          <mat-panel-description>
-            {{ rotuloParcelas(despesa) }} de {{ formatCurrency(valorPorCobranca(despesa)) }}
-          </mat-panel-description>
-        </mat-expansion-panel-header>
-
-        <div class="parcelas-table-shell">
-          <table class="parcelas-table">
-            <thead>
-              <tr>
-                <th>#</th>
-                <th>Vencimento</th>
-                <th>Valor</th>
-                <th>Status</th>
-                <th>Ações</th>
-              </tr>
-            </thead>
-            <tbody>
-              <tr *ngFor="let parcela of despesa.parcelas">
-                <td>{{ parcela.numero }}</td>
-                <td>{{ formatDate(parcela.dataVencimento) }}</td>
-                <td>
-                  <strong class="money-value">{{ formatCurrency(valorParcelaPorPessoa(parcela)) }}</strong>
-                </td>
-                <td>
-                  <span *ngIf="parcela.pago" class="status-chip paid-status-chip">Paga</span>
-                  <span *ngIf="!parcela.pago" class="status-chip pending-status-chip">Pendente</span>
-                </td>
-                <td>
-                  <button
-                    mat-stroked-button
-                    type="button"
-                    class="payment-button"
-                    (click)="pagarParcela(parcela.id)"
-                    [disabled]="!verificaParcelaPendenteParaMim(parcela) || loadingAcao()"
-                  >
-                    <mat-icon aria-hidden="true">{{ verificaParcelaPendenteParaMim(parcela) ? 'paid' : 'check_circle' }}</mat-icon>
-                    {{ verificaParcelaPendenteParaMim(parcela) ? 'Pagar minha parte' : 'Pago por mim' }}
-                  </button>
-                </td>
-              </tr>
-            </tbody>
-          </table>
-        </div>
-      </mat-expansion-panel>
-    </mat-accordion>
   </section>
 </section>
