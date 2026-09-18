@@ -164,10 +164,10 @@
   align-items: center;
   border-radius: 999px;
   display: inline-flex;
-  font-size: 12px;
+  font-size: 13px;
   font-weight: 700;
-  min-height: 24px;
-  padding: 3px 9px;
+  min-height: 26px;
+  padding: 4px 10px;
 }
 
 .category-option {
@@ -198,15 +198,15 @@ table {
 
 .mat-mdc-header-row {
   background: #f8faf9;
-  height: 42px;
+  height: 46px;
 }
 
 .mat-mdc-header-cell {
   border-bottom: 1px solid var(--sh-color-border);
   color: var(--sh-color-text-muted);
-  font-size: 12px;
+  font-size: 13px;
   font-weight: 600;
-  padding: 0 14px;
+  padding: 0 16px;
   text-transform: none;
 }
 
@@ -214,8 +214,9 @@ table {
   background: var(--sh-color-surface);
   border-bottom: 1px solid var(--sh-color-border);
   color: var(--sh-color-text);
+  font-size: 14px;
   line-height: 1.45;
-  padding: 10px 14px;
+  padding: 12px 16px;
   vertical-align: middle;
 }
 
@@ -228,7 +229,7 @@ table {
 }
 
 .mat-mdc-row {
-  height: 58px;
+  height: 64px;
 }
 
 .mat-mdc-row:hover .mat-mdc-cell {
@@ -264,21 +265,21 @@ table {
 }
 
 .purchase-icon {
-  flex: 0 0 32px;
-  height: 32px;
-  width: 32px;
+  flex: 0 0 36px;
+  height: 36px;
+  width: 36px;
 
   mat-icon {
-    font-size: 18px;
-    height: 18px;
-    width: 18px;
+    font-size: 20px;
+    height: 20px;
+    width: 20px;
   }
 }
 
 .purchase-cell strong {
   color: var(--sh-color-text);
   display: block;
-  font-size: 13px;
+  font-size: 14px;
   font-weight: 700;
   margin-bottom: 2px;
   max-width: 220px;
@@ -291,7 +292,7 @@ table {
 .people-text,
 .buyer-text {
   color: var(--sh-color-text-muted);
-  font-size: 13px;
+  font-size: 14px;
 }
 
 .people-text {
@@ -319,12 +320,12 @@ table {
   border-radius: 999px;
   color: var(--sh-color-primary-strong);
   display: inline-flex;
-  font-size: 11px;
+  font-size: 12px;
   font-weight: 800;
-  height: 26px;
+  height: 28px;
   justify-content: center;
   overflow: hidden;
-  width: 26px;
+  width: 28px;
 }
 
 .person-avatar + .person-avatar {
@@ -363,8 +364,8 @@ table {
   --mdc-outlined-button-label-text-color: var(--sh-color-primary-strong);
   --mdc-outlined-button-outline-color: var(--sh-color-primary-muted);
   border-radius: 8px !important;
-  min-height: 34px;
-  min-width: 96px;
+  min-height: 36px;
+  min-width: 102px;
 }
 
 .payment-button.payed-button {
@@ -396,11 +397,11 @@ table {
 
 .row-actions button {
   color: var(--sh-color-text-subtle);
-  flex: 0 0 32px;
-  height: 32px;
+  flex: 0 0 36px;
+  height: 36px;
   opacity: 0.72;
   transition: background 0.16s ease, color 0.16s ease, opacity 0.16s ease;
-  width: 32px;
+  width: 36px;
 }
 
 .row-actions button:hover,
