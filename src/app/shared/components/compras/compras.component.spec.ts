@@ -114,6 +114,13 @@ describe('ComprasComponent', () => {
     expect(component.hasActiveFilters).toBeFalse();
     expect(component.filterForm.value.title).toBe('');
     expect(component.filterForm.value.category).toBeNull();
+    expect(component.filterForm.value.paymentStatus).toBeNull();
+  });
+
+  it('inclui status de pagamento como filtro ativo', () => {
+    component.filterForm.patchValue({ paymentStatus: 'pending' });
+
+    expect(component.hasActiveFilters).toBeTrue();
   });
 
   it('abre o detalhe da compra com o estado premium atual', () => {

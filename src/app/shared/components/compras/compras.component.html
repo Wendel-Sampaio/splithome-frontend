@@ -49,6 +49,14 @@
                 <mat-datepicker #endPicker></mat-datepicker>
             </mat-form-field>
 
+            <mat-form-field appearance="outline">
+                <mat-select formControlName="paymentStatus" placeholder="Pagamento" aria-label="Status do pagamento">
+                    <mat-option [value]="null">Todos</mat-option>
+                    <mat-option value="pending">Falta pagar</mat-option>
+                    <mat-option value="paid">Pagos</mat-option>
+                </mat-select>
+            </mat-form-field>
+
             <mat-form-field appearance="outline" *ngIf="isPremium">
                 <mat-select formControlName="purchaserId" placeholder="Comprador" aria-label="Comprador">
                     <mat-option [value]="null">Todos</mat-option>

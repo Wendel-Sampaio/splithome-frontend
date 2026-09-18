@@ -13,6 +13,7 @@ export interface CompraFilter {
   title?: string;
   category?: string;
   purchaserId?: string;
+  paid?: boolean;
   startDate?: string;
   endDate?: string;
   page?: number;
@@ -37,6 +38,7 @@ export class CompraService {
     if (filter.title) params = params.set('title', filter.title);
     if (filter.category) params = params.set('category', filter.category);
     if (filter.purchaserId) params = params.set('purchaserId', filter.purchaserId);
+    if (filter.paid !== undefined) params = params.set('paid', String(filter.paid));
     if (filter.startDate) params = params.set('startDate', filter.startDate);
     if (filter.endDate) params = params.set('endDate', filter.endDate);
     if (filter.page !== undefined) params = params.set('page', filter.page.toString());

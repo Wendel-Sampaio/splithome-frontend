@@ -79,6 +79,14 @@ describe('CompraService', () => {
     });
   });
 
+  it('envia filtro de pagamento quando informado', () => {
+    service.listarCompras({ paid: false }).subscribe();
+
+    const req = httpMock.expectOne(request => request.url.endsWith('/transactions/purchases'));
+    expect(req.request.params.get('paid')).toBe('false');
+    req.flush([]);
+  });
+
   it('normaliza despesas fixas e parcelas retornadas pelo backend', () => {
     service.listarDespesasFixas().subscribe(page => {
       expect(page.content[0].payers).toEqual(['Ana', 'Bruno']);

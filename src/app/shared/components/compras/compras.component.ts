@@ -41,6 +41,8 @@ interface Purchaser {
   name: string;
 }
 
+type PaymentStatusFilter = 'pending' | 'paid' | null;
+
 @Component({
   selector: 'tabela-compras',
   styleUrl: 'compras.component.scss',
@@ -93,6 +95,7 @@ export class ComprasComponent implements OnInit {
     title: [''],
     category: [null as string | null],
     purchaserId: [null as string | null],
+    paymentStatus: [null as PaymentStatusFilter],
     startDate: [null as Date | null],
     endDate: [null as Date | null],
   });
@@ -107,6 +110,7 @@ export class ComprasComponent implements OnInit {
         title: f.title || undefined,
         category: f.category || undefined,
         purchaserId: f.purchaserId || undefined,
+        paid: this.paymentStatusToPaidFilter(f.paymentStatus),
         startDate: f.startDate ? this.formatDate(f.startDate) : undefined,
         endDate: f.endDate ? this.formatDate(f.endDate) : undefined,
         page: this.pageIndex,
@@ -328,7 +332,7 @@ export class ComprasComponent implements OnInit {
 
   get hasActiveFilters(): boolean {
     const f = this.filterForm.value;
-    return Boolean(f.title || f.category || f.purchaserId || f.startDate || f.endDate);
+    return Boolean(f.title || f.category || f.purchaserId || f.paymentStatus || f.startDate || f.endDate);
   }
 
   recarregarCompras() {
@@ -340,9 +344,22 @@ export class ComprasComponent implements OnInit {
       title: '',
       category: null,
       purchaserId: null,
+      paymentStatus: null,
       startDate: null,
       endDate: null,
     });
+  }
+
+  private paymentStatusToPaidFilter(status: PaymentStatusFilter | undefined): boolean | undefined {
+    if (status === 'paid') {
+      return true;
+    }
+
+    if (status === 'pending') {
+      return false;
+    }
+
+    return undefined;
   }
 
   tratamentoLista(compras: Compra[]): Observable<Compra[]> {
