@@ -108,13 +108,64 @@ describe('DashboardInicioComponent', () => {
     });
 
     expect(component.totalCompras()).toBe(1);
-    expect(component.totalEmAberto()).toBe(30);
+    expect(component.totalEmAberto()).toBe(60);
     expect(component.maiorCategoria()).toBe('OTHERS');
 
     fixture.detectChanges();
     const texto = (fixture.nativeElement as HTMLElement).textContent ?? '';
     expect(texto).toContain('Outros');
     expect(texto).not.toContain('OTHERS');
+  });
+
+  it('mantem contas individuais em aberto separadas dos valores a receber', () => {
+    carregarDashboard({
+      resumo: {
+        balances: [
+          { memberId: 'u1', memberName: 'Joao Silva', netBalance: 100 },
+          { memberId: 'u2', memberName: 'Maria', netBalance: -100 }
+        ],
+        debts: [{ fromMemberId: 'u2', fromMemberName: 'Maria', toMemberId: 'u1', toMemberName: 'Joao Silva', amount: 100 }],
+        settlements: [{ fromMemberId: 'u2', fromMemberName: 'Maria', toMemberId: 'u1', toMemberName: 'Joao Silva', amount: 100 }],
+        totalOutstanding: 100
+      },
+      compras: {
+        content: [{
+          id: 'c-individual',
+          title: 'Conta individual',
+          category: 'OTHERS',
+          value: 120,
+          payers: ['u1'],
+          paymentDate: '2099-09-20',
+          remainingPayers: ['u1'],
+          purchaserId: 'u1',
+          purchaserName: 'Joao Silva',
+          purchaseDate: '2099-09-16',
+          isPaid: false
+        }]
+      },
+      despesas: {
+        content: [{
+          id: 'd-compartilhada',
+          title: 'Conta compartilhada',
+          category: 'OTHERS',
+          valorTotal: 200,
+          quantidadeParcelas: null,
+          diaVencimento: 10,
+          dataInicio: '2099-09-01',
+          paymentDate: '2099-09-10',
+          responsibleId: 'u1',
+          responsibleName: 'Joao Silva',
+          creditCardId: null,
+          payers: ['u1', 'u2'],
+          remainingPayers: ['u2'],
+          parcelas: []
+        }]
+      }
+    });
+
+    expect(component.totalEmAberto()).toBe(220);
+    expect(component.totalAReceber()).toBe(100);
+    expect(component.totalAPagar()).toBe(100);
   });
 
   it('monta pendencias, resumo por cartao e dados financeiros na tela inicial', () => {

@@ -240,8 +240,7 @@ export class DashboardInicioComponent implements OnInit {
   }
 
   private aplicarResumo(resumo: ResumoFinanceiro | null, totalEmAbertoLocal: number): void {
-    const totalResumo = resumo?.totalOutstanding ?? 0;
-    this.totalEmAberto.set(Math.max(totalResumo, totalEmAbertoLocal));
+    this.totalEmAberto.set(totalEmAbertoLocal);
     this.saldos.set(resumo?.balances ?? []);
     this.dividas.set((resumo?.debts ?? []).slice(0, 4));
     this.liquidacoes.set((resumo?.settlements ?? []).slice(0, 4));
@@ -294,15 +293,10 @@ export class DashboardInicioComponent implements OnInit {
         return {
           title: compra.title,
           subtitle: `${compra.purchaserName} · ${this.quantidadePendente(compra.remainingPayers)} pendente(s)`,
-          value: this.valorOuPendente(
+          value: this.calcularValorEmAberto(
             compra.value,
-            this.calcularValorPendente(
-              compra.value,
-              compra.payers,
-              compra.remainingPayers,
-              [compra.purchaserId, compra.purchaserName]
-            ),
-            compra.payers
+            compra.payers,
+            compra.remainingPayers
           ),
           dueDate: vencimento,
           tipo: 'compra' as const,
@@ -323,15 +317,10 @@ export class DashboardInicioComponent implements OnInit {
             return {
               title: despesa.title,
               subtitle: `Parcela ${parcela.numero ?? '-'} · ${this.quantidadePendente(parcela.remainingPayers)} pendente(s)`,
-              value: this.valorOuPendente(
+              value: this.calcularValorEmAberto(
                 valor,
-                this.calcularValorPendente(
-                  valor,
-                  parcela.payers ?? parcela.pagadores ?? [],
-                  parcela.remainingPayers ?? [],
-                  [despesa.responsibleId, despesa.responsibleName]
-                ),
-                parcela.payers ?? parcela.pagadores ?? []
+                parcela.payers ?? parcela.pagadores ?? [],
+                parcela.remainingPayers ?? []
               ),
               dueDate: vencimento,
               tipo: 'parcela' as const,
@@ -345,15 +334,10 @@ export class DashboardInicioComponent implements OnInit {
       return [{
         title: despesa.title,
         subtitle: `${despesa.responsibleName} · ${this.quantidadePendente(despesa.remainingPayers)} pendente(s)`,
-        value: this.valorOuPendente(
+        value: this.calcularValorEmAberto(
           despesa.valorTotal,
-          this.calcularValorPendente(
-            despesa.valorTotal,
-            despesa.payers,
-            despesa.remainingPayers,
-            [despesa.responsibleId, despesa.responsibleName]
-          ),
-          despesa.payers
+          despesa.payers,
+          despesa.remainingPayers
         ),
         dueDate: vencimento,
         tipo: 'despesa' as const,
@@ -420,30 +404,27 @@ export class DashboardInicioComponent implements OnInit {
     if (parcelas.length) {
       return parcelas.reduce((total, parcela) => {
         const valor = parcela.value ?? parcela.valor ?? 0;
-        return total + this.calcularValorPendente(
+        return total + this.calcularValorEmAberto(
           valor,
           parcela.payers ?? parcela.pagadores ?? [],
-          parcela.remainingPayers ?? [],
-          [despesa.responsibleId, despesa.responsibleName]
+          parcela.remainingPayers ?? []
         );
       }, 0);
     }
 
-    return this.calcularValorPendente(
+    return this.calcularValorEmAberto(
       despesa.valorTotal,
       despesa.payers,
-      despesa.remainingPayers,
-      [despesa.responsibleId, despesa.responsibleName]
+      despesa.remainingPayers
     );
   }
 
   private calcularTotalEmAberto(compras: Compra[], despesas: DespesaFixa[]): number {
     const totalCompras = compras.reduce((total, compra) => {
-      return total + this.calcularValorPendente(
+      return total + this.calcularValorEmAberto(
         compra.value,
         compra.payers,
-        compra.remainingPayers,
-        [compra.purchaserId, compra.purchaserName]
+        compra.remainingPayers
       );
     }, 0);
 
@@ -452,43 +433,41 @@ export class DashboardInicioComponent implements OnInit {
 
       if (parcelas.length) {
         return total + parcelas.reduce((subtotal, parcela) => {
-          return subtotal + this.calcularValorPendente(
+          return subtotal + this.calcularValorEmAberto(
             parcela.value ?? parcela.valor ?? 0,
             parcela.payers ?? parcela.pagadores ?? [],
-            parcela.remainingPayers ?? [],
-            [despesa.responsibleId, despesa.responsibleName]
+            parcela.remainingPayers ?? []
           );
         }, 0);
       }
 
-      return total + this.calcularValorPendente(
+      return total + this.calcularValorEmAberto(
         despesa.valorTotal,
         despesa.payers,
-        despesa.remainingPayers,
-        [despesa.responsibleId, despesa.responsibleName]
+        despesa.remainingPayers
       );
     }, 0);
 
     return totalCompras + totalDespesas;
   }
 
-  private calcularValorPendente(
+  private calcularValorEmAberto(
     valor: number,
     pagadores: string[] = [],
-    pagadoresRestantes: string[] = [],
-    responsavel?: string | Array<string | undefined>
+    pagadoresRestantes: string[] = []
   ): number {
-    if (!valor || !pagadores.length || !pagadoresRestantes.length) {
+    if (!valor || !pagadoresRestantes.length) {
       return 0;
     }
 
-    const cota = valor / pagadores.length;
-    const referenciasResponsavel = Array.isArray(responsavel)
-      ? responsavel.filter((reference): reference is string => !!reference)
-      : [responsavel].filter((reference): reference is string => !!reference);
-    const pendentes = pagadoresRestantes.filter((pagador) => pagador && !referenciasResponsavel.includes(pagador));
+    const pagadoresUnicos = this.referenciasUnicas(pagadores);
+    const pendentesUnicos = this.referenciasUnicas(pagadoresRestantes);
 
-    return pendentes.length * cota;
+    if (!pagadoresUnicos.length) {
+      return valor;
+    }
+
+    return (valor / pagadoresUnicos.length) * pendentesUnicos.length;
   }
 
   private lerParcelas(despesa: DespesaFixa): ParcelaResumo[] {
@@ -497,10 +476,6 @@ export class DashboardInicioComponent implements OnInit {
 
   private parcelaPaga(parcela: ParcelaResumo): boolean {
     return parcela.pago ?? parcela.paid ?? false;
-  }
-
-  private valorOuPendente(valorTotal: number, valorPendente: number, pagadores: string[] = []): number {
-    return valorPendente > 0 ? valorPendente : this.calcularValorPorPagador(valorTotal, pagadores);
   }
 
   private valorPorCobranca(despesa: DespesaFixa): number {
@@ -515,6 +490,10 @@ export class DashboardInicioComponent implements OnInit {
     }
 
     return valor / pagadores.length;
+  }
+
+  private referenciasUnicas(referencias: string[] = []): string[] {
+    return [...new Set(referencias.map((referencia) => referencia?.trim()).filter(Boolean))];
   }
 
   private quantidadePendente(pendentes?: string[]): number {
