@@ -33,6 +33,7 @@ import { ModalFooterComponent } from '../ui/modal-footer/modal-footer.component'
 import { ModalHeaderComponent } from '../ui/modal-header/modal-header.component';
 import { FormSectionComponent } from '../ui/form-section/form-section.component';
 import { SummaryBlockComponent } from '../ui/summary-block/summary-block.component';
+import { ValorBrlDirective, parseValorBrl } from '../../directives/valor-brl.directive';
 
 type FormTransacaoData = {
   tipo?: 'compra' | 'despesa-fixa';
@@ -70,6 +71,7 @@ type ModoCobrancaDespesa = 'recorrente' | 'parcelada';
     ModalFooterComponent,
     FormSectionComponent,
     SummaryBlockComponent,
+    ValorBrlDirective,
   ],
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
@@ -231,7 +233,7 @@ export class FormTransacaoComponent {
       this.atualizarValidadoresParcelas(this.formTransacao.get('modoCobranca')?.value);
 
       this.formTransacao.valueChanges.pipe(takeUntilDestroyed(this.destroyRef)).subscribe(values => {
-        this.valorTotal = values.valorTotal || null;
+        this.valorTotal = parseValorBrl(values.valorTotal);
         this.quantidadeParcelas = values.modoCobranca === 'parcelada' ? values.quantidadeParcelas || null : null;
         this.dataInicio = values.dataInicio ? new Date(values.dataInicio) : null;
         this.diaVencimento = values.diaVencimento || null;
@@ -375,8 +377,8 @@ export class FormTransacaoComponent {
   private enviarDespesaFixa(usuarioLogado: User, pagadores: string[]): void {
     const v = this.formTransacao.value;
     const responsavel = v.responsavel || this.responsavel || usuarioLogado.id;
-    const valorTotal = this.parseMoneyValue(v.valorTotal);
-    if (!this.isValidPositiveAmount(valorTotal)) {
+    const valorTotal = parseValorBrl(v.valorTotal);
+    if (valorTotal === null || valorTotal <= 0) {
       this.notify.warning('Informe um valor maior que R$ 0,00.');
       return;
     }
@@ -414,8 +416,8 @@ export class FormTransacaoComponent {
 
   private enviarCompra(usuarioLogado: User, pagadores: string[]): void {
     const responsavel = this.formTransacao.value.responsavel || this.responsavel || usuarioLogado.id;
-    const valor = this.parseMoneyValue(this.formTransacao.value.valor);
-    if (!this.isValidPositiveAmount(valor)) {
+    const valor = parseValorBrl(this.formTransacao.value.valor);
+    if (valor === null || valor <= 0) {
       this.notify.warning('Informe um valor maior que R$ 0,00.');
       return;
     }
@@ -514,27 +516,6 @@ export class FormTransacaoComponent {
     return format(value, 'yyyy-MM-dd');
   }
 
-  private parseMoneyValue(value: unknown): number {
-    if (typeof value === 'number') {
-      return value;
-    }
-
-    const raw = String(value ?? '').trim();
-    if (!raw) {
-      return Number.NaN;
-    }
-
-    const normalized = raw
-      .replace(/[^\d,.-]/g, '')
-      .replace(/\.(?=\d{3}(?:\D|$))/g, '')
-      .replace(',', '.');
-
-    return Number(normalized);
-  }
-
-  private isValidPositiveAmount(value: number): boolean {
-    return Number.isFinite(value) && value > 0;
-  }
 
   private usuarioPodeSerPagador(usuario: User): boolean {
     const usuarioLogado = this.userService.getUser();
