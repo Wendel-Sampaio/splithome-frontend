@@ -132,6 +132,21 @@ describe('FormTransacaoComponent', () => {
     expect(payload.value).toBe(10.91);
   });
 
+  it('aceita valor com centavos menor que um real digitado com vírgula', () => {
+    compraService.cadastrarCompra.and.returnValue(of({} as any));
+    preencher();
+    const campoValor: HTMLInputElement = fixture.nativeElement.querySelector('input[appValorBrl]');
+    campoValor.value = '0,50';
+    campoValor.dispatchEvent(new Event('input'));
+
+    expect(component.formTransacao.get('valor')?.valid).toBeTrue();
+
+    component.cadastrarTransacao();
+
+    const payload = compraService.cadastrarCompra.calls.mostRecent().args[0];
+    expect(payload.value).toBe(0.5);
+  });
+
   it('bloqueia envio quando valor da compra nao e numerico', () => {
     preencher();
     component.formTransacao.patchValue({ valor: 'R$ abc' });

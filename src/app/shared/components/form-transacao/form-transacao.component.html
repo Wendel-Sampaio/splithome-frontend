@@ -38,7 +38,7 @@
       <app-form-section title="Valor e data" [columns]="2">
         <mat-form-field appearance="outline" floatLabel="always">
           <mat-label>Valor</mat-label>
-          <input matInput formControlName="valor" placeholder="0" />
+          <input matInput appValorBrl formControlName="valor" placeholder="0,00" />
           <span matTextPrefix>R$&nbsp;</span>
           <mat-error *ngIf="controlInvalido('valor')">Informe um valor maior que R$ 0,00.</mat-error>
         </mat-form-field>
@@ -57,7 +57,7 @@
       <app-form-section title="Cobrança" [columns]="2">
         <mat-form-field appearance="outline" floatLabel="always">
           <mat-label>{{ isDespesaRecorrente ? 'Valor mensal' : 'Valor total' }}</mat-label>
-          <input matInput formControlName="valorTotal" placeholder="0" type="number" />
+          <input matInput appValorBrl formControlName="valorTotal" placeholder="0,00" />
           <span matTextPrefix>R$&nbsp;</span>
           <mat-error *ngIf="controlInvalido('valorTotal')">Informe um valor maior que R$ 0,00.</mat-error>
         </mat-form-field>
