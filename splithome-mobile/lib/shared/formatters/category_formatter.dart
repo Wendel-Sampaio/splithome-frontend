@@ -11,6 +11,7 @@ class CategoryFormatter {
     'WATER': 'Água',
     'GAS': 'Gás',
     'TRANSPORT': 'Transporte',
+    'SUBSCRIPTION': 'Assinatura',
     'OTHERS': 'Outros',
     'MERCADO': 'Mercado',
     'MORADIA': 'Moradia',
