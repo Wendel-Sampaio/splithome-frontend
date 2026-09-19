@@ -6,6 +6,7 @@ void main() {
     expect(CategoryFormatter.label('FOOD'), 'Alimento');
     expect(CategoryFormatter.label('RENT'), 'Aluguel');
     expect(CategoryFormatter.label('TRANSPORT'), 'Transporte');
+    expect(CategoryFormatter.label('SUBSCRIPTION'), 'Assinatura');
     expect(CategoryFormatter.label('MERCADO'), 'Mercado');
   });
 
