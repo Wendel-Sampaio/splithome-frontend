@@ -24,7 +24,7 @@ import { AbstractControl, ValidationErrors } from '@angular/forms';
   styleUrls: ['./cadastro.component.scss']
 })
 export class CadastroComponent {
-  private readonly maxNameLength = 20;
+  private readonly maxNameLength = 50;
   private readonly minPasswordLength = 8;
   private readonly passwordSpecialCharacterPattern = /[!@#$%^&*(),.?":{}|<>]/;
   readonly passwordSpecialCharacters = '!@#$%^&*(),.?":{}|<>';
