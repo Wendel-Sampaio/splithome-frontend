@@ -47,9 +47,15 @@ describe('CadastroComponent', () => {
       expect(c?.hasError('required')).toBeTrue();
     });
 
-    it('name tem máximo de 20 caracteres', () => {
+    it('name aceita nome completo com mais de 20 caracteres', () => {
       const c = component.cadastroForm.get('name');
-      c?.setValue('NomeMuitoLongoParaOCampoX');
+      c?.setValue('Wendel Soares Sampaio');
+      expect(c?.valid).toBeTrue();
+    });
+
+    it('name tem máximo de 50 caracteres', () => {
+      const c = component.cadastroForm.get('name');
+      c?.setValue('a'.repeat(55));
       expect(c?.hasError('maxlength')).toBeTrue();
     });
 
@@ -63,20 +69,20 @@ describe('CadastroComponent', () => {
 
     it('informa quantos caracteres remover quando o nome passa do limite', () => {
       const c = component.cadastroForm.get('name');
-      c?.setValue('NomeMuitoLongoParaOCampoX');
+      c?.setValue('a'.repeat(55));
       c?.markAsTouched();
 
-      expect(component.nameRequirementMessages()).toEqual(['Use no máximo 20 caracteres (remova 5 caracteres).']);
+      expect(component.nameRequirementMessages()).toEqual(['Use no máximo 50 caracteres (remova 5 caracteres).']);
     });
 
     it('exibe feedback de nome no template quando o campo está inválido e tocado', () => {
       const c = component.cadastroForm.get('name');
-      c?.setValue('NomeMuitoLongoParaOCampoX');
+      c?.setValue('a'.repeat(55));
       c?.markAsTouched();
       fixture.detectChanges();
 
       const feedback = fixture.nativeElement.querySelector('#name-requirements');
-      expect(feedback?.textContent).toContain('Use no máximo 20 caracteres');
+      expect(feedback?.textContent).toContain('Use no máximo 50 caracteres');
       expect(feedback?.textContent).toContain('remova 5 caracteres');
     });
 
