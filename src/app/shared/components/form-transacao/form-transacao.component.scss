@@ -31,6 +31,38 @@ mat-form-field {
   margin: 4px 0 0;
 }
 
+// Parcelamentos longos chegam a 240 parcelas: a lista rola em vez de esticar o modal.
+.sh-transacao__parcelas {
+  display: grid;
+  gap: 4px;
+  grid-template-columns: repeat(auto-fill, minmax(120px, 1fr));
+  list-style: none;
+  margin: var(--sh-space-2) 0 0;
+  max-height: 180px;
+  overflow-y: auto;
+  padding: 0;
+}
+
+.sh-transacao__parcela {
+  align-items: baseline;
+  color: var(--sh-color-text);
+  display: flex;
+  font-size: 13px;
+  gap: 6px;
+}
+
+.sh-transacao__parcela-numero {
+  color: var(--sh-color-text-muted);
+  font-variant-numeric: tabular-nums;
+  min-width: 28px;
+  text-align: right;
+}
+
+.sh-transacao__parcela-data {
+  font-variant-numeric: tabular-nums;
+  font-weight: 500;
+}
+
 .sh-novo-cartao-option {
   align-items: center;
   border-top: 1px solid var(--sh-color-border);
