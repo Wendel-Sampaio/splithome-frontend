@@ -5,6 +5,7 @@ import { MatButtonModule } from '@angular/material/button';
 import { MatIconModule } from '@angular/material/icon';
 import { MatProgressSpinnerModule } from '@angular/material/progress-spinner';
 import { MatDialog, MatDialogModule } from '@angular/material/dialog';
+import { MatCheckboxModule } from '@angular/material/checkbox';
 import { MatExpansionModule } from '@angular/material/expansion';
 import { MatPaginatorModule, PageEvent } from '@angular/material/paginator';
 import { MatTooltipModule } from '@angular/material/tooltip';
@@ -20,7 +21,7 @@ import { CategoriaPipe } from '../../pipes/categoria.pipe';
 import { CategoriaIconePipe } from '../../pipes/categoria-icone.pipe';
 import { CategoriaCorPipe } from '../../pipes/categoria-cor.pipe';
 import { PagadoresPipe } from '../../pipes/pagadores.pipe';
-import { BehaviorSubject, catchError, finalize, of, switchMap, tap } from 'rxjs';
+import { BehaviorSubject, catchError, finalize, forkJoin, map, of, switchMap, tap } from 'rxjs';
 import { ModalService } from '../ui/modal';
 
 @Component({
@@ -32,6 +33,7 @@ import { ModalService } from '../ui/modal';
     MatButtonModule,
     MatIconModule,
     MatDialogModule,
+    MatCheckboxModule,
     MatProgressSpinnerModule,
     MatExpansionModule,
     MatPaginatorModule,
@@ -69,12 +71,15 @@ export class DespesasFixasComponent implements OnInit {
     'actions'
   ];
 
+  private readonly selecionadas = new Set<string>();
+
   private readonly recarregarSubject = new BehaviorSubject<void>(undefined);
 
   ngOnInit(): void {
     this.recarregarSubject.pipe(
       switchMap(() => {
         this.loadingLista.set(true);
+        this.selecionadas.clear();
         return this.compraService.listarDespesasFixas({
           page: this.pageIndex,
           size: this.pageSize,
@@ -186,6 +191,94 @@ export class DespesasFixasComponent implements OnInit {
         this.recarregar();
       },
       error: () => this.notify.error('Não foi possível pagar a parcela.')
+    });
+  }
+
+  // Quitar um parcelamento longo clicando parcela a parcela é penoso, então a
+  // seleção em lote aparece assim que há mais de uma parcela minha em aberto.
+  permiteSelecao(despesa: DespesaFixa): boolean {
+    return this.parcelasSelecionaveis(despesa).length > 1;
+  }
+
+  parcelasSelecionaveis(despesa: DespesaFixa): Parcela[] {
+    return (despesa.parcelas ?? []).filter(parcela => this.verificaParcelaPendenteParaMim(parcela));
+  }
+
+  parcelasSelecionadas(despesa: DespesaFixa): Parcela[] {
+    return this.parcelasSelecionaveis(despesa).filter(parcela => this.estaSelecionada(parcela));
+  }
+
+  estaSelecionada(parcela: Parcela): boolean {
+    return this.selecionadas.has(parcela.id);
+  }
+
+  alternarSelecao(parcela: Parcela, selecionada: boolean): void {
+    if (selecionada) {
+      this.selecionadas.add(parcela.id);
+      return;
+    }
+
+    this.selecionadas.delete(parcela.id);
+  }
+
+  todasSelecionadas(despesa: DespesaFixa): boolean {
+    const selecionaveis = this.parcelasSelecionaveis(despesa);
+    return selecionaveis.length > 0 && selecionaveis.every(parcela => this.estaSelecionada(parcela));
+  }
+
+  selecaoParcial(despesa: DespesaFixa): boolean {
+    const selecionadas = this.parcelasSelecionadas(despesa).length;
+    return selecionadas > 0 && selecionadas < this.parcelasSelecionaveis(despesa).length;
+  }
+
+  alternarTodas(despesa: DespesaFixa, selecionar: boolean): void {
+    this.parcelasSelecionaveis(despesa).forEach(parcela => this.alternarSelecao(parcela, selecionar));
+  }
+
+  valorSelecionado(despesa: DespesaFixa): number {
+    return this.parcelasSelecionadas(despesa)
+      .reduce((total, parcela) => total + this.valorParcelaPorPessoa(parcela), 0);
+  }
+
+  rotuloPagamentoEmLote(despesa: DespesaFixa): string {
+    const quantidade = this.parcelasSelecionadas(despesa).length;
+    if (!quantidade) {
+      return 'Pagar selecionadas';
+    }
+
+    const substantivo = quantidade === 1 ? 'parcela' : 'parcelas';
+    return `Pagar ${quantidade} ${substantivo} · ${this.formatCurrency(this.valorSelecionado(despesa))}`;
+  }
+
+  // O back-end paga uma parcela por requisição; o lote falha por parcela, então
+  // cada uma responde por si e o aviso final diz quantas ficaram para trás.
+  pagarSelecionadas(despesa: DespesaFixa): void {
+    const parcelas = this.parcelasSelecionadas(despesa);
+    if (!parcelas.length) {
+      return;
+    }
+
+    this.loadingAcao.set(true);
+    forkJoin(parcelas.map(parcela => this.compraService.pagarParcela(parcela.id).pipe(
+      map(() => true),
+      catchError(() => of(false))
+    ))).pipe(
+      finalize(() => this.loadingAcao.set(false)),
+      takeUntilDestroyed(this.destroyRef)
+    ).subscribe(resultados => {
+      const pagas = resultados.filter(Boolean).length;
+      const falhas = resultados.length - pagas;
+
+      if (pagas) {
+        this.notify.success(pagas === 1 ? 'Parcela paga!' : `${pagas} parcelas pagas!`);
+      }
+      if (falhas) {
+        this.notify.error(falhas === 1
+          ? 'Não foi possível pagar 1 das parcelas selecionadas.'
+          : `Não foi possível pagar ${falhas} das parcelas selecionadas.`);
+      }
+
+      this.recarregar();
     });
   }
 

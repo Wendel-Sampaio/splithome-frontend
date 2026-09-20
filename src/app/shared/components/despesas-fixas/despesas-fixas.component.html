@@ -109,8 +109,37 @@
               <span class="installment-chip">{{ rotuloParcelas(despesa) }}</span>
             </div>
 
-            <div class="installments-list">
+            <div class="installments-bulk-bar" *ngIf="permiteSelecao(despesa)">
+              <mat-checkbox
+                [checked]="todasSelecionadas(despesa)"
+                [indeterminate]="selecaoParcial(despesa)"
+                [disabled]="loadingAcao()"
+                (change)="alternarTodas(despesa, $event.checked)">
+                Selecionar pendentes
+              </mat-checkbox>
+              <button
+                mat-flat-button
+                type="button"
+                class="bulk-payment-button"
+                [disabled]="!parcelasSelecionadas(despesa).length || loadingAcao()"
+                (click)="pagarSelecionadas(despesa)"
+              >
+                <mat-icon aria-hidden="true">paid</mat-icon>
+                {{ rotuloPagamentoEmLote(despesa) }}
+              </button>
+            </div>
+
+            <div class="installments-list" [class.is-selectable]="permiteSelecao(despesa)">
               <div class="installment-row" *ngFor="let parcela of despesa.parcelas">
+                <span class="installment-select" *ngIf="permiteSelecao(despesa)">
+                  <mat-checkbox
+                    *ngIf="verificaParcelaPendenteParaMim(parcela)"
+                    [checked]="estaSelecionada(parcela)"
+                    [disabled]="loadingAcao()"
+                    (change)="alternarSelecao(parcela, $event.checked)"
+                    [attr.aria-label]="'Selecionar parcela ' + parcela.numero">
+                  </mat-checkbox>
+                </span>
                 <span class="installment-number">{{ parcela.numero }}</span>
                 <span class="installment-date">{{ formatDate(parcela.dataVencimento) }}</span>
                 <strong class="installment-value">{{ formatCurrency(valorParcelaPorPessoa(parcela)) }}</strong>

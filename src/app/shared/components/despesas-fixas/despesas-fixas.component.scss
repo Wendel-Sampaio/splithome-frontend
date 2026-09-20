@@ -345,10 +345,34 @@
   min-width: 58px;
 }
 
+.installments-bulk-bar {
+  align-items: center;
+  background: #f8faf9;
+  border: 1px solid var(--sh-color-border);
+  border-radius: 8px;
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--sh-space-3);
+  justify-content: space-between;
+  padding: 8px 12px;
+}
+
+.bulk-payment-button.mat-mdc-unelevated-button {
+  border-radius: 8px !important;
+  min-height: 34px;
+  white-space: nowrap;
+}
+
 .installments-list {
   border: 1px solid var(--sh-color-border);
   border-radius: 8px;
   overflow: hidden;
+}
+
+.installment-select {
+  align-items: center;
+  display: inline-flex;
+  justify-content: center;
 }
 
 .installment-row {
@@ -359,6 +383,10 @@
   grid-template-columns: 40px minmax(100px, 1fr) minmax(110px, auto) 100px minmax(160px, auto);
   min-height: 56px;
   padding: 8px 12px;
+}
+
+.installments-list.is-selectable .installment-row {
+  grid-template-columns: 32px 40px minmax(100px, 1fr) minmax(110px, auto) 100px minmax(160px, auto);
 }
 
 .installment-row + .installment-row {
@@ -439,9 +467,17 @@ mat-paginator {
     grid-template-columns: 40px minmax(96px, 1fr) minmax(100px, auto) 92px;
   }
 
+  .installments-list.is-selectable .installment-row {
+    grid-template-columns: 32px 40px minmax(96px, 1fr) minmax(100px, auto) 92px;
+  }
+
   .payment-button.mat-mdc-outlined-button {
     grid-column: 2 / -1;
     justify-self: start;
+  }
+
+  .installments-list.is-selectable .payment-button.mat-mdc-outlined-button {
+    grid-column: 3 / -1;
   }
 }
 
@@ -449,9 +485,14 @@ mat-paginator {
   .despesas-fixas-header,
   .list-toolbar,
   .expense-hero,
-  .installments-header {
+  .installments-header,
+  .installments-bulk-bar {
     align-items: stretch;
     flex-direction: column;
+  }
+
+  .bulk-payment-button.mat-mdc-unelevated-button {
+    width: 100%;
   }
 
   .despesas-fixas-actions {
