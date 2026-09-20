@@ -236,6 +236,24 @@ export class DespesasFixasComponent implements OnInit {
     return despesa.quantidadeParcelas ? `${despesa.quantidadeParcelas}x` : 'Mensal';
   }
 
+  iconeCobranca(despesa: DespesaFixa): string {
+    return despesa.quantidadeParcelas ? 'layers' : 'autorenew';
+  }
+
+  // O cabeçalho recebe o que nenhum outro campo do card já diz: o andamento do
+  // parcelamento, ou desde quando a recorrência corre.
+  resumoSecundario(despesa: DespesaFixa): string {
+    if (!despesa.quantidadeParcelas) {
+      return `Início ${this.formatDate(despesa.dataInicio)}`;
+    }
+    return `${this.parcelasPagas(despesa)} de ${this.totalParcelas(despesa)} pagas`;
+  }
+
+  // A regra, por extenso, para não se confundir com a data da próxima cobrança.
+  rotuloVencimento(despesa: DespesaFixa): string {
+    return `Todo dia ${despesa.diaVencimento}`;
+  }
+
   temParcelas(despesa: DespesaFixa): boolean {
     return !!despesa.parcelas?.length;
   }
@@ -259,7 +277,7 @@ export class DespesasFixasComponent implements OnInit {
 
   proximaCobranca(despesa: DespesaFixa): string {
     if (!despesa.parcelas?.length) {
-      return `Dia ${despesa.diaVencimento}`;
+      return '—';
     }
 
     const proxima = [...despesa.parcelas]

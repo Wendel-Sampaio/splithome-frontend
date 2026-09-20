@@ -43,14 +43,14 @@
             </span>
             <span class="expense-title-group">
               <strong>{{ despesa.title }}</strong>
-              <span>{{ despesa.category | categoria }} · Início {{ formatDate(despesa.dataInicio) }}</span>
+              <span>{{ despesa.category | categoria }} · {{ resumoSecundario(despesa) }}</span>
             </span>
           </mat-panel-title>
 
           <mat-panel-description>
             <span class="due-summary">
-              <mat-icon aria-hidden="true">event</mat-icon>
-              Dia {{ despesa.diaVencimento }}
+              <mat-icon aria-hidden="true">{{ iconeCobranca(despesa) }}</mat-icon>
+              {{ rotuloParcelas(despesa) }}
             </span>
             <strong class="money-value">{{ formatCurrency(valorTotalPorPessoa(despesa)) }}</strong>
           </mat-panel-description>
@@ -77,7 +77,7 @@
           <div class="expense-meta-grid">
             <div class="expense-meta-item">
               <span>Vencimento</span>
-              <strong>Dia {{ despesa.diaVencimento }}</strong>
+              <strong>{{ rotuloVencimento(despesa) }}</strong>
             </div>
             <div class="expense-meta-item">
               <span>Responsável</span>
