@@ -54,6 +54,23 @@
     }
 
     @if (isDespesaFixa) {
+      <app-form-section title="Cartão de crédito" description="Opcional: vincule um cartão para calcular os vencimentos pela fatura." [optional]="true">
+        <mat-form-field appearance="outline" class="sh-full-row">
+          <mat-label>Cartão de crédito</mat-label>
+          <mat-select formControlName="cartaoId">
+            <mat-option [value]="null">Sem cartão</mat-option>
+            @for (cartao of cartoes; track cartao.id) {
+              <mat-option [value]="cartao.id">
+                {{ cartao.name }} {{ cartao.lastDigits ? '(****' + cartao.lastDigits + ')' : '' }}
+              </mat-option>
+            }
+            <mat-option [value]="NOVO_CARTAO_ID" class="sh-novo-cartao-option">
+              <mat-icon>add</mat-icon> Criar novo cartão
+            </mat-option>
+          </mat-select>
+        </mat-form-field>
+      </app-form-section>
+
       <app-form-section title="Cobrança" [columns]="2">
         <mat-form-field appearance="outline" floatLabel="always">
           <mat-label>{{ isDespesaRecorrente ? 'Valor mensal' : 'Valor total' }}</mat-label>
@@ -106,23 +123,6 @@
             <mat-error *ngIf="controlInvalido('dataInicio')">Informe a data de início.</mat-error>
           </mat-form-field>
         }
-      </app-form-section>
-
-      <app-form-section title="Cartão de crédito" description="Opcional: vincule um cartão para registrar a fatura." [optional]="true">
-        <mat-form-field appearance="outline" class="sh-full-row">
-          <mat-label>Cartão de crédito</mat-label>
-          <mat-select formControlName="cartaoId">
-            <mat-option [value]="null">Sem cartão</mat-option>
-            @for (cartao of cartoes; track cartao.id) {
-              <mat-option [value]="cartao.id">
-                {{ cartao.name }} {{ cartao.lastDigits ? '(****' + cartao.lastDigits + ')' : '' }}
-              </mat-option>
-            }
-            <mat-option [value]="NOVO_CARTAO_ID" class="sh-novo-cartao-option">
-              <mat-icon>add</mat-icon> Criar novo cartão
-            </mat-option>
-          </mat-select>
-        </mat-form-field>
       </app-form-section>
 
       @if (isDespesaRecorrente && valorParcela && primeiraDataVencimento) {
