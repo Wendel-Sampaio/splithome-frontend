@@ -24,6 +24,19 @@ describe('CompraService', () => {
     expect(service).toBeTruthy();
   });
 
+  it('quita a compra pelo endpoint de settle', () => {
+    let respondeu = false;
+    service.quitarCompra('c1').subscribe(compra => {
+      respondeu = true;
+      expect(compra.remainingPayers).toEqual([]);
+    });
+
+    const req = httpMock.expectOne(request => request.url.endsWith('/transactions/purchases/c1/settle'));
+    expect(req.request.method).toBe('POST');
+    req.flush({ id: 'c1', remainingPayers: [] });
+    expect(respondeu).toBeTrue();
+  });
+
   it('normaliza uma lista simples de compras como pagina', () => {
     service.listarCompras().subscribe(page => {
       expect(page.content.length).toBe(2);

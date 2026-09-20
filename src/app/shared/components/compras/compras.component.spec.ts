@@ -2,7 +2,7 @@ import { ComponentFixture, TestBed } from '@angular/core/testing';
 import { provideRouter } from '@angular/router';
 import { provideHttpClient } from '@angular/common/http';
 import { provideHttpClientTesting } from '@angular/common/http/testing';
-import { firstValueFrom } from 'rxjs';
+import { firstValueFrom, of } from 'rxjs';
 
 import { ComprasComponent } from './compras.component';
 import { UserService } from '../../../core/auth/user/user.service';
@@ -101,6 +101,57 @@ describe('ComprasComponent', () => {
       expect(preparada.payerProfiles).toEqual([
         { reference: 'u1', name: 'João', profilePhoto: 'data:image/jpeg;base64,foto' }
       ]);
+    });
+  });
+
+  describe('quitacao pelo comprador', () => {
+    it('marca canSettle quando o comprador e o unico pendente', () => {
+      spyOn(userService, 'getUser').and.returnValue(makeUser({ id: 'u1', name: 'João' }));
+      const compra = makeCompra({ purchaserId: 'u1', payers: ['u1'], remainingPayers: ['u1'] });
+
+      expect((component as any).prepararCompra(compra, new Map()).canSettle).toBeTrue();
+    });
+
+    it('nao marca canSettle quando outro pagador ainda deve', () => {
+      spyOn(userService, 'getUser').and.returnValue(makeUser({ id: 'u1', name: 'João' }));
+      const compra = makeCompra({ purchaserId: 'u1', payers: ['u1', 'u2'], remainingPayers: ['u1', 'u2'] });
+
+      expect((component as any).prepararCompra(compra, new Map()).canSettle).toBeFalse();
+    });
+
+    it('nao marca canSettle quando o usuario nao e o comprador', () => {
+      spyOn(userService, 'getUser').and.returnValue(makeUser({ id: 'u1', name: 'João' }));
+      const compra = makeCompra({ purchaserId: 'u2', payers: ['u1'], remainingPayers: ['u1'] });
+
+      expect((component as any).prepararCompra(compra, new Map()).canSettle).toBeFalse();
+    });
+
+    it('quita direto pelo settle em vez de abrir o dialogo de PIX', () => {
+      spyOn(userService, 'getUser').and.returnValue(makeUser({ id: 'u1', name: 'João' }));
+      const quitar = spyOn(component.compraService, 'quitarCompra').and.returnValue(of(makeCompra()));
+      const abrirModal = spyOn((component as any).modal, 'open');
+      spyOn(component, 'recarregarCompras');
+
+      component.efetuarPagamento(makeCompra({
+        purchaserId: 'u1', payers: ['u1'], remainingPayers: ['u1'], canSettle: true
+      }));
+
+      expect(quitar).toHaveBeenCalledWith('c1');
+      expect(abrirModal).not.toHaveBeenCalled();
+    });
+
+    it('mantem o dialogo de PIX quando o usuario deve ao comprador', () => {
+      spyOn(userService, 'getUser').and.returnValue(makeUser({ id: 'u2', name: 'Maria' }));
+      const quitar = spyOn(component.compraService, 'quitarCompra');
+      const abrirModal = spyOn((component as any).modal, 'open').and.returnValue({ afterClosed: () => of(true) } as any);
+      spyOn(component, 'recarregarCompras');
+
+      component.efetuarPagamento(makeCompra({
+        purchaserId: 'u1', payers: ['u1', 'u2'], remainingPayers: ['u2'], canSettle: false
+      }));
+
+      expect(quitar).not.toHaveBeenCalled();
+      expect(abrirModal).toHaveBeenCalled();
     });
   });
 
