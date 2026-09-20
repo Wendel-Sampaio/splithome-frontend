@@ -5,7 +5,7 @@ import { Observable } from 'rxjs';
 import { map } from 'rxjs/operators';
 import { environment } from '../../../../environments/environment';
 import { Page } from '../../../core/models/page/page';
-import { DespesaFixa } from '../../../core/models/despesa-fixa/despesa-fixa';
+import { DespesaFixa, DespesaFixaPayload } from '../../../core/models/despesa-fixa/despesa-fixa';
 import { Parcela } from '../../../core/models/parcela/parcela';
 import { Cartao, CreditCardBrand } from '../../../core/models/cartao/cartao';
 
@@ -82,11 +82,11 @@ export class CompraService {
     return this.listarDespesasFixas({ size: 1000 }).pipe(map(page => page.content));
   }
 
-  cadastrarDespesaFixa(data: any): Observable<DespesaFixa> {
+  cadastrarDespesaFixa(data: DespesaFixaPayload): Observable<DespesaFixa> {
     return this.http.post<DespesaFixa>(`${this.API}/new-fixed-expense`, data);
   }
 
-  atualizarDespesaFixa(id: string, data: any): Observable<DespesaFixa> {
+  atualizarDespesaFixa(id: string, data: DespesaFixaPayload): Observable<DespesaFixa> {
     return this.http.put<DespesaFixa>(`${this.API}/update-fixed-expense/${id}`, data);
   }
 

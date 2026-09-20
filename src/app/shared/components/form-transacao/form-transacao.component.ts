@@ -18,7 +18,7 @@ import { UserService } from '../../../core/auth/user/user.service';
 import { format } from 'date-fns';
 import { CompraService } from '../../services/compra/compra.service';
 import { Compra } from '../../../core/models/compra/compra';
-import { DespesaFixa } from '../../../core/models/despesa-fixa/despesa-fixa';
+import { DespesaFixa, DespesaFixaPayload } from '../../../core/models/despesa-fixa/despesa-fixa';
 import { NotificationService } from '../../services/notification/notification.service';
 import { CategoriaPipe } from '../../pipes/categoria.pipe';
 import { CategoriaIconePipe } from '../../pipes/categoria-icone.pipe';
@@ -127,6 +127,7 @@ export class FormTransacaoComponent {
   quantidadeParcelas: number | null = null;
   dataInicio: Date | null = null;
   diaVencimento: number | null = null;
+  dataCompra: Date | null = null;
 
   get isEdicaoCompra(): boolean {
     return !!this.data?.compra;
@@ -187,13 +188,73 @@ export class FormTransacaoComponent {
     return this.valorTotal / this.quantidadeParcelas;
   }
 
+  // Com cartão vinculado quem dita o cronograma é a fatura, então o formulário
+  // pergunta a data da compra no lugar do dia de vencimento e da data de início.
+  get usaDatasDoCartao(): boolean {
+    return !!this.cartaoVinculadoId;
+  }
+
+  get cartaoAtual(): Cartao | null {
+    return this.cartoes.find((cartao) => cartao.id === this.cartaoVinculadoId) ?? null;
+  }
+
+  private get cartaoVinculadoId(): string | null {
+    const cartaoId = this.formTransacao?.get('cartaoId')?.value;
+    return cartaoId && cartaoId !== this.NOVO_CARTAO_ID ? cartaoId : null;
+  }
+
+  get rotuloDataCompra(): string {
+    return this.isDespesaRecorrente ? 'Data da contratação' : 'Data da compra';
+  }
+
+  // Na edição o cronograma salvo continua valendo enquanto a data da compra
+  // não for informada, então nada é recalculado por acidente.
+  get diaVencimentoEfetivo(): number | null {
+    const cartao = this.cartaoAtual;
+    if (cartao && this.dataCompra) {
+      return cartao.dueDay;
+    }
+    return this.diaVencimento;
+  }
+
   get primeiraDataVencimento(): Date | null {
+    const cartao = this.cartaoAtual;
+    if (cartao && this.dataCompra) {
+      return this.primeiraFaturaDoCartao(cartao, this.dataCompra);
+    }
     if (!this.dataInicio || !this.diaVencimento) {
       return null;
     }
-    const data = new Date(this.dataInicio);
-    const dia = Math.min(this.diaVencimento, this.diasNoMes(data.getFullYear(), data.getMonth()));
-    return new Date(data.getFullYear(), data.getMonth(), dia);
+    return this.comDiaDoMes(this.dataInicio, this.diaVencimento);
+  }
+
+  get datasVencimento(): Date[] {
+    const primeira = this.primeiraDataVencimento;
+    const dia = this.diaVencimentoEfetivo;
+    const total = this.quantidadeParcelas;
+    if (!primeira || !dia || !total || total < 1) {
+      return [];
+    }
+    return Array.from({ length: total }, (_, indice) =>
+      this.comDiaDoMes(new Date(primeira.getFullYear(), primeira.getMonth() + indice, 1), dia)
+    );
+  }
+
+  // Mesma regra do backend (CreditCard#firstInvoiceDueDate): a compra entra na
+  // fatura do próprio mês até a véspera do fechamento e na seguinte a partir
+  // dele; e o vencimento que não vem depois do fechamento é do mês seguinte ao
+  // da fatura (cartão que fecha 28 e vence 5 paga a fatura de 28/03 em 05/04).
+  private primeiraFaturaDoCartao(cartao: Cartao, dataCompra: Date): Date {
+    const mesesAFrente =
+      (dataCompra.getDate() >= cartao.billingDay ? 1 : 0) + (cartao.dueDay <= cartao.billingDay ? 1 : 0);
+    const fatura = new Date(dataCompra.getFullYear(), dataCompra.getMonth() + mesesAFrente, 1);
+    return this.comDiaDoMes(fatura, cartao.dueDay);
+  }
+
+  private comDiaDoMes(base: Date, dia: number): Date {
+    const ano = base.getFullYear();
+    const mes = base.getMonth();
+    return new Date(ano, mes, Math.min(dia, this.diasNoMes(ano, mes)));
   }
 
   ngOnInit(): void {
@@ -209,6 +270,7 @@ export class FormTransacaoComponent {
       baseControls['quantidadeParcelas'] = new FormControl(null);
       baseControls['diaVencimento'] = new FormControl(10, [Validators.required, Validators.min(1), Validators.max(31)]);
       baseControls['dataInicio'] = new FormControl(new Date(), [Validators.required]);
+      baseControls['dataCompra'] = new FormControl(this.isEdicaoDespesaFixa ? null : new Date());
       baseControls['cartaoId'] = new FormControl(null);
     } else {
       baseControls['valor'] = new FormControl('', [Validators.required, Validators.min(0.01)]);
@@ -217,7 +279,10 @@ export class FormTransacaoComponent {
 
     this.formTransacao = new FormGroup(baseControls);
 
-    this.cartoes$.pipe(takeUntilDestroyed(this.destroyRef)).subscribe(c => this.cartoes = c);
+    this.cartoes$.pipe(takeUntilDestroyed(this.destroyRef)).subscribe(c => {
+      this.cartoes = c;
+      this.cdr.markForCheck();
+    });
 
     if (this.isDespesaFixa) {
       this.formTransacao.get('cartaoId')?.valueChanges.pipe(takeUntilDestroyed(this.destroyRef)).subscribe(value => {
@@ -225,18 +290,21 @@ export class FormTransacaoComponent {
           this.formTransacao.get('cartaoId')?.setValue(null, { emitEvent: false });
           this.abrirDialogNovoCartao();
         }
+        this.atualizarValidadoresAgenda();
       });
 
       this.formTransacao.get('modoCobranca')?.valueChanges.pipe(takeUntilDestroyed(this.destroyRef)).subscribe(value => {
         this.atualizarValidadoresParcelas(value);
       });
       this.atualizarValidadoresParcelas(this.formTransacao.get('modoCobranca')?.value);
+      this.atualizarValidadoresAgenda();
 
       this.formTransacao.valueChanges.pipe(takeUntilDestroyed(this.destroyRef)).subscribe(values => {
         this.valorTotal = parseValorBrl(values.valorTotal);
         this.quantidadeParcelas = values.modoCobranca === 'parcelada' ? values.quantidadeParcelas || null : null;
         this.dataInicio = values.dataInicio ? new Date(values.dataInicio) : null;
         this.diaVencimento = values.diaVencimento || null;
+        this.dataCompra = values.dataCompra ? new Date(values.dataCompra) : null;
         this.cartaoSelecionado = values.cartaoId || null;
       });
     }
@@ -266,6 +334,31 @@ export class FormTransacaoComponent {
 
   private diasNoMes(ano: number, mes: number): number {
     return new Date(ano, mes + 1, 0).getDate();
+  }
+
+  private atualizarValidadoresAgenda(): void {
+    const dataCompra = this.formTransacao.get('dataCompra');
+    const diaVencimento = this.formTransacao.get('diaVencimento');
+    const dataInicio = this.formTransacao.get('dataInicio');
+    if (!dataCompra || !diaVencimento || !dataInicio) {
+      return;
+    }
+
+    if (this.usaDatasDoCartao) {
+      // Editando, o cronograma já salvo é preservado quando a data da compra
+      // fica em branco, então ela só é obrigatória no cadastro.
+      dataCompra.setValidators(this.isEdicaoDespesaFixa ? [] : [Validators.required]);
+      diaVencimento.clearValidators();
+      dataInicio.clearValidators();
+    } else {
+      dataCompra.clearValidators();
+      diaVencimento.setValidators([Validators.required, Validators.min(1), Validators.max(31)]);
+      dataInicio.setValidators([Validators.required]);
+    }
+
+    [dataCompra, diaVencimento, dataInicio].forEach((control) =>
+      control.updateValueAndValidity({ emitEvent: false })
+    );
   }
 
   private atualizarValidadoresParcelas(modo: ModoCobrancaDespesa | null): void {
@@ -383,17 +476,21 @@ export class FormTransacaoComponent {
       return;
     }
 
-    const payload: any = {
+    const usaCartao = this.usaDatasDoCartao;
+    const payload: DespesaFixaPayload = {
       title: v.titulo,
       category: v.categoria,
       totalValue: valorTotal,
       installmentsCount: v.modoCobranca === 'parcelada' ? Number(v.quantidadeParcelas) : null,
-      dueDay: Number(v.diaVencimento),
-      startDate: this.formatDateOnly(v.dataInicio),
-      creditCardId: v.cartaoId || null,
+      creditCardId: usaCartao ? v.cartaoId : null,
       responsibleId: responsavel,
       payers: pagadores,
-      remainingPayers: this.pagadoresRestantes
+      remainingPayers: this.pagadoresRestantes,
+      // O backend aceita os dois formatos: a data da compra manda quando existe
+      // e o preenchimento manual continua valendo no resto dos casos.
+      ...(usaCartao && v.dataCompra
+        ? { purchaseDate: this.formatDateOnly(v.dataCompra) }
+        : { dueDay: Number(v.diaVencimento), startDate: this.formatDateOnly(v.dataInicio) })
     };
     const request = this.isEdicaoDespesaFixa && this.data?.despesaFixa
       ? this.compraService.atualizarDespesaFixa(this.data.despesaFixa.id, payload)
@@ -469,7 +566,7 @@ export class FormTransacaoComponent {
         titulo: this.data.compra.title,
         categoria: this.data.compra.category,
         valor: this.data.compra.value,
-        dataPagamento: this.data.compra.paymentDate ? new Date(this.data.compra.paymentDate) : '',
+        dataPagamento: this.parseDateOnly(this.data.compra.paymentDate) ?? '',
         responsavel: this.responsavel
       });
       this.pagadores = [...(this.data.compra.payers ?? [])];
@@ -486,7 +583,7 @@ export class FormTransacaoComponent {
         modoCobranca: d.quantidadeParcelas ? 'parcelada' : 'recorrente',
         quantidadeParcelas: d.quantidadeParcelas,
         diaVencimento: d.diaVencimento,
-        dataInicio: d.dataInicio ? new Date(d.dataInicio) : new Date(),
+        dataInicio: this.parseDateOnly(d.dataInicio) ?? new Date(),
         cartaoId: d.creditCardId || null,
         responsavel: this.responsavel
       });
@@ -506,6 +603,19 @@ export class FormTransacaoComponent {
     return this.isEdicaoCompra
       ? this.getPagadoresRestantesEdicao(pagadores)
       : [...pagadores];
+  }
+
+  // new Date('2026-09-01') seria lido como meia-noite UTC e voltaria para 31/08
+  // em fusos negativos, jogando o mês da 1ª parcela para trás.
+  private parseDateOnly(value: string | null | undefined): Date | null {
+    if (!value) {
+      return null;
+    }
+    const [ano, mes, dia] = value.split('T')[0].split('-').map(Number);
+    if (!ano || !mes || !dia) {
+      return null;
+    }
+    return new Date(ano, mes - 1, dia);
   }
 
   private formatDateOnly(value: Date | string): string {
