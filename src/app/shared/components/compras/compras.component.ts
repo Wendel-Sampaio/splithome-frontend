@@ -225,6 +225,10 @@ export class ComprasComponent implements OnInit {
       });
       return;
     }
+    if (element.canSettle) {
+      this.quitarCompra(element);
+      return;
+    }
     const dialogRef = this.modal.open(DialogPagamentoComponent, {
       size: 'sm',
       data: element
@@ -232,6 +236,22 @@ export class ComprasComponent implements OnInit {
     dialogRef.afterClosed().pipe(takeUntilDestroyed(this.destroyRef)).subscribe(result => {
       this.recarregarCompras();
       console.log(`Dialog result: ${result}`);
+    });
+  }
+
+  private quitarCompra(compra: Compra): void {
+    this.loadingAcao.set(true);
+    this.compraService.quitarCompra(compra.id).pipe(
+      finalize(() => this.loadingAcao.set(false)),
+      takeUntilDestroyed(this.destroyRef)
+    ).subscribe({
+      next: () => {
+        this.notify.success('Compra marcada como paga!');
+        this.recarregarCompras();
+      },
+      error: () => {
+        this.notify.error('Não foi possível marcar a compra como paga.');
+      }
     });
   }
 
@@ -393,6 +413,16 @@ export class ComprasComponent implements OnInit {
       || (compra.remainingPayers ?? []).includes(user.name);
   }
 
+  // Nao ha para quem transferir quando o comprador e o unico pendente: e o caso
+  // de quem esta sem familia ou sozinho nela. O back so deixa o comprador quitar,
+  // e a quitacao zera a lista inteira - por isso exigimos que ninguem mais deva.
+  private podeQuitar(compra: Compra, currentUser: User): boolean {
+    return compra.purchaserId === currentUser.id
+      && (compra.remainingPayers ?? []).every(
+        (payer) => payer === currentUser.id || payer === currentUser.name
+      );
+  }
+
   verificarPagamento(element: Compra): boolean {
     return element.isPaid;
   }
@@ -475,6 +505,7 @@ export class ComprasComponent implements OnInit {
       remainingPayerNames,
       remainingPayerProfiles,
       showPaymentButton: payers.includes(currentUser.id) || payers.includes(currentUser.name),
+      canSettle: this.podeQuitar(compraNormalizada, currentUser),
       isPaid: !this.verificaUserRemainingPayers(compraNormalizada)
     };
   }

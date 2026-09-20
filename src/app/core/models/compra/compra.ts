@@ -21,5 +21,7 @@ export class Compra {
     purchaserName!: string;
     purchaseDate!: string;
     showPaymentButton!: boolean;
+    /** Comprador que nao deve nada a ninguem: quita a compra em vez de pagar via PIX. */
+    canSettle!: boolean;
     isPaid!: boolean;
 }

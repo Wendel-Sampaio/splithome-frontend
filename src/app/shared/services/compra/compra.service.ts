@@ -57,6 +57,12 @@ export class CompraService {
     return this.http.put<any>(`${this.API}/update-purchase`, data);
   }
 
+  // Quitacao pelo comprador: zera de uma vez quem ainda deve. So faz sentido
+  // quando ninguem alem do proprio comprador esta na lista de pendentes.
+  quitarCompra(compraId: string): Observable<Compra> {
+    return this.http.post<Compra>(`${this.API}/purchases/${compraId}/settle`, {});
+  }
+
   deleteCompra(contaId: string): Observable<string> {
     return this.http.delete<string>(`${this.API}/delete/${contaId}`, { responseType: 'text' as 'json' });
   }
