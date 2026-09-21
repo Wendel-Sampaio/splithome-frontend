@@ -125,6 +125,22 @@ describe('UserService', () => {
       req.flush('Usuário cadastrado com sucesso!');
     });
 
+    it('solicitarCodigoResetSenha deve fazer POST para /user/auth/password-reset/request', () => {
+      service.solicitarCodigoResetSenha('joao@test.com').subscribe();
+
+      const req = httpMock.expectOne(r => r.method === 'POST' && r.url.includes('/user/auth/password-reset/request'));
+      expect(req.request.body).toEqual({ email: 'joao@test.com' });
+      req.flush('Código enviado');
+    });
+
+    it('confirmarResetSenha deve fazer POST para /user/auth/password-reset/confirm', () => {
+      service.confirmarResetSenha('joao@test.com', '123456', 'Senha@123').subscribe();
+
+      const req = httpMock.expectOne(r => r.method === 'POST' && r.url.includes('/user/auth/password-reset/confirm'));
+      expect(req.request.body).toEqual({ email: 'joao@test.com', code: '123456', newPassword: 'Senha@123' });
+      req.flush('Senha alterada');
+    });
+
     it('getUserById deve fazer GET para /user/{id}', () => {
       service.getUserById('uuid-123').subscribe();
       const req = httpMock.expectOne(r => r.method === 'GET' && r.url.includes('/user/uuid-123'));

@@ -35,6 +35,22 @@ export class UserService {
     return this.http.post<string>(this.API+"/auth/register", register, {responseType: 'text' as 'json'})
   }
 
+  solicitarCodigoResetSenha(email: string): Observable<string> {
+    return this.http.post<string>(
+      `${this.API}/auth/password-reset/request`,
+      { email },
+      {responseType: 'text' as 'json'}
+    );
+  }
+
+  confirmarResetSenha(email: string, code: string, newPassword: string): Observable<string> {
+    return this.http.post<string>(
+      `${this.API}/auth/password-reset/confirm`,
+      { email, code, newPassword },
+      {responseType: 'text' as 'json'}
+    );
+  }
+
   atualizarUsuario(id: string, user: User): Observable<User> {
     return this.http.put<User>(`${this.API}/${id}/edit-user`, user).pipe(
       map((updatedUser) => this.normalizeUser(updatedUser))

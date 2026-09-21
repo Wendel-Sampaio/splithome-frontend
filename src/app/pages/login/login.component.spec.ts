@@ -20,7 +20,12 @@ describe('LoginComponent', () => {
   let userState: jasmine.SpyObj<UserStateService>;
 
   beforeEach(async () => {
-    userService = jasmine.createSpyObj<UserService>('UserService', ['logar', 'addToken']);
+    userService = jasmine.createSpyObj<UserService>('UserService', [
+      'logar',
+      'addToken',
+      'solicitarCodigoResetSenha',
+      'confirmarResetSenha'
+    ]);
     notify = jasmine.createSpyObj<NotificationService>('NotificationService', ['success', 'error', 'info', 'warning']);
     router = jasmine.createSpyObj<Router>('Router', ['navigate']);
     dialog = jasmine.createSpyObj<MatDialog>('MatDialog', ['open']);
@@ -75,6 +80,37 @@ describe('LoginComponent', () => {
     component.loginForm.setValue({ email: '', password: '' });
     component.login();
     expect(userService.logar).not.toHaveBeenCalled();
+  });
+
+  it('solicita código de recuperação e avança etapa', () => {
+    userService.solicitarCodigoResetSenha.and.returnValue(of('ok'));
+    component.openPasswordReset();
+    component.resetForm.patchValue({ email: 'a@b.com' });
+
+    component.requestPasswordReset();
+
+    expect(userService.solicitarCodigoResetSenha).toHaveBeenCalledWith('a@b.com');
+    expect(component.resetCodeSent()).toBe(true);
+    expect(notify.success).toHaveBeenCalledWith('Enviamos um código para o e-mail informado.');
+  });
+
+  it('confirma reset de senha e volta para login', () => {
+    userService.confirmarResetSenha.and.returnValue(of('ok'));
+    component.openPasswordReset();
+    component.resetCodeSent.set(true);
+    component.resetForm.setValue({
+      email: 'a@b.com',
+      code: '123456',
+      newPassword: 'Senha@123',
+      repeatPassword: 'Senha@123'
+    });
+
+    component.confirmPasswordReset();
+
+    expect(userService.confirmarResetSenha).toHaveBeenCalledWith('a@b.com', '123456', 'Senha@123');
+    expect(notify.success).toHaveBeenCalledWith('Senha alterada com sucesso. Faça login com a nova senha.');
+    expect(component.resetMode()).toBe(false);
+    expect(component.loginForm.get('email')?.value).toBe('a@b.com');
   });
 
   it('abre diálogo de indisponibilidade ao clicar no botão do Google', () => {

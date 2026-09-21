@@ -15,7 +15,7 @@
         <img class="brand-logo" src="../../../assets/logo-semfundo.png" alt="SplitHome">
       </div>
 
-      <form class="auth-form" [formGroup]="loginForm" (ngSubmit)="login()">
+      <form class="auth-form" [formGroup]="loginForm" (ngSubmit)="login()" *ngIf="!resetMode()">
         <div class="field" [class.field--invalid]="isInvalid('email')">
           <input formControlName="email" type="email" placeholder="E-mail" autocomplete="email" aria-label="E-mail">
           <mat-icon>person</mat-icon>
@@ -30,13 +30,54 @@
           </button>
         </div>
 
+        <button type="button" class="forgot-link" (click)="openPasswordReset()">Esqueci minha senha</button>
+
         <button type="submit" class="auth-submit" [disabled]="loading() || loginForm.invalid">
           <mat-spinner *ngIf="loading()" diameter="20"></mat-spinner>
           <span *ngIf="!loading()">Entrar</span>
         </button>
       </form>
 
-      <div class="social" aria-label="Entrar com redes sociais">
+      <form class="auth-form reset-form" [formGroup]="resetForm" *ngIf="resetMode()" (ngSubmit)="resetCodeSent() ? confirmPasswordReset() : requestPasswordReset()">
+        <div class="field" [class.field--invalid]="isResetInvalid('email')">
+          <input formControlName="email" type="email" placeholder="E-mail" autocomplete="email" aria-label="E-mail">
+          <mat-icon>mail</mat-icon>
+        </div>
+
+        <ng-container *ngIf="resetCodeSent()">
+          <div class="field" [class.field--invalid]="isResetInvalid('code')">
+            <input formControlName="code" inputmode="numeric" maxlength="6" placeholder="Código" autocomplete="one-time-code" aria-label="Código">
+            <mat-icon>pin</mat-icon>
+          </div>
+
+          <div class="field" [class.field--invalid]="isResetInvalid('newPassword')">
+            <input formControlName="newPassword" [type]="hideResetPassword() ? 'password' : 'text'" placeholder="Nova senha"
+              autocomplete="new-password" aria-label="Nova senha">
+            <button type="button" class="field-toggle" (click)="clickEventResetPassword($event)"
+              [attr.aria-label]="hideResetPassword() ? 'Mostrar senha' : 'Ocultar senha'" [attr.aria-pressed]="!hideResetPassword()">
+              <mat-icon>{{ hideResetPassword() ? 'visibility' : 'visibility_off' }}</mat-icon>
+            </button>
+          </div>
+
+          <div class="field" [class.field--invalid]="isResetInvalid('repeatPassword') || resetForm.hasError('passwordMismatch')">
+            <input formControlName="repeatPassword" [type]="hideResetPasswordConfirm() ? 'password' : 'text'" placeholder="Confirmar senha"
+              autocomplete="new-password" aria-label="Confirmar senha">
+            <button type="button" class="field-toggle" (click)="clickEventResetPasswordConfirm($event)"
+              [attr.aria-label]="hideResetPasswordConfirm() ? 'Mostrar senha' : 'Ocultar senha'" [attr.aria-pressed]="!hideResetPasswordConfirm()">
+              <mat-icon>{{ hideResetPasswordConfirm() ? 'visibility' : 'visibility_off' }}</mat-icon>
+            </button>
+          </div>
+        </ng-container>
+
+        <button type="submit" class="auth-submit" [disabled]="resetLoading() || (resetCodeSent() ? resetForm.invalid : resetForm.get('email')?.invalid)">
+          <mat-spinner *ngIf="resetLoading()" diameter="20"></mat-spinner>
+          <span *ngIf="!resetLoading()">{{ resetCodeSent() ? 'Alterar senha' : 'Enviar código' }}</span>
+        </button>
+
+        <button type="button" class="forgot-link forgot-link--center" (click)="backToLogin()">Voltar para login</button>
+      </form>
+
+      <div class="social" aria-label="Entrar com redes sociais" *ngIf="!resetMode()">
         <button type="button" class="social-btn social-btn--google" aria-label="Entrar com Google"
           (click)="openSocialUnavailable('google')">
           <svg viewBox="0 0 48 48" aria-hidden="true">
@@ -54,7 +95,7 @@
         </button>
       </div>
 
-      <p class="auth-footer">
+      <p class="auth-footer" *ngIf="!resetMode()">
         Não tem uma conta? <a href="/cadastro">cadastre-se aqui.</a>
       </p>
     </section>
