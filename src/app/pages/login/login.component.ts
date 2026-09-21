@@ -4,7 +4,7 @@ import { Router } from '@angular/router';
 import { MatIcon } from '@angular/material/icon';
 import { AbstractControl, FormBuilder, FormGroup, ReactiveFormsModule, ValidationErrors, Validators } from '@angular/forms';
 import { MatProgressSpinnerModule } from '@angular/material/progress-spinner';
-import { finalize } from 'rxjs';
+import { finalize, timeout } from 'rxjs';
 import { Login } from '../../core/auth/user/login';
 import { UserService } from '../../core/auth/user/user.service';
 import { NotificationService } from '../../shared/services/notification/notification.service';
@@ -135,6 +135,7 @@ export class LoginComponent {
 
     this.resetLoading.set(true);
     this.userService.solicitarCodigoResetSenha(emailControl.value).pipe(
+      timeout(20000),
       finalize(() => this.resetLoading.set(false)),
       takeUntilDestroyed(this.destroyRef)
     ).subscribe({
@@ -155,6 +156,7 @@ export class LoginComponent {
     const { email, code, newPassword } = this.resetForm.value;
     this.resetLoading.set(true);
     this.userService.confirmarResetSenha(email, code, newPassword).pipe(
+      timeout(20000),
       finalize(() => this.resetLoading.set(false)),
       takeUntilDestroyed(this.destroyRef)
     ).subscribe({
