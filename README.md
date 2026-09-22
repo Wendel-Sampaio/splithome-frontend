@@ -116,3 +116,17 @@ Open a Pull Request explaining the problem solved or feature made, if exists, ap
 [📝 How to create a Pull Request](https://www.atlassian.com/br/git/tutorials/making-a-pull-request)
 
 [💾 Commit pattern](https://gist.github.com/joshbuchea/6f47e86d2510bce28f8e7f42ae84c716)
+
+### Tour de primeiro acesso
+
+A Home consulta `GET /api/user/me/onboarding-tour` depois da primeira renderização.
+O backend retorna `onboardingTourCompletedAt` (data ISO ou `null`) e
+`shouldShowOnboardingTour`. A conclusão usa `PUT` no mesmo endpoint, com corpo `{}`,
+e só fecha o tour após a API confirmar. Ambos os endpoints usam o usuário autenticado.
+O backend deve ser atualizado junto com o frontend para persistir a conclusão entre acessos e dispositivos.
+
+Fechar pelo botão × ou pela tecla Escape não conclui o tour: ele reaparece no próximo
+acesso à Home. Falhas ao consultar o status não impedem o uso da página; falhas ao
+salvar permitem tentar novamente. O CTA de upgrade utiliza o modal existente do
+`PlanService`, sem checkout. Os pontos `data-tour-id` da Home são o contrato de
+ancoragem do componente e devem permanecer estáveis.

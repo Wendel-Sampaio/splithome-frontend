@@ -1,4 +1,4 @@
-import { ChangeDetectorRef, Component, DestroyRef, inject } from '@angular/core';
+import { afterNextRender, ChangeDetectorRef, Component, DestroyRef, inject } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { ActivatedRoute } from '@angular/router';
@@ -23,13 +23,18 @@ import { ModalService } from '../../shared/components/ui/modal';
 import { FamiliaComponent } from '../familia/familia.component';
 import { RecadosComponent } from '../recados/recados.component';
 
+import { OnboardingTourService } from '../../core/onboarding/onboarding-tour.service';
+import { OnboardingTourComponent } from '../../shared/components/onboarding-tour/onboarding-tour.component';
+
 @Component({
   selector: 'app-home',
-  imports: [MatCardModule, MatIcon, MatButtonModule, MatMenuModule, ComprasComponent, DespesasFixasComponent, MeuPerfilComponent, EstatisticasComponent, ResumoFinanceiroComponent, DashboardInicioComponent, FamiliaComponent, RecadosComponent, CommonModule, MatToolbarModule],
+  providers: [OnboardingTourService],
+  imports: [OnboardingTourComponent, MatCardModule, MatIcon, MatButtonModule, MatMenuModule, ComprasComponent, DespesasFixasComponent, MeuPerfilComponent, EstatisticasComponent, ResumoFinanceiroComponent, DashboardInicioComponent, FamiliaComponent, RecadosComponent, CommonModule, MatToolbarModule],
   templateUrl: './home.component.html',
   styleUrl: './home.component.scss'
 })
 export class HomeComponent {
+  readonly onboardingTour = inject(OnboardingTourService);
   loginService = inject(UserService);
   route = inject(ActivatedRoute);
   planService = inject(PlanService);
@@ -45,6 +50,7 @@ export class HomeComponent {
   isMenuCollapsed = false;
 
   constructor() {
+    afterNextRender(() => this.onboardingTour.initialize());
     this.user = this.loginService.getUser();
     this.loginService.profilePhotoUpdates$.pipe(takeUntilDestroyed(this.destroyRef)).subscribe(() => {
       this.user = {

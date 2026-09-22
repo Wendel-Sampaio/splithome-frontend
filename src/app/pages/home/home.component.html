@@ -1,5 +1,5 @@
-<div class="app-shell" [ngClass]="{'menu-minimizado': isMenuCollapsed}">
-    <mat-card class="menu-lateral" appearance="outlined" aria-label="Menu principal">
+<div [attr.inert]="onboardingTour.active() ? '' : null" class="app-shell" [ngClass]="{'menu-minimizado': isMenuCollapsed}">
+    <mat-card data-tour-id="menu-lateral" class="menu-lateral" appearance="outlined" aria-label="Menu principal">
         <mat-card-header class="header-menu-lateral">
             <button class="botao-logo"
                     type="button"
@@ -14,19 +14,19 @@
             <nav class="menu-groups">
                 <div class="menu-group">
                     <span class="group-label">Principal</span>
-                    <button (click)="abrirInicio()"
+                    <button data-tour-id="menu-inicio" (click)="abrirInicio()"
                             class="botoes-menu-lateral"
                             [ngClass]="{'selected': currentView === 'inicio'}">
                         <mat-icon class="icones-botao">dashboard</mat-icon>
                         <span class="menu-label">In&iacute;cio</span>
                     </button>
-                    <button (click)="abrirCompras()"
+                    <button data-tour-id="menu-compras" (click)="abrirCompras()"
                             class="botoes-menu-lateral"
                             [ngClass]="{'selected': currentView === 'compras'}">
                         <mat-icon class="icones-botao">shopping_cart</mat-icon>
                         <span class="menu-label">Compras</span>
                     </button>
-                    <button (click)="abrirDespesas()"
+                    <button data-tour-id="menu-despesas-fixas" (click)="abrirDespesas()"
                             class="botoes-menu-lateral"
                             [ngClass]="{'selected': currentView === 'despesasFixas', 'premium-locked': !isPremium}">
                         <mat-icon class="icones-botao">payments</mat-icon>
@@ -40,13 +40,13 @@
 
                 <div class="menu-group">
                     <span class="group-label">Financeiro</span>
-                    <button (click)="abrirGraficos()"
+                    <button data-tour-id="menu-graficos" (click)="abrirGraficos()"
                             class="botoes-menu-lateral"
                             [ngClass]="{'selected': currentView === 'graficos'}">
                         <mat-icon class="icones-botao">bar_chart</mat-icon>
                         <span class="menu-label">Gr&aacute;ficos</span>
                     </button>
-                    <button (click)="abrirResumoFinanceiro()"
+                    <button data-tour-id="menu-resumo-financeiro" (click)="abrirResumoFinanceiro()"
                             class="botoes-menu-lateral"
                             [ngClass]="{'selected': currentView === 'resumoFinanceiro', 'premium-locked': !isPremium}">
                         <mat-icon class="icones-botao">account_balance_wallet</mat-icon>
@@ -60,13 +60,13 @@
 
                 <div class="menu-group">
                     <span class="group-label">Fam&iacute;lia</span>
-                    <button (click)="abrirFamilia()"
+                    <button data-tour-id="menu-familia" (click)="abrirFamilia()"
                             class="botoes-menu-lateral"
                             [ngClass]="{'selected': currentView === 'familia'}">
                         <mat-icon class="icones-botao">groups</mat-icon>
                         <span class="menu-label">Fam&iacute;lia</span>
                     </button>
-                    <button (click)="abrirRecados()"
+                    <button data-tour-id="menu-recados" (click)="abrirRecados()"
                             class="botoes-menu-lateral"
                             [ngClass]="{'selected': currentView === 'recados', 'premium-locked': !isPremium}">
                         <mat-icon class="icones-botao">forum</mat-icon>
@@ -80,7 +80,7 @@
 
                 <div class="menu-group">
                     <span class="group-label">Conta</span>
-                    <button (click)="abrirMeuPerfil()"
+                    <button data-tour-id="menu-meu-perfil" (click)="abrirMeuPerfil()"
                             class="botoes-menu-lateral"
                             [ngClass]="{'selected': currentView === 'meuPerfil'}">
                         <mat-icon class="icones-botao">perm_identity</mat-icon>
@@ -101,21 +101,21 @@
     </mat-card>
 
     <main class="main-area">
-        <mat-toolbar class="topbar">
+        <mat-toolbar data-tour-id="barra-superior" class="topbar">
             <h1>{{ currentViewTitle }}</h1>
 
-            <div class="topbar-search">
+            <div data-tour-id="busca" class="topbar-search">
                 <mat-icon>search</mat-icon>
                 <input type="text" placeholder="Buscar compras, despesas..." aria-label="Buscar">
             </div>
 
             <div class="topbar-right">
-                <button class="topbar-notif" type="button" aria-label="Notifica&ccedil;&otilde;es">
+                <button data-tour-id="notificacoes" class="topbar-notif" type="button" aria-label="Notifica&ccedil;&otilde;es">
                     <mat-icon>notifications</mat-icon>
                     <span class="notif-badge" aria-hidden="true">3</span>
                 </button>
 
-                <button class="avatar-trigger" type="button" [matMenuTriggerFor]="avatarMenu"
+                <button data-tour-id="menu-conta" class="avatar-trigger" type="button" [matMenuTriggerFor]="avatarMenu"
                         aria-label="Menu da conta">
                     <span class="topbar-greeting">Ol&aacute;, {{ user.name }}</span>
                     <img class="topbar-avatar" [src]="profilePhotoUrl" alt="Foto de perfil">
@@ -158,3 +158,7 @@
         </section>
     </main>
 </div>
+
+@if (onboardingTour.active()) {
+    <app-onboarding-tour></app-onboarding-tour>
+}

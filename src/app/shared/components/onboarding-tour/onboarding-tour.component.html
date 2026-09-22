@@ -1,0 +1,49 @@
+<div class="tour-layer" [class.is-ready]="ready()" (keydown)="onKeydown($event)">
+  <div class="tour-blocker" [class.is-dimmed]="!highlight()" aria-hidden="true"></div>
+  @if (highlight(); as rect) {
+    <div class="tour-highlight" aria-hidden="true" [style.left.px]="rect.left" [style.top.px]="rect.top"
+         [style.width.px]="rect.width" [style.height.px]="rect.height"></div>
+  }
+  <section #panel class="tour-panel" [class.tour-final]="tour.isLast()" [ngStyle]="position()"
+           role="dialog" aria-modal="true" aria-labelledby="tour-title" aria-describedby="tour-description"
+           cdkTrapFocus [cdkTrapFocusAutoCapture]="true" [attr.aria-busy]="tour.saving()">
+    <header>
+      <span class="tour-eyebrow">Conheça o SplitHome · {{ tour.index() + 1 }}/{{ tour.steps.length }}</span>
+      <button class="tour-close" type="button" aria-label="Fechar tour sem concluir" title="Continuar depois"
+              [disabled]="tour.saving()" (click)="tour.dismiss()">×</button>
+    </header>
+    <div class="tour-progress" aria-hidden="true"><span [style.width.%]="(tour.index() + 1) / tour.steps.length * 100"></span></div>
+    <h2 #heading id="tour-title" tabindex="-1" cdkFocusInitial>{{ tour.step().title }}</h2>
+    <p id="tour-description">{{ tour.step().description }}</p>
+    @if (tour.isLast()) {
+      <div class="tour-plans">
+        <section aria-label="Plano grátis">
+          <h3>Grátis</h3>
+          <ul><li>Compras pessoais</li><li>Despesas fixas pessoais</li><li>Gráficos básicos</li><li>Perfil</li></ul>
+        </section>
+        <section class="premium" aria-label="Plano premium">
+          <h3>Premium</h3>
+          <p>Tudo do grátis, mais:</p>
+          <ul><li>Família</li><li>Divisão de despesas</li><li>Recados</li><li>Resumo financeiro</li><li>Recursos colaborativos</li></ul>
+        </section>
+      </div>
+      @if (plan.isPremium()) {
+        <p class="tour-plan-note">Você já é premium! Todos esses recursos estão disponíveis para você.</p>
+      }
+    }
+    @if (tour.error()) { <p class="tour-error" role="alert">{{ tour.error() }}</p> }
+    <footer>
+      @if (tour.index() > 0) {
+        <button type="button" class="secondary" [disabled]="tour.saving()" (click)="tour.previous()">Voltar</button>
+      }
+      @if (!tour.isLast()) {
+        <button type="button" class="primary" (click)="tour.next()">Próximo</button>
+      } @else if (plan.isPremium()) {
+        <button type="button" class="primary" [disabled]="tour.saving()" (click)="tour.complete()">{{ tour.saving() ? 'Salvando…' : 'Finalizar' }}</button>
+      } @else {
+        <button type="button" class="secondary" [disabled]="tour.saving()" (click)="tour.complete()">Continuar no plano grátis</button>
+        <button type="button" class="primary" [disabled]="tour.saving()" (click)="tour.complete(true)">{{ tour.saving() ? 'Salvando…' : 'Fazer upgrade' }}</button>
+      }
+    </footer>
+  </section>
+</div>
