@@ -1,4 +1,5 @@
 import { ComponentFixture, TestBed } from '@angular/core/testing';
+import { OverlayContainer } from '@angular/cdk/overlay';
 import { provideRouter } from '@angular/router';
 import { provideHttpClient } from '@angular/common/http';
 import { HttpTestingController, provideHttpClientTesting } from '@angular/common/http/testing';
@@ -83,6 +84,28 @@ describe('HomeComponent', () => {
     fixture.detectChanges();
     expect(fixture.nativeElement.querySelector('app-onboarding-tour')).toBeNull();
     expect(fixture.nativeElement.querySelector('.app-shell').hasAttribute('inert')).toBeFalse();
+  });
+
+  it('replays from the account menu, returning to Home with the sidebar expanded', async () => {
+    component.currentView = 'meuPerfil';
+    component.isMenuCollapsed = true;
+    fixture.detectChanges();
+    fixture.nativeElement.querySelector('[data-tour-id="menu-conta"]').click();
+    fixture.detectChanges();
+    await fixture.whenStable();
+    const overlay = TestBed.inject(OverlayContainer).getContainerElement();
+    const replay = Array.from(overlay.querySelectorAll<HTMLButtonElement>('[mat-menu-item]'))
+      .find(button => button.textContent?.includes('Rever Tour'))!;
+    expect(replay).toBeDefined();
+    replay.click(); fixture.detectChanges();
+    await fixture.whenStable();
+    fixture.detectChanges();
+    expect(component.currentView).toBe('inicio');
+    expect(component.isMenuCollapsed).toBeFalse();
+    expect(component.onboardingTour.active()).toBeTrue();
+    expect(component.onboardingTour.index()).toBe(0);
+    expect(fixture.nativeElement.querySelector('app-onboarding-tour')).not.toBeNull();
+    expect(overlay.querySelector('[role="menu"]')).toBeNull();
   });
 
 });

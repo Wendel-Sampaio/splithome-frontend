@@ -31,6 +31,7 @@ export class OnboardingTourService {
   private readonly destroyRef = inject(DestroyRef);
   private readonly endpoint = `${environment.apiUrl}/user/me/onboarding-tour`;
   private initialized = false;
+  private manuallyStarted = false;
   private readonly activeState = signal(false);
   private readonly indexState = signal(0);
   private readonly savingState = signal(false);
@@ -50,6 +51,7 @@ export class OnboardingTourService {
     this.initialized = true;
     this.http.get<OnboardingTourStatus>(this.endpoint).pipe(takeUntilDestroyed(this.destroyRef)).subscribe({
       next: status => {
+        if (this.manuallyStarted) return;
         if (status.onboardingTourCompletedAt === null || status.shouldShowOnboardingTour === true) {
           this.start();
         }
@@ -57,6 +59,12 @@ export class OnboardingTourService {
       // An unavailable status must never block the Home or guess that a user is new.
       error: () => { this.initialized = false; }
     });
+  }
+
+  replay(): void {
+    if (this.saving()) return;
+    this.manuallyStarted = true;
+    this.start();
   }
 
   private start(): void {
@@ -81,7 +89,16 @@ export class OnboardingTourService {
   }
 
   complete(upgrade = false): void {
-    if (!this.active() || !this.isLast() || this.saving()) return;
+    if (!this.isLast()) return;
+    this.finish(upgrade);
+  }
+
+  skip(): void {
+    this.finish();
+  }
+
+  private finish(upgrade = false): void {
+    if (!this.active() || this.saving()) return;
     this.savingState.set(true);
     this.errorState.set('');
     this.http.put<OnboardingTourStatus>(this.endpoint, {}).pipe(takeUntilDestroyed(this.destroyRef)).subscribe({

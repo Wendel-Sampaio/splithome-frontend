@@ -96,6 +96,12 @@ export class HomeComponent {
     this.isMenuCollapsed = !this.isMenuCollapsed;
   }
 
+  reverTour(): void {
+    this.isMenuCollapsed = false;
+    this.abrirInicio();
+    this.onboardingTour.replay();
+  }
+
   abrirInicio(): void {
     this.currentView = 'inicio';
     this.currentViewTitle = 'In\u00edcio';

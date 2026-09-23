@@ -81,4 +81,19 @@ describe('OnboardingTourComponent', () => {
     fixture.nativeElement.querySelector('[role="dialog"]').dispatchEvent(new KeyboardEvent('keydown', { key: 'Escape', bubbles: true }));
     expect(tour.active()).toBeFalse();
   });
+  it('explains how to replay and persists skipping from the first step', () => {
+    expect(fixture.nativeElement.querySelector('#tour-replay-hint').textContent).toContain('Rever Tour');
+    button('Pular tour').click(); fixture.detectChanges();
+    expect(button('Próximo').disabled).toBeTrue();
+    TestBed.inject(HttpTestingController).expectOne(`${environment.apiUrl}/user/me/onboarding-tour`)
+      .flush({ onboardingTourCompletedAt: '2026-09-23T12:00:00Z' });
+    expect(tour.active()).toBeFalse();
+  });
+
+  it('reminds users about replay in the final step', () => {
+    last();
+    expect(fixture.nativeElement.querySelector('#tour-replay-hint').textContent).toContain('sua foto');
+    expect(fixture.nativeElement.querySelector('#tour-replay-hint').textContent).toContain('Rever Tour');
+  });
+
 });

@@ -96,4 +96,62 @@ describe('OnboardingTourService', () => {
     expect(service.active()).toBeFalse();
     expect(plan.requiresPremium).not.toHaveBeenCalled();
   });
+  it('persists skipping from an intermediate step only once and never opens upgrade', () => {
+    start(); service.next();
+    service.skip();
+    service.skip();
+    service.replay();
+    expect(service.index()).toBe(1);
+    expect(service.active()).toBeTrue();
+    expect(service.saving()).toBeTrue();
+    const request = http.expectOne(endpoint);
+    expect(request.request.method).toBe('PUT');
+    request.flush({ onboardingTourCompletedAt: '2026-09-23T12:00:00Z', shouldShowOnboardingTour: false });
+    expect(service.active()).toBeFalse();
+    expect(plan.requiresPremium).not.toHaveBeenCalled();
+  });
+
+  it('keeps the tour open when skipping fails and allows retry', () => {
+    start();
+    service.skip();
+    http.expectOne(endpoint).flush({}, { status: 500, statusText: 'Error' });
+    expect(service.active()).toBeTrue();
+    expect(service.saving()).toBeFalse();
+    expect(service.error()).toContain('Tente novamente');
+    service.skip();
+    http.expectOne(endpoint).flush({ onboardingTourCompletedAt: '2026-09-23T12:00:00Z' });
+    expect(service.active()).toBeFalse();
+  });
+
+  it('replays for completed users without clearing their saved completion', () => {
+    service.initialize();
+    http.expectOne(endpoint).flush({ onboardingTourCompletedAt: '2026-09-23T12:00:00Z', shouldShowOnboardingTour: false });
+    service.replay();
+    expect(service.active()).toBeTrue();
+    expect(service.index()).toBe(0);
+    service.next(); service.dismiss(); service.replay();
+    expect(service.index()).toBe(0);
+    http.expectNone(endpoint);
+  });
+
+  it('allows replay after skipping and resets progress', () => {
+    start(); service.next(); service.skip();
+    http.expectOne(endpoint).flush({ onboardingTourCompletedAt: '2026-09-23T12:00:00Z' });
+    service.replay();
+    expect(service.active()).toBeTrue();
+    expect(service.index()).toBe(0);
+    expect(service.error()).toBe('');
+    http.expectNone(endpoint);
+  });
+
+  it('does not restart a manually replayed tour when a delayed status arrives', () => {
+    service.initialize();
+    const status = http.expectOne(endpoint);
+    service.replay(); service.next();
+    status.flush(pending);
+    expect(service.index()).toBe(1);
+    service.dismiss();
+    expect(service.active()).toBeFalse();
+  });
+
 });

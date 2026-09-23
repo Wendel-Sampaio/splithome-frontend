@@ -30,3 +30,6 @@ ul { margin: 0; padding-left: 18px; font-size: 14px; line-height: 1.65; }
 @media (max-width: 400px) { .tour-panel { padding: 16px; } .tour-plans { grid-template-columns: 1fr; } }
 
 @media (max-width: 760px) { .tour-panel:not(.tour-final) { max-height: calc(100dvh - 108px); } }
+
+.tour-replay-hint { font-size: 13px; background: #edf4ef; border-radius: 10px; padding: 12px; }
+.tour-skip { margin-right: auto; }

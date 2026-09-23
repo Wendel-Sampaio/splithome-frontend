@@ -125,7 +125,12 @@ O backend retorna `onboardingTourCompletedAt` (data ISO ou `null`) e
 e só fecha o tour após a API confirmar. Ambos os endpoints usam o usuário autenticado.
 O backend deve ser atualizado junto com o frontend para persistir a conclusão entre acessos e dispositivos.
 
-Fechar pelo botão × ou pela tecla Escape não conclui o tour: ele reaparece no próximo
+O botão **Pular tour** registra a conclusão no mesmo endpoint e impede novas aberturas
+automáticas. A opção **Rever Tour**, no menu da foto da conta, reinicia o tour na primeira
+etapa a qualquer momento, mesmo após concluir ou pular. Essa opção é explicada no início
+e no final do tour. Rever o tour não apaga a conclusão já salva.
+
+Fechar pelo botão × ou pela tecla Escape não conclui o tour: se ainda não foi concluído ou pulado, ele reaparece no próximo
 acesso à Home. Falhas ao consultar o status não impedem o uso da página; falhas ao
 salvar permitem tentar novamente. O CTA de upgrade utiliza o modal existente do
 `PlanService`, sem checkout. Os pontos `data-tour-id` da Home são o contrato de

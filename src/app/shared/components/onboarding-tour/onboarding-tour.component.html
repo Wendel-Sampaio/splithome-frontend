@@ -5,7 +5,7 @@
          [style.width.px]="rect.width" [style.height.px]="rect.height"></div>
   }
   <section #panel class="tour-panel" [class.tour-final]="tour.isLast()" [ngStyle]="position()"
-           role="dialog" aria-modal="true" aria-labelledby="tour-title" aria-describedby="tour-description"
+           role="dialog" aria-modal="true" aria-labelledby="tour-title" [attr.aria-describedby]="tour.index() === 0 || tour.isLast() ? 'tour-description tour-replay-hint' : 'tour-description'"
            cdkTrapFocus [cdkTrapFocusAutoCapture]="true" [attr.aria-busy]="tour.saving()">
     <header>
       <span class="tour-eyebrow">Conheça o SplitHome · {{ tour.index() + 1 }}/{{ tour.steps.length }}</span>
@@ -15,6 +15,9 @@
     <div class="tour-progress" aria-hidden="true"><span [style.width.%]="(tour.index() + 1) / tour.steps.length * 100"></span></div>
     <h2 #heading id="tour-title" tabindex="-1" cdkFocusInitial>{{ tour.step().title }}</h2>
     <p id="tour-description">{{ tour.step().description }}</p>
+    @if (tour.index() === 0 || tour.isLast()) {
+      <p id="tour-replay-hint" class="tour-replay-hint">Você pode pular o tour e revê-lo quando quiser: clique na sua foto, no canto superior direito, e escolha <strong>Rever Tour</strong>.</p>
+    }
     @if (tour.isLast()) {
       <div class="tour-plans">
         <section aria-label="Plano grátis">
@@ -33,11 +36,14 @@
     }
     @if (tour.error()) { <p class="tour-error" role="alert">{{ tour.error() }}</p> }
     <footer>
+      @if (!tour.isLast()) {
+        <button type="button" class="tour-skip" [disabled]="tour.saving()" (click)="tour.skip()">{{ tour.saving() ? 'Salvando…' : 'Pular tour' }}</button>
+      }
       @if (tour.index() > 0) {
         <button type="button" class="secondary" [disabled]="tour.saving()" (click)="tour.previous()">Voltar</button>
       }
       @if (!tour.isLast()) {
-        <button type="button" class="primary" (click)="tour.next()">Próximo</button>
+        <button type="button" class="primary" [disabled]="tour.saving()" (click)="tour.next()">Próximo</button>
       } @else if (plan.isPremium()) {
         <button type="button" class="primary" [disabled]="tour.saving()" (click)="tour.complete()">{{ tour.saving() ? 'Salvando…' : 'Finalizar' }}</button>
       } @else {
