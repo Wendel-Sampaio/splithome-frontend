@@ -1,14 +1,14 @@
 <app-modal-header
   [title]="compra.title || 'Compra sem título'"
   description="Detalhes da compra e da divisão"
-  [icon]="compra.category | categoriaIcone" />
+  [icon]="(compra.categoryDetails ?? compra.category) | categoriaIcone" />
 
 <app-modal-body>
   <section class="detail-shell">
     <div class="detail-hero">
-      <span class="detail-category" [style.border-color]="compra.category | categoriaCor">
-        <mat-icon aria-hidden="true" [style.color]="compra.category | categoriaCor">{{ compra.category | categoriaIcone }}</mat-icon>
-        {{ compra.category | categoria }}
+      <span class="detail-category" [style.border-color]="(compra.categoryDetails ?? compra.category) | categoriaCor">
+        <mat-icon aria-hidden="true" [style.color]="(compra.categoryDetails ?? compra.category) | categoriaCor">{{ (compra.categoryDetails ?? compra.category) | categoriaIcone }}</mat-icon>
+        {{ (compra.categoryDetails ?? compra.category) | categoria }}
       </span>
 
       <div class="detail-title-row">

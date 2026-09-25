@@ -14,15 +14,15 @@
 
       <mat-form-field appearance="outline">
         <mat-label>Categoria</mat-label>
-        <mat-select formControlName="categoria">
+        <mat-select formControlName="categoria" [disabled]="carregandoCategorias() || erroCategorias()">
           <mat-select-trigger>
             <span class="sh-category-option sh-category-option--trigger">
-              <mat-icon aria-hidden="true" [style.color]="formTransacao.get('categoria')?.value | categoriaCor">{{ formTransacao.get('categoria')?.value | categoriaIcone }}</mat-icon>
-              {{ formTransacao.get('categoria')?.value | categoria }}
+              <mat-icon aria-hidden="true" [style.color]="categoriaSelecionada | categoriaCor">{{ categoriaSelecionada | categoriaIcone }}</mat-icon>
+              {{ categoriaSelecionada | categoria }}
             </span>
           </mat-select-trigger>
-          @for (categoria of categorias$ | async; track categoria) {
-            <mat-option [value]="categoria">
+          @for (categoria of categorias(); track categoria.id) {
+            <mat-option [value]="categoria.id">
               <span class="sh-category-option">
                 <mat-icon aria-hidden="true" [style.color]="categoria | categoriaCor">{{ categoria | categoriaIcone }}</mat-icon>
                 {{ categoria | categoria }}
@@ -32,6 +32,23 @@
         </mat-select>
         <mat-error *ngIf="controlInvalido('categoria')">{{ getMensagemErroCampo('categoria') }}</mat-error>
       </mat-form-field>
+      @if (carregandoCategorias()) {
+        <p role="status">Carregando categorias…</p>
+      } @else if (erroCategorias()) {
+        <div role="alert">
+          <p>Não foi possível carregar as categorias.</p>
+          <button mat-button type="button" (click)="carregarCategorias()">Tentar novamente</button>
+        </div>
+      } @else {
+        @if (formTransacao.get('categoria')?.hasError('indisponivel')) {
+          <p class="sh-payer-error" role="status">A categoria anterior não está disponível. Escolha outra para salvar.</p>
+        }
+        @if (temFamilia) {
+          <button mat-button type="button" (click)="abrirCategorias()" [disabled]="loading()">
+            <mat-icon>add</mat-icon> Criar ou gerenciar categorias
+          </button>
+        }
+      }
     </app-form-section>
 
     @if (!isDespesaFixa) {

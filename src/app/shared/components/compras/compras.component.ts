@@ -1,3 +1,4 @@
+import { Categoria } from '../../../core/models/categoria/categoria';
 import { Component, DestroyRef, inject, OnInit, signal } from '@angular/core';
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { MatTableModule } from '@angular/material/table';
@@ -88,7 +89,7 @@ export class ComprasComponent implements OnInit {
   totalElements = 0;
   sortField = 'purchaseDate';
   sortDirection = 'desc';
-  categories: string[] = [];
+  categories: Categoria[] = [];
   purchasers: Purchaser[] = [];
 
   filterForm = this.fb.group({
@@ -108,7 +109,7 @@ export class ComprasComponent implements OnInit {
       const f = this.filterForm.value;
       return this.compraService.listarCompras({
         title: f.title || undefined,
-        category: f.category || undefined,
+        categoryId: f.category || undefined,
         purchaserId: f.purchaserId || undefined,
         paid: this.paymentStatusToPaidFilter(f.paymentStatus),
         startDate: f.startDate ? this.formatDate(f.startDate) : undefined,
@@ -135,9 +136,7 @@ export class ComprasComponent implements OnInit {
   );
 
   ngOnInit(): void {
-    this.transacaoService.listarCategorias().pipe(
-      takeUntilDestroyed(this.destroyRef)
-    ).subscribe(cats => this.categories = cats);
+    this.carregarCategorias();
 
     this.filterForm.valueChanges.pipe(
       debounceTime(300),
@@ -145,6 +144,13 @@ export class ComprasComponent implements OnInit {
     ).subscribe(() => {
       this.pageIndex = 0;
       this.recarregarCompras();
+    });
+  }
+
+  private carregarCategorias(): void {
+    this.transacaoService.listarCategorias().pipe(takeUntilDestroyed(this.destroyRef)).subscribe({
+      next: cats => this.categories = cats,
+      error: () => this.notify.error('Não foi possível carregar as categorias.')
     });
   }
 
@@ -167,7 +173,7 @@ export class ComprasComponent implements OnInit {
       disableClose: true,
     });
     formRef.afterClosed().pipe(takeUntilDestroyed(this.destroyRef)).subscribe(result => {
-      console.log(`Dialog result: ${result}`);
+      this.carregarCategorias();
       this.recarregarCompras();
     });
   }
@@ -187,7 +193,7 @@ export class ComprasComponent implements OnInit {
     });
 
     formRef.afterClosed().pipe(takeUntilDestroyed(this.destroyRef)).subscribe(result => {
-      console.log(`Dialog result: ${result}`);
+      this.carregarCategorias();
       this.recarregarCompras();
     });
   }
@@ -235,7 +241,7 @@ export class ComprasComponent implements OnInit {
     });
     dialogRef.afterClosed().pipe(takeUntilDestroyed(this.destroyRef)).subscribe(result => {
       this.recarregarCompras();
-      console.log(`Dialog result: ${result}`);
+      this.carregarCategorias();
     });
   }
 

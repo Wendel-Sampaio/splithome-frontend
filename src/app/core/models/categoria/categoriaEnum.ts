@@ -1,3 +1,5 @@
+import { CategoriaValor, codigoCategoria } from './categoria';
+
 export enum CategoriaEnum {
     CLEANING = 'Limpeza',
     FOOD = 'Alimento',
@@ -40,18 +42,20 @@ export const CategoriaCor: Record<keyof typeof CategoriaEnum, string> = {
     OTHERS: '#64748b'
 };
 
-export function getCategoriaIcone(categoria: string | null | undefined): string {
-    if (!categoria) {
+export function getCategoriaIcone(categoria: CategoriaValor): string {
+    const codigo = codigoCategoria(categoria);
+    if (!codigo) {
         return CategoriaIcone.OTHERS;
     }
 
-    return CategoriaIcone[categoria as keyof typeof CategoriaIcone] ?? CategoriaIcone.OTHERS;
+    return CategoriaIcone[codigo as keyof typeof CategoriaIcone] ?? CategoriaIcone.OTHERS;
 }
 
-export function getCategoriaCor(categoria: string | null | undefined): string {
-    if (!categoria) {
+export function getCategoriaCor(categoria: CategoriaValor): string {
+    const codigo = codigoCategoria(categoria);
+    if (!codigo) {
         return CategoriaCor.OTHERS;
     }
 
-    return CategoriaCor[categoria as keyof typeof CategoriaCor] ?? CategoriaCor.OTHERS;
+    return CategoriaCor[codigo as keyof typeof CategoriaCor] ?? CategoriaCor.OTHERS;
 }

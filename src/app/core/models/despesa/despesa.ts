@@ -1,7 +1,10 @@
+import { Categoria } from '../categoria/categoria';
 export class Despesa {
     id!: string;
     title!: string;
-    category!: string;
+    category!: string | null;
+    categoryId?: string;
+    categoryDetails?: Categoria | null;
     value!: number;
     unitValue!: number;
     payers!: Array<string>;

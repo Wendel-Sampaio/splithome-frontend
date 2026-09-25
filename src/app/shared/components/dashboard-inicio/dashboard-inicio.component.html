@@ -160,7 +160,7 @@
                     <div class="legenda">
                         <div class="legenda-item" *ngFor="let item of categorias(); let i = index">
                             <span class="legenda-cor" [style.background-color]="getCorCategoria(i)"></span>
-                            <span class="legenda-nome">{{ item.categoria | categoria }}</span>
+                            <span class="legenda-nome">{{ (item.categoryDetails ?? item.categoria) | categoria }}</span>
                             <strong>{{ moeda(item.total) }}</strong>
                         </div>
                     </div>

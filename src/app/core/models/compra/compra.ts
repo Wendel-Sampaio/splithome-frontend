@@ -1,3 +1,4 @@
+import { Categoria } from '../categoria/categoria';
 export type PaymentPerson = {
     reference: string;
     name: string;
@@ -7,7 +8,9 @@ export type PaymentPerson = {
 export class Compra {
     id!: string;
     title!: string;
-    category!: string;
+    category!: string | null;
+    categoryId?: string;
+    categoryDetails?: Categoria | null;
     value!: number;
     unitValue!: number;
     payers!: Array<string>;

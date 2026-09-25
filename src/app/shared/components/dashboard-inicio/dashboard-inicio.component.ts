@@ -1,3 +1,4 @@
+import { CategoriaValor } from '../../../core/models/categoria/categoria';
 import { CommonModule } from '@angular/common';
 import { Component, DestroyRef, EventEmitter, OnInit, Output, inject, signal } from '@angular/core';
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
@@ -29,7 +30,7 @@ export type DashboardView = 'compras' | 'despesas' | 'graficos' | 'resumoFinance
 
 interface Atividade {
   title: string;
-  category: string;
+  category: CategoriaValor;
   value: number;
   date: string;
   tipo: 'compra' | 'despesa';
@@ -102,7 +103,7 @@ export class DashboardInicioComponent implements OnInit {
   readonly totalAReceber = signal(0);
   readonly totalAPagar = signal(0);
   readonly pagamentosSugeridos = signal(0);
-  readonly maiorCategoria = signal<string>('—');
+  readonly maiorCategoria = signal<CategoriaValor>('—');
   readonly atividades = signal<Atividade[]>([]);
   readonly barrasMes = signal<BarraMes[]>([]);
   readonly categorias = signal<EstatisticaCategoria[]>([]);
@@ -225,7 +226,7 @@ export class DashboardInicioComponent implements OnInit {
     }
 
     this.totalDespesasMes.set(estatisticas.totalMesAtual ?? 0);
-    this.maiorCategoria.set(estatisticas.maiorCategoria?.categoria ?? '—');
+    this.maiorCategoria.set(estatisticas.maiorCategoria?.categoryDetails ?? estatisticas.maiorCategoria?.categoria ?? '—');
     this.categorias.set((estatisticas.totaisPorCategoria ?? []).slice(0, 6));
 
     const meses = estatisticas.totaisPorMes ?? [];
@@ -260,7 +261,7 @@ export class DashboardInicioComponent implements OnInit {
   private montarAtividades(compras: Compra[], despesas: DespesaFixa[]): void {
     const deCompras: Atividade[] = compras.map((c) => ({
       title: c.title,
-      category: c.category,
+      category: c.categoryDetails ?? c.category,
       value: this.calcularValorPorPagador(c.value, c.payers),
       date: c.purchaseDate,
       tipo: 'compra',
@@ -269,7 +270,7 @@ export class DashboardInicioComponent implements OnInit {
 
     const deDespesas: Atividade[] = despesas.map((d) => ({
       title: d.title,
-      category: d.category,
+      category: d.categoryDetails ?? d.category,
       value: this.calcularValorPorPagador(this.valorPorCobranca(d), d.payers),
       date: d.dataInicio,
       tipo: 'despesa',

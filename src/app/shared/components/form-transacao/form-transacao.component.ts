@@ -1,3 +1,5 @@
+import { Categoria } from '../../../core/models/categoria/categoria';
+import { DialogCategoriasComponent } from '../dialog-categorias/dialog-categorias.component';
 import { ChangeDetectionStrategy, ChangeDetectorRef, Component, DestroyRef, Inject, inject, Optional, signal } from '@angular/core';
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { AsyncPipe, CommonModule, DatePipe } from '@angular/common';
@@ -91,9 +93,46 @@ export class FormTransacaoComponent {
   private destroyRef = inject(DestroyRef);
   private cdr = inject(ChangeDetectorRef);
   readonly isPremium = this.planService.isPremium();
-  readonly categorias$ = this.transacaoService.listarCategorias().pipe(
-    shareReplay({ bufferSize: 1, refCount: true })
-  );
+  readonly categorias = signal<Categoria[]>([]);
+  readonly carregandoCategorias = signal(true);
+  readonly erroCategorias = signal(false);
+
+  get temFamilia(): boolean {
+    const user = this.userService.getUser();
+    return !!(user.familyId || user.familyCode);
+  }
+
+  get categoriaSelecionada(): Categoria | null {
+    return this.categorias().find(c => c.id === this.formTransacao?.get('categoria')?.value) ?? null;
+  }
+
+  carregarCategorias(selecionarId?: string): void {
+    this.carregandoCategorias.set(true);
+    this.erroCategorias.set(false);
+    this.transacaoService.listarCategorias().pipe(
+      finalize(() => this.carregandoCategorias.set(false)), takeUntilDestroyed(this.destroyRef)
+    ).subscribe({
+      next: categorias => {
+        this.categorias.set(categorias);
+        const control = this.formTransacao.get('categoria');
+        const original = this.data?.compra ?? this.data?.despesaFixa;
+        if (selecionarId) control?.setValue(selecionarId);
+        else if (!control?.value && original?.category) {
+          control?.setValue(categorias.find(c => c.systemDefault && c.name === original.category)?.id ?? '');
+        }
+        control?.updateValueAndValidity();
+        this.cdr.markForCheck();
+      },
+      error: () => this.erroCategorias.set(true)
+    });
+  }
+
+  abrirCategorias(): void {
+    if (!this.temFamilia || this.carregandoCategorias() || this.erroCategorias()) return;
+    const ref = this.modal.open<DialogCategoriasComponent, Categoria[], Categoria | undefined>(DialogCategoriasComponent,
+      { size: 'sm', data: this.categorias() });
+    ref.afterClosed().pipe(takeUntilDestroyed(this.destroyRef)).subscribe(categoria => this.carregarCategorias(categoria?.id));
+  }
   readonly usuarios$ = this.userStateService.getFamilyUsers().pipe(
     map((usuarios) => {
       const usuarioLogado = this.userService.getUser();
@@ -260,7 +299,8 @@ export class FormTransacaoComponent {
   ngOnInit(): void {
     const baseControls: Record<string, FormControl> = {
       titulo: new FormControl('', [Validators.required]),
-      categoria: new FormControl('', [Validators.required]),
+      categoria: new FormControl('', [Validators.required, control =>
+        control.value && !this.categorias().some(c => c.id === control.value) ? { indisponivel: true } : null]),
       responsavel: new FormControl(this.responsavel, [Validators.required]),
     };
 
@@ -310,6 +350,7 @@ export class FormTransacaoComponent {
     }
 
     this.preencherFormularioEdicao();
+    this.carregarCategorias();
   }
 
   private abrirDialogNovoCartao(): void {
@@ -404,7 +445,7 @@ export class FormTransacaoComponent {
     if (!this.formTransacao) {
       return false;
     }
-    return this.formTransacao.valid;
+    return this.formTransacao.valid && !this.carregandoCategorias() && !this.erroCategorias();
   }
 
   get pagadoresObrigatoriosInvalidos(): boolean {
@@ -424,6 +465,9 @@ export class FormTransacaoComponent {
     if (!control?.errors) {
       return '';
     }
+    if (control.errors['indisponivel']) {
+      return 'Categoria indisponível. Selecione uma categoria ativa.';
+    }
     if (control.errors['required']) {
       return 'Campo obrigatório.';
     }
@@ -436,7 +480,7 @@ export class FormTransacaoComponent {
   cadastrarTransacao(): void {
     this.tentouEnviar = true;
 
-    if (this.formTransacao.invalid) {
+    if (this.formTransacao.invalid || this.carregandoCategorias() || this.erroCategorias()) {
       this.formTransacao.markAllAsTouched();
       this.notify.warning('Preencha todos os campos obrigatórios antes de continuar.');
       return;
@@ -479,7 +523,7 @@ export class FormTransacaoComponent {
     const usaCartao = this.usaDatasDoCartao;
     const payload: DespesaFixaPayload = {
       title: v.titulo,
-      category: v.categoria,
+      categoryId: v.categoria,
       totalValue: valorTotal,
       installmentsCount: v.modoCobranca === 'parcelada' ? Number(v.quantidadeParcelas) : null,
       creditCardId: usaCartao ? v.cartaoId : null,
@@ -526,7 +570,7 @@ export class FormTransacaoComponent {
     const formData = {
       ...(this.isEdicaoCompra ? { id: this.data?.compra?.id } : {}),
       title: this.formTransacao.value.titulo,
-      category: this.formTransacao.value.categoria,
+      categoryId: this.formTransacao.value.categoria,
       value: valor,
       payers: pagadores,
       paymentDate: this.formatDateOnly(this.formTransacao.value.dataPagamento),
@@ -564,7 +608,7 @@ export class FormTransacaoComponent {
       this.responsavel = this.data.compra.purchaserId;
       this.formTransacao.patchValue({
         titulo: this.data.compra.title,
-        categoria: this.data.compra.category,
+        categoria: this.data.compra.categoryId ?? this.data.compra.categoryDetails?.id ?? '',
         valor: this.data.compra.value,
         dataPagamento: this.parseDateOnly(this.data.compra.paymentDate) ?? '',
         responsavel: this.responsavel
@@ -578,7 +622,7 @@ export class FormTransacaoComponent {
       this.responsavel = d.responsibleId;
       this.formTransacao.patchValue({
         titulo: d.title,
-        categoria: d.category,
+        categoria: d.categoryId ?? d.categoryDetails?.id ?? '',
         valorTotal: d.valorTotal,
         modoCobranca: d.quantidadeParcelas ? 'parcelada' : 'recorrente',
         quantidadeParcelas: d.quantidadeParcelas,

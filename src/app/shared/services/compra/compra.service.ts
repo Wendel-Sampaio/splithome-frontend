@@ -12,6 +12,7 @@ import { Cartao, CreditCardBrand } from '../../../core/models/cartao/cartao';
 export interface CompraFilter {
   title?: string;
   category?: string;
+  categoryId?: string;
   purchaserId?: string;
   paid?: boolean;
   startDate?: string;
@@ -36,7 +37,8 @@ export class CompraService {
   listarCompras(filter: CompraFilter = {}): Observable<Page<Compra>> {
     let params = new HttpParams();
     if (filter.title) params = params.set('title', filter.title);
-    if (filter.category) params = params.set('category', filter.category);
+    if (filter.categoryId) params = params.set('categoryId', filter.categoryId);
+    else if (filter.category) params = params.set('category', filter.category);
     if (filter.purchaserId) params = params.set('purchaserId', filter.purchaserId);
     if (filter.paid !== undefined) params = params.set('paid', String(filter.paid));
     if (filter.startDate) params = params.set('startDate', filter.startDate);

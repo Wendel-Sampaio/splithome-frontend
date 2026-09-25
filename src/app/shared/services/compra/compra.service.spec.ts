@@ -100,6 +100,16 @@ describe('CompraService', () => {
     req.flush([]);
   });
 
+  it('filtra pelo ID persistido sem enviar o nome como enum', () => {
+    service.listarCompras({ categoryId: 'pets', page: 1, size: 20, paid: true }).subscribe();
+    const req = httpMock.expectOne(request => request.url.endsWith('/transactions/purchases'));
+    expect(req.request.params.get('categoryId')).toBe('pets');
+    expect(req.request.params.has('category')).toBeFalse();
+    expect(req.request.params.get('page')).toBe('1');
+    expect(req.request.params.get('paid')).toBe('true');
+    req.flush([]);
+  });
+
   it('normaliza despesas fixas e parcelas retornadas pelo backend', () => {
     service.listarDespesasFixas().subscribe(page => {
       expect(page.content[0].payers).toEqual(['Ana', 'Bruno']);

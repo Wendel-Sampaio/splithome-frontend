@@ -1,9 +1,12 @@
+import { Categoria } from '../categoria/categoria';
 import { Parcela } from '../parcela/parcela';
 
 export interface DespesaFixa {
   id: string;
   title: string;
-  category: string;
+  category: string | null;
+  categoryId?: string;
+  categoryDetails?: Categoria | null;
   valorTotal: number;
   quantidadeParcelas: number | null;
   diaVencimento: number;
@@ -27,7 +30,8 @@ export interface DespesaFixa {
 // dele), ou do par dia de vencimento + data de início quando não há.
 export interface DespesaFixaPayload {
   title: string;
-  category: string;
+  categoryId?: string;
+  category?: string;
   totalValue: number;
   installmentsCount: number | null;
   creditCardId: string | null;

@@ -1,3 +1,4 @@
+import { Categoria } from '../../../core/models/categoria/categoria';
 import { HttpClient, HttpParams } from '@angular/common/http';
 import { inject, Injectable } from '@angular/core';
 import { map, Observable } from 'rxjs';
@@ -10,6 +11,8 @@ export interface EstatisticasFiltro {
 
 export interface EstatisticaCategoria {
   categoria: string;
+  categoryId?: string;
+  categoryDetails?: Categoria;
   total: number;
 }
 
@@ -136,14 +139,24 @@ export class EstatisticasService {
     }
 
     const itemObject = item as Record<string, unknown>;
-    const categoria = this.lerTexto(itemObject, ['category', 'categoria', 'name', 'label']);
+    const details = itemObject['categoryDetails'];
+    const categoryDetails = this.isCategoria(details) ? details : undefined;
+    const categoria = categoryDetails?.name ?? this.lerTexto(itemObject, ['category', 'categoria', 'name', 'label']);
     const total = this.lerNumero(itemObject, ['total', 'value', 'amount', 'valor']);
 
     if (!categoria || total === null || total <= 0) {
       return null;
     }
 
-    return { categoria, total };
+    const categoryId = this.lerTexto(itemObject, ['categoryId']) ?? categoryDetails?.id;
+    return { categoria, total, ...(categoryId ? { categoryId } : {}), ...(categoryDetails ? { categoryDetails } : {}) };
+  }
+
+  private isCategoria(value: unknown): value is Categoria {
+    if (!value || typeof value !== 'object') return false;
+    const dto = value as Record<string, unknown>;
+    return typeof dto['id'] === 'string' && typeof dto['name'] === 'string'
+      && typeof dto['systemDefault'] === 'boolean' && typeof dto['custom'] === 'boolean';
   }
 
   private normalizarMes(item: unknown): EstatisticaMensal | null {

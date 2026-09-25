@@ -1,3 +1,4 @@
+import { CategoriaValor } from '../../core/models/categoria/categoria';
 import { Pipe, PipeTransform } from '@angular/core';
 import { getCategoriaIcone } from '../../core/models/categoria/categoriaEnum';
 
@@ -6,7 +7,7 @@ import { getCategoriaIcone } from '../../core/models/categoria/categoriaEnum';
   standalone: true
 })
 export class CategoriaIconePipe implements PipeTransform {
-  transform(categoria: string | null | undefined): string {
+  transform(categoria: CategoriaValor): string {
     return getCategoriaIcone(categoria);
   }
 }

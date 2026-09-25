@@ -1,8 +1,11 @@
+import { User } from '../../../core/models/user/user';
 import { ComponentFixture, TestBed } from '@angular/core/testing';
 import { provideHttpClient } from '@angular/common/http';
 import { Validators } from '@angular/forms';
 import { MatDialogRef, MAT_DIALOG_DATA } from '@angular/material/dialog';
 import { of, throwError } from 'rxjs';
+import { Categoria } from '../../../core/models/categoria/categoria';
+import { ModalService } from '../ui/modal';
 import { FormTransacaoComponent } from './form-transacao.component';
 import { CompraService } from '../../services/compra/compra.service';
 import { TransacaoService } from '../../services/transacao/transacao.service';
@@ -13,6 +16,9 @@ import { NotificationService } from '../../services/notification/notification.se
 import { provideBrDateAdapterTesting } from '../../testing/br-date-adapter-testing';
 
 describe('FormTransacaoComponent', () => {
+  const PETS: Categoria = { id: 'pets-id', name: 'Pets', systemDefault: false, custom: true };
+  const FOOD: Categoria = { id: 'C', name: 'FOOD', systemDefault: true, custom: false };
+  let transacaoService: jasmine.SpyObj<TransacaoService>;
   let component: FormTransacaoComponent;
   let fixture: ComponentFixture<FormTransacaoComponent>;
   let compraService: jasmine.SpyObj<CompraService>;
@@ -24,8 +30,8 @@ describe('FormTransacaoComponent', () => {
     compraService = jasmine.createSpyObj<CompraService>('CompraService',
       ['cadastrarCompra', 'atualizarCompra', 'listarCartoes', 'cadastrarDespesaFixa', 'atualizarDespesaFixa']);
     compraService.listarCartoes.and.returnValue(of([]));
-    const transacaoService = jasmine.createSpyObj<TransacaoService>('TransacaoService', ['listarCategorias']);
-    transacaoService.listarCategorias.and.returnValue(of([]));
+    transacaoService = jasmine.createSpyObj<TransacaoService>('TransacaoService', ['listarCategorias']);
+    transacaoService.listarCategorias.and.returnValue(of([FOOD, PETS, { id: 'CASA', name: 'CASA', systemDefault: true, custom: false }]));
     const userService = jasmine.createSpyObj<UserService>('UserService',
       ['getUser', 'getAllUsers', 'getProfilePhoto', 'getUserById']);
     userService.getUser.and.returnValue({
@@ -73,6 +79,69 @@ describe('FormTransacaoComponent', () => {
     });
     component.pagadores = ['Eu'];
   }
+
+  it('mostra os nomes das categorias e envia somente o ID customizado na compra', () => {
+    compraService.cadastrarCompra.and.returnValue(of({}));
+    preencher();
+    component.formTransacao.patchValue({ categoria: PETS.id });
+    expect(component.categoriaSelecionada).toEqual(PETS);
+    component.cadastrarTransacao();
+    const payload = compraService.cadastrarCompra.calls.mostRecent().args[0];
+    expect(payload.categoryId).toBe(PETS.id);
+    expect(payload.category).toBeUndefined();
+  });
+
+  it('pré-seleciona e salva a categoria customizada ao editar compra', async () => {
+    await montar({ compra: { id: 'compra', title: 'Veterinário', category: null,
+      categoryId: PETS.id, categoryDetails: PETS, value: 100, paymentDate: '2026-09-01',
+      purchaseDate: '2026-09-01', purchaserId: 'u1', payers: ['u1'], remainingPayers: [] } });
+    compraService.atualizarCompra.and.returnValue(of({}));
+    expect(component.formTransacao.value.categoria).toBe(PETS.id);
+    component.cadastrarTransacao();
+    expect(compraService.atualizarCompra.calls.mostRecent().args[0].categoryId).toBe(PETS.id);
+  });
+
+  it('resolve a categoria padrão legada para o ID retornado pela API', async () => {
+    await montar({ compra: { category: 'FOOD', purchaserId: 'u1' } });
+    expect(component.formTransacao.value.categoria).toBe(FOOD.id);
+  });
+
+  it('bloqueia categoria desativada e permite escolher outra na edição', async () => {
+    await montar({ compra: { categoryId: 'inativa', categoryDetails: { ...PETS, id: 'inativa' } } });
+    expect(component.formTransacao.get('categoria')?.hasError('indisponivel')).toBeTrue();
+    expect(fixture.nativeElement.textContent).toContain('A categoria anterior não está disponível');
+    component.formTransacao.patchValue({ categoria: PETS.id });
+    expect(component.formTransacao.get('categoria')?.valid).toBeTrue();
+  });
+
+  it('recarrega e seleciona a categoria criada no diálogo', () => {
+    const nova = { ...PETS, id: 'nova', name: 'Viagens' };
+    const modal = TestBed.inject(ModalService);
+    spyOn(modal, 'open').and.returnValue({ afterClosed: () => of(nova) } as MatDialogRef<unknown>);
+    transacaoService.listarCategorias.and.returnValue(of([FOOD, PETS, nova]));
+    component.abrirCategorias();
+    expect(component.categoriaSelecionada).toEqual(nova);
+  });
+
+  it('não abre o gerenciador para usuário sem família', () => {
+    const userService = TestBed.inject(UserService) as jasmine.SpyObj<UserService>;
+    userService.getUser.and.returnValue({ id: 'u1', familyCode: '', plan: 'FREE' } as User);
+    const abrir = spyOn(TestBed.inject(ModalService), 'open');
+    component.abrirCategorias();
+    expect(abrir).not.toHaveBeenCalled();
+  });
+
+  it('oferece nova tentativa quando as categorias não carregam', () => {
+    transacaoService.listarCategorias.and.returnValue(throwError(() => ({ status: 500 })));
+    component.carregarCategorias();
+    fixture.detectChanges();
+    expect(component.erroCategorias()).toBeTrue();
+    expect(fixture.nativeElement.textContent).toContain('Tentar novamente');
+    expect(component.isFormularioProntoParaEnvio).toBeFalse();
+    transacaoService.listarCategorias.and.returnValue(of([PETS]));
+    component.carregarCategorias();
+    expect(component.erroCategorias()).toBeFalse();
+  });
 
   it('loading começa false', () => {
     expect(component.loading()).toBe(false);
@@ -216,6 +285,15 @@ describe('FormTransacaoComponent', () => {
       });
     }
 
+    it('envia categoria customizada ao cadastrar despesa', () => {
+      compraService.cadastrarDespesaFixa.and.returnValue(of({} as any));
+      preencherDespesa({ categoria: PETS.id });
+      component.cadastrarTransacao();
+      const payload = compraService.cadastrarDespesaFixa.calls.mostRecent().args[0];
+      expect(payload.categoryId).toBe(PETS.id);
+      expect(payload.category).toBeUndefined();
+    });
+
     it('troca dia de vencimento e data de início pela data da compra ao escolher um cartão', () => {
       expect(component.usaDatasDoCartao).toBeFalse();
 
@@ -313,6 +391,13 @@ describe('FormTransacaoComponent', () => {
       component.cartoes = [{ id: 'c1', name: 'Nubank', brand: null, lastDigits: null, billingDay: 6, dueDay: 13 }];
       (component as any).usuariosFamilia = [{ id: 'u1', name: 'Eu' }];
       component.pagadores = ['u1'];
+    });
+
+    it('envia categoria customizada ao editar despesa', () => {
+      compraService.atualizarDespesaFixa.and.returnValue(of({} as any));
+      component.formTransacao.patchValue({ categoria: PETS.id });
+      component.cadastrarTransacao();
+      expect(compraService.atualizarDespesaFixa.calls.mostRecent().args[1].categoryId).toBe(PETS.id);
     });
 
     it('não exige a data da compra e preserva o cronograma já salvo', () => {

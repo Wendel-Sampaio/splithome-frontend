@@ -1,0 +1,46 @@
+<app-modal-header title="Categorias da família" icon="category"
+  description="As categorias criadas aqui ficam disponíveis para todos da sua família."
+  [showClose]="!salvando()" />
+<app-modal-body>
+  <form [formGroup]="form" (ngSubmit)="salvar()" class="categoria-form">
+    <mat-form-field appearance="outline">
+      <mat-label>{{ editando() ? 'Renomear categoria' : 'Nome da nova categoria' }}</mat-label>
+      <input matInput [formControl]="nome" maxlength="100" autocomplete="off" placeholder="Ex.: Pets" />
+      <mat-hint>{{ nome.value.length }}/100</mat-hint>
+      <mat-error>Informe um nome de até 100 caracteres.</mat-error>
+    </mat-form-field>
+    <div class="categoria-acoes">
+      @if (editando()) {
+        <button mat-button type="button" (click)="cancelarEdicao()" [disabled]="salvando()">Cancelar edição</button>
+      }
+      <button mat-flat-button type="submit" [disabled]="salvando() || nome.invalid">
+        @if (salvando()) { <mat-spinner diameter="18" aria-label="Salvando categoria" /> }
+        @else { {{ editando() ? 'Salvar e selecionar' : 'Criar e selecionar' }} }
+      </button>
+    </div>
+  </form>
+  @if (erro()) { <p class="categoria-erro" role="alert">{{ erro() }}</p> }
+  <h3>Categorias customizadas</h3>
+  @for (categoria of categorias(); track categoria.id) {
+    <div class="categoria-item">
+      <span>{{ categoria.name }}</span>
+      <button mat-icon-button type="button" [attr.aria-label]="'Renomear ' + categoria.name"
+        [disabled]="salvando()" (click)="editar(categoria)"><mat-icon>edit</mat-icon></button>
+      <button mat-icon-button type="button" [attr.aria-label]="'Desativar ' + categoria.name"
+        [disabled]="salvando()" (click)="excluindo.set(categoria); erro.set('')"><mat-icon>delete_outline</mat-icon></button>
+    </div>
+  } @empty { <p>Sua família ainda não tem categorias customizadas.</p> }
+  @if (excluindo(); as categoria) {
+    <div class="categoria-confirmacao" role="region" aria-label="Confirmar desativação">
+      <p>Desativar <strong>{{ categoria.name }}</strong>?</p>
+      <p>Ela sairá das opções da família. As transações existentes manterão seu histórico.</p>
+      <div class="categoria-acoes">
+        <button mat-button type="button" [disabled]="salvando()" (click)="excluindo.set(null)">Cancelar</button>
+        <button mat-flat-button type="button" color="warn" [disabled]="salvando()" (click)="confirmarExclusao()">Desativar</button>
+      </div>
+    </div>
+  }
+</app-modal-body>
+<app-modal-footer align="end">
+  <button mat-button type="button" [disabled]="salvando()" (click)="fechar()">Fechar</button>
+</app-modal-footer>

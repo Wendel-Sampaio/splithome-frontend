@@ -43,7 +43,7 @@
 
       <article class="resumo-card sh-stat-card">
         <span>Maior categoria</span>
-        <strong>{{ dados.maiorCategoria?.categoria | categoria }}</strong>
+        <strong>{{ (dados.maiorCategoria?.categoryDetails ?? dados.maiorCategoria?.categoria) | categoria }}</strong>
         <small *ngIf="dados.maiorCategoria">
           {{ dados.maiorCategoria.total | currency:'BRL':'symbol':'1.2-2' }}
         </small>
@@ -62,7 +62,7 @@
           <div class="legenda">
             <div class="legenda-item" *ngFor="let item of dados.totaisPorCategoria; let i = index">
               <span class="legenda-cor" [style.background-color]="getCor(i)"></span>
-              <span class="legenda-nome">{{ item.categoria | categoria }}</span>
+              <span class="legenda-nome">{{ (item.categoryDetails ?? item.categoria) | categoria }}</span>
               <strong>{{ item.total | currency:'BRL':'symbol':'1.2-2' }}</strong>
             </div>
           </div>

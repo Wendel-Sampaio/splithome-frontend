@@ -1,0 +1,7 @@
+.categoria-form { display: grid; gap: var(--sh-space-3); }
+.categoria-acoes { display: flex; flex-wrap: wrap; justify-content: flex-end; gap: var(--sh-space-2); }
+.categoria-item { display: flex; align-items: center; gap: var(--sh-space-2); padding-block: var(--sh-space-2); border-bottom: 1px solid var(--sh-color-border); }
+.categoria-item span { flex: 1; min-width: 0; overflow-wrap: anywhere; }
+.categoria-confirmacao { padding: var(--sh-space-3); margin-top: var(--sh-space-3); background: var(--sh-color-surface-alt); border-radius: var(--sh-radius-md); }
+.categoria-confirmacao strong { overflow-wrap: anywhere; }
+.categoria-erro { color: #b3261e; }

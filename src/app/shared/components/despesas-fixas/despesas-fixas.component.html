@@ -39,11 +39,11 @@
         <mat-expansion-panel-header>
           <mat-panel-title>
             <span class="category-icon">
-              <mat-icon aria-hidden="true" [style.color]="despesa.category | categoriaCor">{{ despesa.category | categoriaIcone }}</mat-icon>
+              <mat-icon aria-hidden="true" [style.color]="(despesa.categoryDetails ?? despesa.category) | categoriaCor">{{ (despesa.categoryDetails ?? despesa.category) | categoriaIcone }}</mat-icon>
             </span>
             <span class="expense-title-group">
               <strong>{{ despesa.title }}</strong>
-              <span>{{ despesa.category | categoria }} · {{ resumoSecundario(despesa) }}</span>
+              <span>{{ (despesa.categoryDetails ?? despesa.category) | categoria }} · {{ resumoSecundario(despesa) }}</span>
             </span>
           </mat-panel-title>
 
