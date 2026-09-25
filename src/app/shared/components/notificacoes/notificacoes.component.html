@@ -1,0 +1,81 @@
+@if (autenticado()) {
+  <button #trigger cdkOverlayOrigin #origin="cdkOverlayOrigin" data-tour-id="notificacoes"
+          class="topbar-notif" type="button" (click)="abrir()"
+          aria-haspopup="dialog" [attr.aria-expanded]="aberto()"
+          [attr.aria-label]="'Notificações, ' + naoLidas() + ' não lidas'">
+    <mat-icon>notifications</mat-icon>
+    @if (naoLidas() > 0) {
+      <span class="notif-badge" aria-hidden="true">{{ naoLidas() > 99 ? '99+' : naoLidas() }}</span>
+    } @else if (erro()) {
+      <span class="notif-badge" aria-label="Erro ao carregar notificações">!</span>
+    }
+  </button>
+
+  <ng-template cdkConnectedOverlay [cdkConnectedOverlayOrigin]="origin"
+               [cdkConnectedOverlayOpen]="aberto()" [cdkConnectedOverlayPositions]="positions"
+               [cdkConnectedOverlayHasBackdrop]="true" cdkConnectedOverlayBackdropClass="cdk-overlay-transparent-backdrop"
+               [cdkConnectedOverlayViewportMargin]="12" [cdkConnectedOverlayPush]="true"
+               (backdropClick)="fechar()" (overlayKeydown)="$event.key === 'Escape' && fechar()">
+    <section class="notificacoes" role="dialog" aria-modal="true" aria-labelledby="notificacoes-titulo"
+             cdkTrapFocus [cdkTrapFocusAutoCapture]="true">
+      <header>
+        <div>
+          <h2 id="notificacoes-titulo">Notificações</h2>
+          <p aria-live="polite">{{ naoLidas() }} não lidas</p>
+        </div>
+        <button type="button" class="icon-button" (click)="fechar()" aria-label="Fechar notificações" cdkFocusInitial>
+          <mat-icon>close</mat-icon>
+        </button>
+      </header>
+      <div class="actions">
+        <button type="button" (click)="carregar()" [disabled]="carregando() || salvando()">Atualizar</button>
+        <button type="button" (click)="marcarTodas()" [disabled]="!naoLidas() || carregando() || salvando()">
+          Marcar todas como lidas
+        </button>
+      </div>
+      <div class="notification-body" [attr.aria-busy]="carregando() || salvando()">
+        @if (erroLeitura()) { <p class="error" role="alert">{{ erroLeitura() }}</p> }
+        @if (erro()) {
+          <div class="error" role="alert">
+            <p>{{ erro() }}</p>
+            <button type="button" (click)="carregar()" [disabled]="salvando()">Tentar novamente</button>
+          </div>
+        }
+        @if (carregando()) { <p class="status" role="status">Carregando notificações…</p> }
+        @if (!carregando() && !erro() && !itens().length) {
+          <div class="status empty" role="status">
+            <mat-icon>notifications_none</mat-icon>
+            <strong>Nenhuma notificação por enquanto</strong>
+            <p>Quando houver novidades, elas aparecerão aqui.</p>
+          </div>
+        }
+        <ul>
+          @for (item of itens(); track item.id) {
+            <li [class.unread]="!item.readAt">
+              <span class="read-status">{{ item.readAt ? 'Lida' : 'Não lida' }}</span>
+              <h3>{{ item.title }}</h3>
+              <p class="message">{{ item.message }}</p>
+              <time [attr.datetime]="item.createdAt">{{ item.createdAt | date:'dd/MM/yyyy HH:mm' }}</time>
+              <div class="item-actions">
+                @if (destino(item); as destination) {
+                  <a [href]="destination" (click)="abrirDestino($event, item)"
+                     [attr.aria-disabled]="salvando() || carregando()">Ver detalhes</a>
+                }
+                @if (!item.readAt) {
+                  <button type="button" (click)="marcarLida(item)" [disabled]="salvando() || carregando()">
+                    Marcar como lida
+                  </button>
+                }
+              </div>
+            </li>
+          }
+        </ul>
+        @if (temMais()) {
+          <button type="button" class="load-more" (click)="carregar(true)" [disabled]="carregando() || salvando()">
+            Carregar mais
+          </button>
+        }
+      </div>
+    </section>
+  </ng-template>
+}

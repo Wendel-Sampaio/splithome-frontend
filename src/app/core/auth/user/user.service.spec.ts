@@ -33,6 +33,16 @@ describe('UserService', () => {
   });
 
   describe('token no localStorage', () => {
+    it('informa mudanças de sessão após persistir ou remover o token', () => {
+      const tokens: (string | null)[] = [];
+      const subscription = service.sessionChanges$.subscribe(() => tokens.push(service.getToken()));
+      service.addToken('primeiro');
+      service.addToken('segundo');
+      service.removerToken();
+      expect(tokens).toEqual([null, 'primeiro', 'segundo', null]);
+      subscription.unsubscribe();
+    });
+
     it('deve armazenar token', () => {
       service.addToken('meu.jwt.token');
       expect(localStorage.getItem('token')).toBe('meu.jwt.token');

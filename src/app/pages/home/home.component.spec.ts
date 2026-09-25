@@ -1,6 +1,7 @@
 import { ComponentFixture, TestBed } from '@angular/core/testing';
 import { OverlayContainer } from '@angular/cdk/overlay';
-import { provideRouter } from '@angular/router';
+import { ActivatedRoute, Event, Navigation, NavigationEnd, provideRouter, Router } from '@angular/router';
+import { Subject } from 'rxjs';
 import { provideHttpClient } from '@angular/common/http';
 import { HttpTestingController, provideHttpClientTesting } from '@angular/common/http/testing';
 
@@ -55,6 +56,33 @@ describe('HomeComponent', () => {
 
     component.alternarMenu();
     expect(component.isMenuCollapsed).toBeFalse();
+  });
+
+  it('restaura a view da rota ao abrir uma notificação na mesma URL', () => {
+    fixture.destroy();
+    const events = new Subject<Event>();
+    spyOnProperty(TestBed.inject(Router), 'events', 'get').and.returnValue(events);
+    TestBed.inject(ActivatedRoute).snapshot.data = { initialView: 'familia' };
+    fixture = TestBed.createComponent(HomeComponent);
+    component = fixture.componentInstance;
+    component.abrirCompras();
+    events.next(new NavigationEnd(1, '/familia', '/familia'));
+    expect(component.currentView).toBe('familia');
+    expect(component.currentViewTitle).toBe('Família');
+  });
+
+  it('aplica a rota uma única vez quando o componente nasce durante uma navegação', () => {
+    fixture.destroy();
+    const events = new Subject<Event>();
+    const router = TestBed.inject(Router);
+    spyOnProperty(router, 'events', 'get').and.returnValue(events);
+    spyOn(router, 'getCurrentNavigation').and.returnValue({ id: 1 } as Navigation);
+    TestBed.inject(ActivatedRoute).snapshot.data = { initialView: 'familia' };
+    const abrirFamilia = spyOn(HomeComponent.prototype, 'abrirFamilia').and.callThrough();
+    fixture = TestBed.createComponent(HomeComponent);
+    expect(abrirFamilia).not.toHaveBeenCalled();
+    events.next(new NavigationEnd(1, '/familia', '/familia'));
+    expect(abrirFamilia).toHaveBeenCalledTimes(1);
   });
   it('starts after rendering and restores navigation when dismissed', () => {
     fixture.destroy();

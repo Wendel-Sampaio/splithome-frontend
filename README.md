@@ -135,3 +135,27 @@ acesso à Home. Falhas ao consultar o status não impedem o uso da página; falh
 salvar permitem tentar novamente. O CTA de upgrade utiliza o modal existente do
 `PlanService`, sem checkout. Os pontos `data-tour-id` da Home são o contrato de
 ancoragem do componente e devem permanecer estáveis.
+
+
+### Notificações
+
+O sino da Home abre um dropdown responsivo com notificações persistidas no backend.
+`NotificacoesService` consome `GET /api/notifications?page=0&size=20`,
+`PUT /api/notifications/{id}/read` e `PUT /api/notifications/read-all`, usando a URL
+configurada no ambiente e o interceptor JWT existente. O contador total vem do
+servidor e inclui notificações ainda não carregadas na lista.
+
+A consulta ocorre ao entrar na sessão, abrir o dropdown ou clicar em **Atualizar**.
+**Carregar mais** busca a próxima página. O estado de leitura e o contador só mudam
+após confirmação do servidor; falhas mantêm os dados e permitem tentar novamente.
+**Ver detalhes** marca a notificação como lida e abre a rota interna ou link HTTP/HTTPS.
+O dropdown fecha com Escape, pelo botão de fechar ou por clique fora, devolvendo o foco ao sino.
+
+Logout, expiração detectada pela API e troca de usuário limpam o estado e cancelam
+requisições pendentes. Sem sessão, o sino não é renderizado nem consulta a API.
+O serviço existente `NotificationService` continua responsável pelos avisos de snackbar.
+
+Para validar manualmente com dados reais: publique um recado com um membro Premium
+da família, entre como outro membro, abra o sino e teste a leitura individual,
+**Marcar todas como lidas**, recarregamento da página e **Ver detalhes**. A API de
+notificações e a migração correspondente precisam estar disponíveis no backend.

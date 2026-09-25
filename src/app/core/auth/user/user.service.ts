@@ -21,6 +21,8 @@ export class UserService {
   private readonly profilePhotoStoragePrefix = 'profilePhoto:';
   private readonly profilePhotoUpdatesSubject = new BehaviorSubject<void>(undefined);
   readonly profilePhotoUpdates$ = this.profilePhotoUpdatesSubject.asObservable();
+  private readonly sessionChangesSubject = new BehaviorSubject<void>(undefined);
+  readonly sessionChanges$ = this.sessionChangesSubject.asObservable();
 
 
   constructor() { }
@@ -72,10 +74,12 @@ export class UserService {
 
   addToken(token: string) {
     localStorage.setItem('token', token);
+    this.sessionChangesSubject.next();
   }
 
   removerToken() {
     localStorage.removeItem('token');
+    this.sessionChangesSubject.next();
   }
 
   getToken() {

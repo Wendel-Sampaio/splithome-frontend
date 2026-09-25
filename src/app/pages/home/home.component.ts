@@ -1,7 +1,9 @@
 import { afterNextRender, ChangeDetectorRef, Component, DestroyRef, inject } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
-import { ActivatedRoute } from '@angular/router';
+import { ActivatedRoute, NavigationEnd, Router } from '@angular/router';
+import { filter } from 'rxjs';
+import { NotificacoesComponent } from '../../shared/components/notificacoes/notificacoes.component';
 import { MatButtonModule } from '@angular/material/button';
 import { MatCardModule } from '@angular/material/card';
 import { MatDialog } from '@angular/material/dialog';
@@ -29,7 +31,7 @@ import { OnboardingTourComponent } from '../../shared/components/onboarding-tour
 @Component({
   selector: 'app-home',
   providers: [OnboardingTourService],
-  imports: [OnboardingTourComponent, MatCardModule, MatIcon, MatButtonModule, MatMenuModule, ComprasComponent, DespesasFixasComponent, MeuPerfilComponent, EstatisticasComponent, ResumoFinanceiroComponent, DashboardInicioComponent, FamiliaComponent, RecadosComponent, CommonModule, MatToolbarModule],
+  imports: [NotificacoesComponent, OnboardingTourComponent, MatCardModule, MatIcon, MatButtonModule, MatMenuModule, ComprasComponent, DespesasFixasComponent, MeuPerfilComponent, EstatisticasComponent, ResumoFinanceiroComponent, DashboardInicioComponent, FamiliaComponent, RecadosComponent, CommonModule, MatToolbarModule],
   templateUrl: './home.component.html',
   styleUrl: './home.component.scss'
 })
@@ -64,12 +66,25 @@ export class HomeComponent {
       this.userStateService.getFamilyUsers().pipe(takeUntilDestroyed(this.destroyRef)).subscribe();
     }
 
+    const router = inject(Router);
+    // Durante a criação por uma navegação, aguarda NavigationEnd para não
+    // abrir duas vezes o modal de plano das rotas protegidas.
+    if (!router.getCurrentNavigation()) this.aplicarRota();
+    router.events.pipe(
+      filter(event => event instanceof NavigationEnd),
+      takeUntilDestroyed(this.destroyRef)
+    ).subscribe(() => this.aplicarRota());
+  }
+
+  private aplicarRota(): void {
     const initialView = this.route.snapshot.data['initialView'];
 
     if (initialView === 'familia') {
       this.abrirFamilia();
     } else if (initialView === 'recados') {
       this.abrirRecados();
+    } else {
+      this.abrirInicio();
     }
   }
 

@@ -279,49 +279,6 @@
     margin-left: auto;
 }
 
-.topbar-notif {
-    align-items: center;
-    background: transparent;
-    border: none;
-    border-radius: 50%;
-    color: var(--sh-color-text-muted);
-    cursor: pointer;
-    display: inline-flex;
-    height: 42px;
-    justify-content: center;
-    position: relative;
-    transition: background 0.18s ease;
-    width: 42px;
-
-    &:hover {
-        background: var(--sh-color-bg-strong);
-    }
-
-    .mat-icon {
-        font-size: 25px;
-        height: 25px;
-        width: 25px;
-    }
-
-    .notif-badge {
-        align-items: center;
-        background: #e53935;
-        border: 2px solid var(--sh-color-surface);
-        border-radius: 999px;
-        color: #ffffff;
-        display: inline-flex;
-        font-size: 10px;
-        font-weight: 800;
-        height: 18px;
-        justify-content: center;
-        min-width: 18px;
-        padding: 0 3px;
-        position: absolute;
-        right: 4px;
-        top: 2px;
-    }
-}
-
 .avatar-trigger {
     align-items: center;
     background: transparent;
